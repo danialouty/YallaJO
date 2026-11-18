@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('adventures', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->string('description');
+            $table->enum('defeculty_level ', ['Easy','Medium','Hard'])->default('Easy');
+            $table->integer('capacity');
+            $table->timestamp('start_at');
+            $table->timestamp('ends_at');
+            $table->enum('status', ['Active','Suspended'])->default('Active');
             $table->timestamps();
         });
     }

@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('adventure_id')->constrained('adventures')->cascadeOnDelete();
+            $table->foreignId('adventurers_id')->constrained('adventurers')->cascadeOnDelete();
+            $table->integer('count');
             $table->timestamps();
         });
     }
