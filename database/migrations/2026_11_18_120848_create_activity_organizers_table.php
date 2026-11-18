@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->string('license_number');
             $table->enum('organizer_type', ['Adventure_group','Tourism_office'])->default('Tourism_office');
-            $table->enum('approval_status ', ['Pending','Approved','Rejected','Banned'])->default('Approved');
+            $table->enum('approval_status', ['Pending','Approved','Rejected','Banned'])->default('Pending');
             $table->string('social_handle_url');
             $table->foreignId('approved_by')->constrained('users')->cascadeOnDelete();
             $table->timestamp('approved_at');
