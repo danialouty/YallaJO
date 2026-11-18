@@ -1,5 +1,3 @@
 - **[trello](https://trello.com/invite/b/6afd4b2a727c2913e5684cf7/ATTIca9fda1c94f25115ebc69f33810e4724CFA6AB0B/adventurebook)**
-- 
 - **[miro](https://miro.com/welcomeonboard/d3NYN0F1elBWS29ucnpXR0E4RTFmSzh2NVlqdS96cTJ5Y05icmQrYWJTNUxRR0huWHIyWEFTQzJObkR4MTlrYnNzSi83UlJ4c1ByS0lsRDE2dkdzVDhsZDBPWDhZaGpnVWVNY3dsdmFncjMrU3BGNmw5dFpJeFV2V0pmcUJDTmpBd044SHFHaVlWYWk0d3NxeHNmeG9BPT0hdjE=?share_link_id=667285150353)**
-- 
 - **[Fima](https://www.figma.com/design/0xC6nBqp8wMbup6XAtkixc/adventure?node-id=0-1&t=0YIJV8XgEWISLqcg-1)**
