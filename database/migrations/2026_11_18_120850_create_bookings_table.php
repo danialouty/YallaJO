@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('adventure_id')->constrained('adventures')->cascadeOnDelete();
             $table->foreignId('adventurers_id')->constrained('adventurers')->cascadeOnDelete();
             $table->integer('count');
+            $table->decimal('unit_price', 9, 2);
+            $table->decimal('commission_rate', 9, 2);
+            $table->decimal('total_amount', 9, 2);
             $table->timestamps();
         });
     }

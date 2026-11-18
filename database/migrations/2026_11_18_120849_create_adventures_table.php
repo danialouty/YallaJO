@@ -16,10 +16,11 @@ return new class extends Migration
             $table->string('title');
             $table->string('description');
             $table->foreignId('activity_organizer_id')->constrained('activity_organizers')->cascadeOnDelete();
-            $table->enum('defeculty_level ', ['Easy','Medium','Hard'])->default('Easy');
+            $table->enum('difficulty_level', ['Easy','Medium','Hard'])->default('Easy');
             $table->integer('capacity');
-            $table->timestamp('start_at');
-            $table->timestamp('ends_at');
+            $table->dateTime('start_at');
+            $table->dateTime('ends_at');
+            $table->decimal('price', 9, 2);
             $table->enum('status', ['Active','Suspended'])->default('Active');
             $table->timestamps();
         });
