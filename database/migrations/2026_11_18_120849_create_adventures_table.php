@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('description');
+            $table->foreignId('activity_organizer_id')->constrained('activity_organizer')->cascadeOnDelete();
             $table->enum('defeculty_level ', ['Easy','Medium','Hard'])->default('Easy');
             $table->integer('capacity');
             $table->timestamp('start_at');
