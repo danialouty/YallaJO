@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('adventurers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->enum('experience_level ', ['Beginner','Intermediate','Advanced'])->default('Beginner');
             $table->json('interests')->nullable();
             $table->string('location')->nullable();
