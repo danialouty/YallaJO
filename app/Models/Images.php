@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Images extends Model
 {
-    //
+    protected $table = 'images';
+
     protected $fillable = [
         'adventure_id',
         'image_path',

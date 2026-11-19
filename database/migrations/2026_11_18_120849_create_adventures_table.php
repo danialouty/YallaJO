@@ -18,9 +18,11 @@ return new class extends Migration
             $table->foreignId('activity_organizer_id')->constrained('activity_organizers')->cascadeOnDelete();
             $table->enum('difficulty_level', ['Easy','Medium','Hard'])->default('Easy');
             $table->integer('capacity');
-            $table->dateTime('start_at');
-            $table->dateTime('ends_at');
+            $table->enum('category', ['Hiking','Diving','Camping','Cyciling','Zaitoon day out','kayaking','climbing','Sky Diving','Blimping','Toursim'])->default('Hiking');
+            $table->text('location');
+            $table->decimal('duration_hours',5,2);
             $table->decimal('price', 9, 2);
+            $table->text('requirements');
             $table->enum('status', ['Active','Suspended'])->default('Active');
             $table->timestamps();
         });

@@ -59,7 +59,13 @@ class User extends Authenticatable
         return $this->hasOne(Adventurer::class);
     }
 
-    public function activityOrganizerApproved_by(): HasMany{
-        return $this->hasMany(ActivityOrganizer::class);   
+    public function guide(): HasOne
+    {
+        return $this->hasOne(Guides::class);
+    }
+
+    public function approvedOrganizers(): HasMany
+    {
+        return $this->hasMany(ActivityOrganizer::class, 'approved_by');
     }
 }

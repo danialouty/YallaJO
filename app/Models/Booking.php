@@ -8,12 +8,31 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Booking extends Model
 {
-    //
+    protected $table = 'bookings';
+
     protected $fillable = [
         'adventure_id',
-        'adventurers_id',
-        'count',
+        'adventurer_id',
+        'participants_count',
+        'unit_price',
+        'commission_rate',
+        'total_amount',
+        'status',
+        'capacity',
+        'cancelled_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'participants_count' => 'integer',
+            'unit_price' => 'decimal:2',
+            'commission_rate' => 'decimal:2',
+            'total_amount' => 'decimal:2',
+            'capacity' => 'integer',
+            'cancelled_at' => 'datetime',
+        ];
+    }
 
     public function adventure(): BelongsTo{
         return $this->belongsTo(Adventure::class);
