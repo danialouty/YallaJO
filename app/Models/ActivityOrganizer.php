@@ -20,6 +20,10 @@ class ActivityOrganizer extends Model
         'approved_at',
     ];
 
+    protected $casts = [
+        'approved_at' => 'datetime',
+    ];
+
     public function user(): BelongsTo {
         return $this->belongsTo(User::class);
     }
