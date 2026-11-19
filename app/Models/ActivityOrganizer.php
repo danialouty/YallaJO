@@ -31,5 +31,11 @@ class ActivityOrganizer extends Model
     public function booking(): BelongsToMany{
         return $this->belongsToMany(Booking::class,'bookings');
     }
-    
+
+    /**
+     * connecting the approved by relationship
+     */
+    public function approver() : BelongsTo {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 }
