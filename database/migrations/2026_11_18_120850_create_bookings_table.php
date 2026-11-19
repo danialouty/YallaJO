@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('adventure_id')->constrained('adventures')->cascadeOnDelete();
-            $table->foreignId('adventurers_id')->constrained('adventurers')->cascadeOnDelete();
+            $table->foreignId('adventurer_id')->constrained('adventurers')->cascadeOnDelete();
             $table->integer('count');
             $table->decimal('unit_price', 9, 2);
             $table->decimal('commission_rate', 9, 2);
