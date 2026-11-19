@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('total_amount', 9, 2);
             $table->enum('status', ['Accepted','Cancelled','Pending'])->default('Pending');
             $table->integer('capacity');
-            $table->timestamp('cancelled_at');
+            $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
         });
     }

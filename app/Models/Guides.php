@@ -12,7 +12,7 @@ class Guides extends Model
     protected $table = 'guides';
 
     protected $fillable = [
-        'user_id',
+        'activity_organizer_id',
         'bio',
         'experience_years',
         'specialization',
@@ -28,9 +28,9 @@ class Guides extends Model
         ];
     }
 
-    public function user(): BelongsTo
+    public function activityOrganizer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(ActivityOrganizer::class, 'activity_organizer_id');
     }
 
     public function availability(): HasOne

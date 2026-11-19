@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ActivityOrganizer extends Model
 {
@@ -35,9 +36,16 @@ class ActivityOrganizer extends Model
         return $this->hasMany(Adventure::class);
     }
 
+    public function guide(): HasOne
+    {
+        return $this->hasOne(Guides::class, 'activity_organizer_id');
+    }
+
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
+
+    
     
 }
