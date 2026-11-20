@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('activity_organizers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
+            $table->string('license_number');
+            $table->enum('organizer_type', ['Adventure_group','Tourism_office'])->default('Tourism_office');
+            $table->enum('approval_status', ['Pending','Approved','Rejected','Banned'])->default('Pending');
+            $table->string('social_handle_url')->nullable();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });
     }
