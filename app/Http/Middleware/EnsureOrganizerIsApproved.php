@@ -17,17 +17,17 @@ class EnsureOrganizerIsApproved
     {
         $user = auth()->user();
 
-        if (!$user || $user->role !== 'organizer') {
+        if (!$user || $user->role !== 'Activity_Organizer') {
             abort(403, 'Only organizers can access this area.');
         }
 
         if (!$user->activity_organizer) {
-            return redirect()->route('organizer.dashboard')
+            return redirect()->route('organizers.index')
                 ->with('error', 'Please complete your organizer profile first.');
         }
 
         if ($user->activity_organizer->approval_status !== 'approved') {
-            return redirect()->route('organizer.dashboard')
+            return redirect()->route('organizers.index')
                 ->with('error', 'Your organizer account is pending admin approval.');
         }
 
