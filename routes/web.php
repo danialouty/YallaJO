@@ -1,9 +1,61 @@
 <?php
 
+use App\Http\Controllers\AdventureController;
+use App\Http\Controllers\AdventureSchedulesController;
+use App\Http\Controllers\ImagesController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BookingController;
+
+
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::resource('bookings', BookingController::class)->middleware('auth');
+
+require __DIR__.'/auth.php';
 use App\Http\Controllers\AdventurerController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\GuidesController;
+use App\Http\Controllers\GuidesAvailabilitiesController;
 
+
+
+Route::get('/', [HomeController::class, 'home'])->name('home');
+
+Route::get('/home/adventures', [AdventureController::class, 'indexAll'])
+    ->name('adventuresAll.index');
+
+Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'showProfile'])
+    ->name('adventures.profile');
+
+
+Route::middleware('auth')->group(function () {
+    Route::resource('adventures', AdventureController::class);
+    Route::post('/schedules', [AdventureSchedulesController::class, 'store'])
+        ->name('schedules.store');
+    Route::post('/adventure-images', [ImagesController::class, 'store'])
+        ->name('images.store');
+    Route::put('/adventure-images/{image}', [ImagesController::class, 'update'])
+        ->name('images.update');
+    Route::put('/schedules/{adventure_schedules}', [AdventureSchedulesController::class, 'update'])
+        ->name('schedules.update');
+
+});
 
 Route::middleware('auth')->controller(AdventurerController::class)->prefix('adventurer/profile')
     ->name('adventurer.')->group(function () {
@@ -80,3 +132,13 @@ if (app()->environment('local')) {
     )->name('auth.preview');
 
 }
+    Route::resource('payments', PaymentController::class)->middleware('auth');
+
+    Route::resource('guides', GuidesController::class);
+
+    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
+
+
+    Route::get('/bookings/{bookingId}/payments',
+    [PaymentController::class, 'showByBooking']
+    )->name('payments.byBooking');
