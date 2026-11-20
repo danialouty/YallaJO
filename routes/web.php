@@ -24,22 +24,3 @@ Route::middleware(['auth', 'admin'])
         Route::resource('organizers', AdminOrganizerController::class)
             ->only(['index', 'update', 'destroy']);
     });
-
-// =========================================================================
-// TEMPORARY LOCAL TEST ROUTES — DELETE BEFORE FINAL PR
-// =========================================================================
-Route::get('/test-login/{id}', function ($id) {
-    $user = User::findOrFail($id);
-    Auth::login($user);
-
-    return $user->isAdmin()
-        ? redirect()->route('admin.organizers.index')
-        : redirect()->route('organizers.index');
-});
-
-Route::get('/test-approved', function () {
-    return 'Access granted! You are an approved organizer.';
-})->middleware(['auth', 'approved.organizer']);
-
-Route::get('/login', fn () => response('Unauthenticated. Visit /test-login/{id} first.', 401))
-    ->name('login');
