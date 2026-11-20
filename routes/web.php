@@ -74,9 +74,13 @@ Route::controller(ReviewController::class)
 
     });
 
-    Route::resource('payments', PaymentController::class)->middleware('auth');
+    Route::resource('payments', PaymentController::class)
+        ->except(['create'])
+        ->middleware('auth');
 
-    Route::resource('guides', GuidesController::class);
+    Route::resource('guides', GuidesController::class)
+        ->only(['index', 'update'])
+        ->middleware('auth');
 
     Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
 
