@@ -5,22 +5,75 @@ use App\Http\Controllers\AdventureSchedulesController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\AdventurerController;
+use App\Http\Controllers\ReviewController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
-Route::resource('adventures',AdventureController::class);
-Route::post('/schedules', [AdventureSchedulesController::class, 'store'])
-    ->name('schedules.store');
-Route::post('/adventure-images', [ImagesController::class, 'store'])
-    ->name('images.store');
-Route::put('/adventure-images/{image}', [ImagesController::class, 'update'])
-    ->name('images.update');
-Route::put('/schedules/{adventure_schedules}', [AdventureSchedulesController::class, 'update'])
-    ->name('schedules.update');
+
 Route::get('/', [HomeController::class, 'home'])->name('home');
+
 Route::get('/home/adventures', [AdventureController::class, 'indexAll'])
     ->name('adventuresAll.index');
+
 Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'showProfile'])
     ->name('adventures.profile');
+
+
+Route::middleware('auth')->group(function () {
+    Route::resource('adventures', AdventureController::class);
+    Route::post('/schedules', [AdventureSchedulesController::class, 'store'])
+        ->name('schedules.store');
+    Route::post('/adventure-images', [ImagesController::class, 'store'])
+        ->name('images.store');
+    Route::put('/adventure-images/{image}', [ImagesController::class, 'update'])
+        ->name('images.update');
+    Route::put('/schedules/{adventure_schedules}', [AdventureSchedulesController::class, 'update'])
+        ->name('schedules.update');
+
+});
+
+Route::middleware('auth')->controller(AdventurerController::class)->prefix('adventurer/profile')
+    ->name('adventurer.')->group(function () {
+
+        Route::get('/create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('/', 'show')->name('show');
+        Route::get('/edit', 'edit')->name('edit');
+        Route::patch('/', 'update')->name('update');
+    });
+
+
+
+Route::controller(ReviewController::class)
+    ->prefix('adventures/{adventure}/reviews')
+    ->name('reviews.')
+    ->group(function () {
+
+        Route::get('/', 'index')
+            ->name('index');
+
+        Route::get('/create', 'create')
+            ->middleware('auth')
+            ->name('create');
+
+        Route::post('/', 'store')
+            ->middleware('auth')
+            ->name('store');
+
+        Route::get('/{review}', 'show')
+            ->name('show');
+
+        Route::get('/{review}/edit', 'edit')
+            ->middleware('auth')
+            ->name('edit');
+
+        Route::patch('/{review}', 'update')
+            ->middleware('auth')
+            ->name('update');
+
+        Route::delete('/{review}', 'destroy')
+            ->middleware('auth')
+            ->name('destroy');
+
+    });
