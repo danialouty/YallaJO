@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('adventurer_id')->constrained('adventurers')->cascadeOnDelete();
             $table->foreignId('adventure_id')->constrained('adventures')->cascadeOnDelete();
+            $table->foreignId('booking_id')->constrained('bookings')->cascadeOnDelete();
             $table->integer('rating');
             $table->text('comment');
             $table->timestamps();

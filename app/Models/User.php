@@ -66,7 +66,7 @@ class User extends Authenticatable
      * so i am connecting the foreign key 'approved_by' instead of the
      * default 'user_id'
      */
-    public function activityOrganizerApproved_by(): HasMany{
+    public function approvedOrganizers(): HasMany{
         return $this->hasMany(ActivityOrganizer::class, 'approved_by');
     }
 
