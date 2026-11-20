@@ -60,8 +60,23 @@ class User extends Authenticatable
         return $this->hasOne(Adventurer::class);
     }
 
-    public function approvedOrganizers(): HasMany
-    {
+    /**
+     * The activity organizer has 2 foreign keys connected to the
+     * user account one for the activity organizer own account and
+     * one for the who approved the activity organizer
+     * so i am connecting the foreign key 'approved_by' instead of the
+     * default 'user_id'
+     */
+    public function approvedOrganizers(): HasMany{
         return $this->hasMany(ActivityOrganizer::class, 'approved_by');
+    }
+
+    public function isAdmin(): bool {
+        return $this->role === 'Admin';
+    }
+
+    public function isApprovedOrganizer(): bool {
+        return $this->role === 'Activity_Organizer'
+            && $this->activityOrganizer?->approval_status == 'Approved';
     }
 }

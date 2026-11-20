@@ -41,11 +41,10 @@ class ActivityOrganizer extends Model
         return $this->hasOne(Guides::class, 'activity_organizer_id');
     }
 
-    public function approver(): BelongsTo
-    {
+    /**
+     * connecting the approved by relationship
+     */
+    public function approver() : BelongsTo {
         return $this->belongsTo(User::class, 'approved_by');
     }
-
-    
-    
 }
