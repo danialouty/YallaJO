@@ -105,6 +105,37 @@ Route::controller(ReviewController::class)
     Route::resource('payments', PaymentController::class)
         ->except(['create'])
         ->middleware('auth');
+// Frontend preview - local development only
+if (app()->environment('local')) {
+    Route::view('/ui-preview', 'pages.ui-preview')
+        ->name('ui.preview');
+}
+
+// Home Page Preview - Local Development Only
+if (app()->environment('local')) {
+    Route::view('/home-preview', 'pages.home')
+        ->name('home.preview');
+}
+
+// Dashboard UI preview - local environment only.
+if (app()->environment('local')) {
+    Route::view(
+        '/dashboard-preview',
+        'pages.dashboard-preview'
+    )->name('dashboard.preview');
+}
+
+// Auth UI Preview - Local Environment Only
+
+if (app()->environment('local')) {
+
+    Route::view(
+        '/auth-preview',
+        'pages.auth-preview'
+    )->name('auth.preview');
+
+}
+    Route::resource('payments', PaymentController::class)->middleware('auth');
 
     Route::resource('guides', GuidesController::class)
         ->only(['index', 'update'])
