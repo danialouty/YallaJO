@@ -16,10 +16,14 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $userId = Auth::user()->id;
-        $adventurer = Adventurer::where('user_id', '=', $userId)->first();
-        $booking = Booking::where('adventurer_id', '=', $adventurer->id)->get();
-        return view('bookings.index', ['booking' => $booking]);
+        $userId = Auth::id();
+        $adventurer = Adventurer::firstOrCreate(['user_id' => $userId]);
+        $bookings = Booking::with('adventure')->where('adventurer_id', $adventurer->id)->latest()->get();
+        $adventures = Adventure::all();
+        return view('bookings.index', [
+            'data' => $bookings,
+            'adventures' => $adventures,
+        ]);
     }
     /**
      * Show the form for creating a new resource.
@@ -28,7 +32,7 @@ class BookingController extends Controller
     {
         $adventures = Adventure::all();
         return view('bookings.create', ['adventures' => $adventures]);
-    } 
+    }
 
 
     /**
@@ -55,7 +59,7 @@ class BookingController extends Controller
             'unit_price' => $unitPrice,
             'commission_rate' => $commissionRate,
             'total_amount' => $totalAmount,
-            'status' => 'Pending', 
+            'status' => 'Pending',
         ];
 
         Booking::create($dataToInsert);
@@ -65,9 +69,16 @@ class BookingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Booking $booking)
+    public function show(string $id)
     {
-        //
+        $userId = Auth::id();
+        $adventurer = Adventurer::firstOrCreate(['user_id' => $userId]);
+
+        $booking = Booking::with('adventure')
+            ->where('adventurer_id', $adventurer->id)
+            ->findOrFail($id);
+
+        return view('bookings.show', ['data' => $booking]);
     }
 
     /**
@@ -86,10 +97,10 @@ class BookingController extends Controller
     {
         $booking = Booking::findOrFail($id);
         $booking->update([
-            'participants_count'=>$request->participants_count,
-            'total_amount'=>$request->participants_count * $booking->unit_price
+            'participants_count' => $request->participants_count,
+            'total_amount' => $request->participants_count * $booking->unit_price
         ]);
-        return redirect()->route('bookings.index')->with('success','booking updated successfully');
+        return redirect()->route('bookings.index')->with('success', 'booking updated successfully');
     }
 
     /**
