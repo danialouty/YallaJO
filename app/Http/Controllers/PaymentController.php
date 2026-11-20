@@ -11,14 +11,17 @@ class PaymentController extends Controller
     
     public function index()
     {
-        $payments = Payment::all();
-         return response()->json($payments);
+        $payments = Payment::with('booking')->get();
+
+        return view('payments.index', compact('payments'));
     }
 
     
     public function create()
     {
-        //
+    $bookings = Booking::all();
+
+    return view('payments.create', compact('bookings'));
     }
 
     /**
@@ -26,44 +29,41 @@ class PaymentController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-        'booking_id' => 'required|exists:bookings,id',
-        'method' => 'required|in:Visa,Cash',
+       $validated = $request->validate([
+            'booking_id' => 'required|exists:bookings,id',
+            'method' => 'required|in:Visa,Cash',
         ]);
 
         $booking = Booking::findOrFail($validated['booking_id']);
 
-        $payment = Payment::create([
-        'booking_id' => $booking->id,
-        'total_amount' => $booking->total_amount,
-        'method' => $validated['method'],
-        'status' => 'Pending',
-    ]);
+        Payment::create([
+            'booking_id' => $booking->id,
+            'total_amount' => $booking->total_amount,
+            'method' => $validated['method'],
+            'status' => 'Pending',
+        ]);
 
-    return response()->json([
-        'message' => 'Payment created successfully',
-        'payment' => $payment
-    ], 201);
-
-
+        return redirect()->route('payments.index')
+            ->with('success', 'تم إنشاء الدفعة بنجاح');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Display one payment
     public function show($id)
     {
-       $payment = Payment::findOrFail($id);
+        $payment = Payment::with('booking')->findOrFail($id);
 
-       return response()->json($payment);
+        return view('payments.show', compact('payment'));
+        
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Payment $payment)
+    public function edit($id)
     {
-        //
+        $payment = Payment::findOrFail($id);
+
+        return view('payments.edit', compact('payment'));
     }
 
     /**
@@ -86,15 +86,10 @@ class PaymentController extends Controller
     ]);
     }
 
-    return response()->json([
-        'message' => 'Payment updated successfully',
-        'payment' => $payment
-    ]);
+    return redirect()->route('payments.index')
+        ->with('success', 'تم تعديل الدفعة بنجاح');
 
     }
-
-
-
 
     
 
@@ -105,19 +100,18 @@ class PaymentController extends Controller
     {
         $payment = Payment::findOrFail($id);
 
-    // Delete the payment
-    $payment->delete();
+        $payment->delete();
 
-    // Return response
-    return response()->json([
-        'message' => 'Payment deleted successfully'
-    ]);
+        return redirect()->route('payments.index')
+            ->with('success', 'تم حذف الدفعة بنجاح');
     }
 
     public function showByBooking($bookingId)
     {
-    $payments = Payment::where('booking_id', $bookingId)->get();
+    $booking = Booking::findOrFail($bookingId);
 
-    return response()->json($payments);
-     }
+        $payments = Payment::where('booking_id', $booking->id)->get();
+
+        return view('payments.index', compact('payments'));
+}
 }

@@ -24,6 +24,9 @@ Route::resource('bookings', BookingController::class)->middleware('auth');
 require __DIR__.'/auth.php';
 use App\Http\Controllers\AdventurerController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\GuidesController;
+use App\Http\Controllers\GuidesAvailabilitiesController;
 
 
 Route::middleware('auth')->controller(AdventurerController::class)->prefix('adventurer/profile')
@@ -70,3 +73,14 @@ Route::controller(ReviewController::class)
             ->name('destroy');
 
     });
+
+    Route::resource('payments', PaymentController::class)->middleware('auth');
+
+    Route::resource('guides', GuidesController::class);
+
+    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
+
+
+    Route::get('/bookings/{bookingId}/payments',
+    [PaymentController::class, 'showByBooking']
+    )->name('payments.byBooking');
