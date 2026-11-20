@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('adventure_id')->constrained('adventures')->cascadeOnDelete();
+            $table->foreignId('adventurer_id')->constrained('adventurers')->cascadeOnDelete();
+            $table->integer('participants_count');
+            $table->decimal('unit_price', 9, 2);
+            $table->decimal('commission_rate', 9, 2);
+            $table->decimal('total_amount', 9, 2);
+            $table->enum('status', ['Accepted','Cancelled','Pending'])->default('Pending');
+            $table->integer('capacity');
+            $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
         });
     }
