@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class ActivityOrganizerController extends Controller
 {
+    // --- Organizer Side ---
+    /**
+     * organizer dashboard
+     */
+    public function dashboard()
+    {
+        $organizer = auth()->user()->activity_organizer;
+        return view('organizer.dashboard', compact('organizer'));
+    }
     /**
      * Display a listing of the resource.
      */
