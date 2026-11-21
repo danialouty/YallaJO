@@ -157,6 +157,29 @@
             font-weight: 900;
         }
 
+        .reviews-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 44px;
+            margin-block-start: 12px;
+            padding: 8px 16px;
+            border: 1px solid var(--color-brand, #a43716);
+            border-radius: var(--radius-control, 0.5rem);
+            color: var(--color-brand, #a43716);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .reviews-link:hover {
+            color: var(--color-brand-dark, #862201);
+            text-decoration: underline;
+        }
+
+        .reviews-link:focus-visible {
+            outline: 2px solid var(--color-brand, #a43716);
+            outline-offset: 3px;
+        }
+
         .location {
             color: #777;
             font-size: 12px;
@@ -605,6 +628,10 @@
                             <p class="location">
                                 📍 {{ $adventure->location }}، الأردن
                             </p>
+
+                            <a href="{{ route('reviews.index', ['adventure' => $adventure]) }}" class="reviews-link">
+                                عرض تقييمات المغامرة
+                            </a>
                         </div>
 
                         <span class="badge rating">

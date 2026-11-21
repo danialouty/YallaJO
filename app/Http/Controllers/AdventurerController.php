@@ -95,7 +95,7 @@ class AdventurerController extends Controller
     {
         $user = $request->user();
 
-        abort_unless($user->role === 'Adventuretr', 403);
+        abort_unless($user->role === 'Adventurer', 403);
 
         $adventurer = $user->adventurer;
 
