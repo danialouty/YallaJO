@@ -140,7 +140,7 @@ class AdventureController extends Controller
 
     public function indexAll(Request $request)
     {
-        $query = Adventure::query();
+        $query = Adventure::where('status', 'Active');
 
         // Search by adventure name
         if ($request->filled('search')) {

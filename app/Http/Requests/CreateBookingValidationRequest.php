@@ -23,16 +23,17 @@ class CreateBookingValidationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'adventure_id'=>'required','integer','exists:adventures,id',
+            'adventure_id' => ['required', 'integer', 'exists:adventures,id'],
+            'participants_count' => ['required', 'integer', 'min:1'],
         ];
     }
     public function messages(): array{
       return [
             'adventure_id.required' => 'Please select an adventure.',
             'adventure_id.exists'   => 'The selected adventure does not exist.',
-            'count.required'        => 'Please enter the number of people.',
-            'count.integer'         => 'The number of people must be a valid integer.',
-            'count.min'             => 'You must book for at least 1 person.',
+            'participants_count.required' => 'يرجى إدخال عدد الأشخاص.',
+            'participants_count.integer' => 'عدد الأشخاص يجب أن يكون رقمًا صحيحًا.',
+            'participants_count.min' => 'يجب حجز مقعد واحد على الأقل.',
         ];
 }
 }

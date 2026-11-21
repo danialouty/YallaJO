@@ -101,8 +101,7 @@
                                            class="px-3 py-1.5 text-xs font-semibold bg-[#E8F1ED] hover:bg-[#d5e6de] text-[#2D5041] rounded-lg transition">
                                             تعديل
                                         </a>
-                                        <form action="{{ route('payments.destroy', $payment->id) }}" method="POST"
-                                              onsubmit="return confirm('هل أنت متأكد من حذف هذه الدفعة؟')">
+                                        <form action="{{ route('payments.destroy', $payment->id) }}" method="POST" data-confirm="هل أنت متأكد من حذف هذه الدفعة؟">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -125,14 +124,5 @@
             </div>
         </div>
     </div>
-
-    <style>
-        .btn-yalla-primary {
-            background-color: #A94B2B;
-            color: #ffffff;
-            transition: background-color 0.2s ease;
-        }
-        .btn-yalla-primary:hover { background-color: #8E3D22; }
-    </style>
 
 </x-app-layout>

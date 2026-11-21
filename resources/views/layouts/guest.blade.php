@@ -12,10 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 antialiased">
 

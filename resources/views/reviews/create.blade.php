@@ -1,60 +1,111 @@
 @extends('layouts.site')
 
+@section('title', 'إضافة تقييم | ' . $adventure->title . ' | YallaJO')
+
 @section('content')
-<div class="mx-auto max-w-2xl px-4 py-10" dir="rtl">
-    <h1 class="mb-2 font-display text-2xl font-bold text-ink">إضافة تقييم جديد</h1>
-    <p class="mb-6 text-sm text-muted">المغامرة: {{ $adventure->title }}</p>
+    <section class="bg-canvas py-8 sm:py-14" aria-labelledby="create-review-heading">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <a
+                href="{{ route('reviews.index', ['adventure' => $adventure]) }}"
+                class="mb-6 inline-flex min-h-11 items-center gap-2 rounded-control text-sm font-semibold
+                       text-brand hover:underline focus-visible:outline-2 focus-visible:outline-offset-4
+                       focus-visible:outline-brand"
+            >
+                <span aria-hidden="true">→</span>
+                العودة إلى التقييمات
+            </a>
 
-    @if ($bookings->isEmpty())
-        <div class="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-sm text-amber-900">
-            لا يوجد لديك حجز مقبول (Accepted) غير مُقيّم لهذه المغامرة حالياً.
-            <div class="mt-4">
-                <a href="{{ route('reviews.index', $adventure) }}" class="font-bold underline">العودة للتقييمات</a>
-            </div>
+            <header class="mb-6">
+                <h1 id="create-review-heading" class="font-display text-3xl font-bold text-ink sm:text-4xl">
+                    إضافة تقييم
+                </h1>
+                <p class="mt-2 text-lg text-muted [overflow-wrap:anywhere]">{{ $adventure->title }}</p>
+            </header>
+
+            <x-ui.card variant="outline" padding="lg">
+                @if ($bookings->isEmpty())
+                    <p class="text-ink">لا توجد لديك حجوزات متاحة للتقييم لهذه المغامرة.</p>
+                @else
+                    @php
+                        $oldBooking = old('booking_id');
+                        $oldRating = old('rating');
+                        $oldComment = old('comment');
+                    @endphp
+
+                    <form action="{{ route('reviews.store', ['adventure' => $adventure]) }}" method="POST" class="space-y-6">
+                        @csrf
+
+                        <div class="space-y-2">
+                            <label for="review-booking" class="block text-sm font-semibold text-ink">الحجز</label>
+                            <select
+                                id="review-booking" name="booking_id" required
+                                @error('booking_id') aria-invalid="true" aria-describedby="review-booking-error" @enderror
+                                class="block w-full rounded-control border border-outline/60 bg-surface py-3 ps-4 pe-10
+                                       text-sm text-ink rtl:bg-position-[left_0.5rem_center]
+                                       focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                            >
+                                <option value="">اختر الحجز</option>
+                                @foreach ($bookings as $booking)
+                                    <option value="{{ $booking->id }}" @selected(is_scalar($oldBooking) && (string) $oldBooking === (string) $booking->id)>
+                                        الحجز رقم {{ $booking->id }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('booking_id')
+                                <p id="review-booking-error" class="text-sm text-danger" role="alert">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <fieldset class="space-y-2" @error('rating') aria-describedby="review-rating-error" @enderror>
+                            <legend class="text-sm font-semibold text-ink">التقييم من ٥ نجوم</legend>
+                            <div class="grid max-w-sm grid-cols-5 gap-1.5 sm:gap-2">
+                                @for ($rating = 1; $rating <= 5; $rating++)
+                                    <label class="relative cursor-pointer">
+                                        <input
+                                            type="radio" name="rating" value="{{ $rating }}" required class="peer sr-only"
+                                            @checked(is_scalar($oldRating) && (string) $oldRating === (string) $rating)
+                                            @error('rating') aria-invalid="true" @enderror
+                                        >
+                                        <span class="sr-only">{{ $rating }} من ٥ نجوم</span>
+                                        <span
+                                            aria-hidden="true"
+                                            class="flex min-h-12 flex-col items-center justify-center rounded-control
+                                                   border border-outline/60 bg-surface py-1 text-sm text-ink
+                                                   hover:border-brand peer-checked:border-brand peer-checked:bg-brand/10
+                                                   peer-checked:font-bold peer-checked:text-brand
+                                                   peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2
+                                                   peer-focus-visible:outline-brand"
+                                        >
+                                            <span class="text-xl leading-none">★</span>
+                                            {{ $rating }}
+                                        </span>
+                                    </label>
+                                @endfor
+                            </div>
+                            @error('rating')
+                                <p id="review-rating-error" class="text-sm text-danger" role="alert">{{ $message }}</p>
+                            @enderror
+                        </fieldset>
+
+                        <div class="space-y-2">
+                            <label for="review-comment" class="block text-sm font-semibold text-ink">التعليق</label>
+                            <textarea
+                                id="review-comment" name="comment" rows="5" maxlength="1000" required dir="auto"
+                                aria-describedby="review-comment-hint{{ $errors->has('comment') ? ' review-comment-error' : '' }}"
+                                @error('comment') aria-invalid="true" @enderror
+                                class="block w-full rounded-control border border-outline/60 bg-surface px-4 py-3
+                                       text-sm text-ink focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+                            >{{ is_string($oldComment) ? $oldComment : '' }}</textarea>
+                            <p id="review-comment-hint" class="text-sm text-muted">الحد الأقصى ١٠٠٠ حرف.</p>
+                            @error('comment')
+                                <p id="review-comment-error" class="text-sm text-danger" role="alert">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <x-ui.button type="submit" size="lg" class="w-full sm:w-auto">إرسال التقييم</x-ui.button>
+                    </form>
+                @endif
+            </x-ui.card>
         </div>
-    @else
-        <form method="POST" action="{{ route('reviews.store', $adventure) }}"
-              class="space-y-4 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
-            @csrf
-
-            <div>
-                <label class="mb-1 block text-sm font-medium text-ink">اختر الحجز</label>
-                <select name="booking_id" required class="w-full rounded-control border border-black/15 px-3 py-2 text-sm">
-                    @foreach ($bookings as $booking)
-                        <option value="{{ $booking->id }}">حجز رقم #{{ $booking->id }} — {{ $booking->created_at->format('Y-m-d') }}</option>
-                    @endforeach
-                </select>
-                @error('booking_id') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label class="mb-1 block text-sm font-medium text-ink">التقييم</label>
-                <select name="rating" required class="w-full rounded-control border border-black/15 px-3 py-2 text-sm">
-                    <option value="5">⭐⭐⭐⭐⭐ (5 - ممتاز)</option>
-                    <option value="4">⭐⭐⭐⭐ (4 - جيد جداً)</option>
-                    <option value="3">⭐⭐⭐ (3 - جيد)</option>
-                    <option value="2">⭐⭐ (2 - مقبول)</option>
-                    <option value="1">⭐ (1 - سيء)</option>
-                </select>
-                @error('rating') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label class="mb-1 block text-sm font-medium text-ink">التعليق</label>
-                <textarea name="comment" rows="4" required placeholder="شاركنا تجربتك بالتفصيل..."
-                          class="w-full rounded-control border border-black/15 px-3 py-2 text-sm">{{ old('comment') }}</textarea>
-                @error('comment') <p class="mt-1 text-xs text-rose-600">{{ $message }}</p> @enderror
-            </div>
-
-            <div class="flex justify-end gap-3 pt-2">
-                <a href="{{ route('reviews.index', $adventure) }}"
-                   class="rounded-control border border-black/15 px-4 py-2 text-sm text-ink">إلغاء</a>
-                <button type="submit"
-                        class="rounded-control bg-brand px-5 py-2 text-sm font-semibold text-white hover:opacity-90">
-                    نشر التقييم
-                </button>
-            </div>
-        </form>
-    @endif
-</div>
+    </section>
 @endsection

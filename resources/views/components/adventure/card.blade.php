@@ -141,14 +141,16 @@
                     </p>
                 </div>
 
-                <x-ui.button
-                    size="sm"
-                    type="button"
-                    :disabled="true"
-                    title="هذه بيانات معاينة وليست حجزًا فعليًا"
-                >
-                    احجز الآن
-                </x-ui.button>
+                @if (!empty($adventure['id']))
+                    <a href="{{ route('adventures.profile', $adventure['id']) }}"
+                       class="inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-dark">
+                        احجز الآن
+                    </a>
+                @else
+                    <span class="inline-flex min-h-11 items-center justify-center rounded-control bg-outline/20 px-4 py-2 text-sm text-muted">
+                        احجز الآن
+                    </span>
+                @endif
             </div>
 
         </div>
