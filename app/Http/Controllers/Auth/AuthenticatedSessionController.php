@@ -28,11 +28,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $destination = $request->user()->role === 'Activity_Organizer'
-            ? ($request->user()->isApprovedOrganizer() ? route('organizer.dashboard') : route('organizers.index'))
-            : route('bookings.index', absolute: false);
+        $destination = match ($request->user()->role) {
+            'Admin' => 'admin.dashboard',
+            'Activity_Organizer' => $request->user()->isApprovedOrganizer() ? 'organizer.dashboard' : 'organizers.index',
+            'Adventurer' => 'bookings.index',
+            default => 'dashboard',
+        };
 
-        return redirect()->intended($destination);
+        return redirect()->intended(route($destination, absolute: false));
     }
 
     /**

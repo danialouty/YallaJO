@@ -4,6 +4,12 @@
 @section('dashboard-name', 'مساحة المنظّم')
 @section('dashboard-title', 'لوحة تحكم المنظّم')
 
+@section('dashboard-header-actions')
+    <a href="{{ route('organizers.index') }}" class="rounded-control border border-outline px-3 py-2 text-sm font-semibold text-ink focus-visible:outline-2 focus-visible:outline-brand">
+        ملف المنظّم
+    </a>
+@endsection
+
 @section('content')
     <div class="space-y-6">
         @if (session('status'))

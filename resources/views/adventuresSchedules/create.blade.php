@@ -53,7 +53,7 @@
                         <input type="number" name="capacity" value="{{ old('capacity') }}" min="1" required
                             class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
                     </label>
-            
+
                     <div class="flex flex-wrap gap-3 sm:col-span-2">
                         <button type="submit"
                             class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">حفظ

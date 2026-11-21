@@ -45,7 +45,15 @@
                     @if(session('error'))
                         <p class="booking-note text-red-600">{{ session('error') }}</p>
                     @endif
+                    @foreach ($errors->all() as $error)
+                        <p class="booking-note text-red-600" role="alert">{{ $error }}</p>
+                    @endforeach
 
+                    @if ($adventure->status !== 'Active' || $adventure->capacity < 1)
+                        <p class="booking-note">الحجز غير متاح لهذه المغامرة حاليًا.</p>
+                    @elseif (auth()->check() && auth()->user()->role !== 'Adventurer')
+                        <p class="booking-note">الحجز متاح لحسابات المغامرين.</p>
+                    @else
                     <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                         @csrf
                         <input type="hidden" name="adventure_id" value="{{ $adventure->id }}">
@@ -57,15 +65,15 @@
                         <label class="booking-label">عدد الأشخاص</label>
                         <div class="people-control">
                             <button type="button" id="increase" aria-label="زيادة عدد الأشخاص">+</button>
-                            <strong id="peopleCount">2</strong>
+                            <strong id="peopleCount">1</strong>
                             <button type="button" id="decrease" aria-label="تقليل عدد الأشخاص">−</button>
                         </div>
-                        <input type="hidden" name="participants_count" id="peopleInput" value="2">
+                        <input type="hidden" name="participants_count" id="peopleInput" value="1">
 
                         <div class="total">
                             <span>الإجمالي التقريبي</span>
                             <span class="total-price">
-                                <span id="totalPrice">{{ number_format($adventure->price * 2, 2) }}</span> د.أ
+                                <span id="totalPrice">{{ number_format($adventure->price, 2) }}</span> د.أ
                             </span>
                         </div>
 
@@ -74,6 +82,7 @@
                         </button>
                         <p class="booking-note">سيتم إنشاء الحجز والدفع المعلق تلقائيًا بعد التأكيد.</p>
                     </form>
+                    @endif
                 </div>
 
                 <div class="card benefits">
@@ -125,32 +134,20 @@
                     <p class="description">{{ $adventure->description }}</p>
                 </div>
 
-<<<<<<< HEAD
-                <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-                    <h2 class="mb-5 text-lg font-black">♧ برنامج الرحلة خطوة بخطوة</h2>
-                    <div class="space-y-5 border-r-2 border-emerald-100 pr-5">
+                <div class="card">
+                    <h2 class="section-title">♧ برنامج الرحلة خطوة بخطوة</h2>
+                    <div class="timeline">
                         @forelse ($adventure->days as $day)
-                            <div class="relative">
-                                <span class="absolute -right-[1.65rem] top-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-800 ring-2 ring-emerald-100"></span>
-                                <span class="text-xs font-bold text-orange-700">اليوم {{ $day->day_number }}</span>
-                                <h3 class="mt-1 font-bold">{{ $day->title }}</h3>
+                            <div class="timeline-item">
+                                <span class="timeline-time">اليوم {{ $day->day_number }}</span>
+                                <h3>{{ $day->title }}</h3>
                                 @if ($day->description)
-                                    <p class="mt-1 text-sm leading-6 text-slate-500">{{ $day->description }}</p>
+                                    <p>{{ $day->description }}</p>
                                 @endif
                             </div>
                         @empty
                             <p class="text-sm text-slate-500">لم تتم إضافة برنامج الرحلة بعد.</p>
                         @endforelse
-=======
-                <div class="card">
-                    <h2 class="section-title">♧ برنامج الرحلة خطوة بخطوة</h2>
-                    <div class="timeline">
-                        <div class="timeline-item"><span class="timeline-time">08:00 صباحاً</span><h3>التجمع والانطلاق</h3><p>الالتقاء بالمجموعة والانطلاق إلى موقع المغامرة.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">09:30 صباحاً</span><h3>الوصول والتعرف على المنطقة</h3><p>استكشاف المكان والتعرف على طبيعته وثقافته المحلية.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">10:15 صباحاً</span><h3>بدء النشاط الرئيسي</h3><p>الاستمتاع بالنشاط الأساسي والتجربة المقدمة من المنظم.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">12:00 ظهراً</span><h3>وجبة محلية واستراحة</h3><p>الاستمتاع بوجبة محلية وأخذ استراحة مع المجموعة.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">02:00 ظهراً</span><h3>نهاية الرحلة والعودة</h3><p>اختتام التجربة والعودة من موقع المغامرة.</p></div>
->>>>>>> 1a08f9c506b76acdf41213bd291ee4e010e1d85b
                     </div>
                 </div>
             </section>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('reviews', function (Blueprint $table) {
             $table->boolean('is_reported')->default(false)->after('comment');
-            $table->string('report_status')->nullable()->after('is_reported'); 
+            $table->string('report_status')->nullable()->after('is_reported');
             $table->string('report_reason')->nullable()->after('report_status');
         });
     }

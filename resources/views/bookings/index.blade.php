@@ -28,6 +28,16 @@
             </div>
         @endif
 
+        @if ($errors->any() && old('_method'))
+            <div class="mb-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger" role="alert">
+                <ul class="list-inside list-disc">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <!-- بطاقات الإحصائيات السريعة (KPI Cards) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
@@ -91,7 +101,7 @@
                                 <td class="py-4 px-4 font-extrabold text-gray-900">{{ number_format($booking->total_amount, 2) }} د.أ</td>
 
                                 <td class="py-4 px-4">
-                                    @if ($booking->status === 'Confirmed')
+                                    @if ($booking->status === 'Accepted')
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
                                             مؤكد من المنظم
                                         </span>
@@ -115,7 +125,7 @@
                                         </a>
 
                                         <!-- زر Edit Pop-up (يظهر فقط إذا كانت الحالة Pending) -->
-                                        @if ($booking->status === 'Pending')
+                                        @if ($booking->isChangeable() && $booking->adventure?->status === 'Active')
                                             <button type="button"
                                                     data-open-edit-modal
                                                     data-id="{{ $booking->id }}"
@@ -128,7 +138,8 @@
                                         @endif
 
                                         <!-- إلغاء الحجز -->
-                                        <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" data-confirm="هل أنت متأكد من إلغاء وحذف هذا الحجز؟">
+                                        @if ($booking->isChangeable())
+                                        <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" data-confirm="هل أنت متأكد من إلغاء هذا الحجز؟">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -136,6 +147,7 @@
                                                 إلغاء
                                             </button>
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

@@ -70,7 +70,7 @@
                         <fieldset class="ai-day-row rounded-xl border border-slate-200 p-4">
                             <legend class="px-2 text-sm font-bold text-slate-700">اليوم {{ $day->day_number }}</legend>
                             <div class="grid gap-3 sm:grid-cols-2">
-                                
+
                                 <label class="text-sm font-semibold text-slate-700">العنوان
                                     <input type="text" maxlength="255" name="days[{{ $day->id }}][title]"
                                         value="{{ old('days.' . $day->id . '.title', $day->title) }}" required

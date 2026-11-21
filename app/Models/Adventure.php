@@ -53,6 +53,11 @@ class Adventure extends Model
         return $this->hasMany(Booking::class);
     }
 
+    public function reservedBookings(): HasMany
+    {
+        return $this->bookings()->whereIn('status', ['Pending', 'Accepted']);
+    }
+
     public function images(): HasMany
     {
         return $this->hasMany(Images::class);

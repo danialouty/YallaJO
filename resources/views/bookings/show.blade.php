@@ -22,7 +22,7 @@
         <div class="mb-5 flex items-center justify-between">
             <span class="text-sm font-semibold text-gray-500">حالة الطلب الحالية:</span>
 
-            @if ($item->status === 'Confirmed')
+            @if ($item->status === 'Accepted')
                 <span class="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
                     مؤكد من المنظم
                 </span>
@@ -76,6 +76,7 @@
                 </div>
 
                 <!-- زر الإلغاء -->
+                @if ($item->isChangeable())
                 <div class="border-t border-gray-100 pt-5 flex items-center justify-end gap-3">
                     <form action="{{ route('bookings.destroy', $item->id) }}" method="POST" data-confirm="هل أنت متأكد من إلغاء هذا الحجز؟">
                         @csrf
@@ -85,6 +86,11 @@
                         </button>
                     </form>
                 </div>
+                @elseif ($item->status === 'Pending' && $item->payment_exists)
+                    <p class="border-t border-outline/30 pt-5 text-sm text-muted">
+                        الإلغاء غير متاح لهذا الحجز لوجود دفعة مرتبطة به.
+                    </p>
+                @endif
             </div>
         </div>
     </div>
