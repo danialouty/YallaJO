@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Guides_availabilities;
 use App\Models\Guides;
+use App\Models\ActivityOrganizer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class GuidesAvailabilitiesController extends Controller
 {
@@ -33,12 +35,20 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function store(Request $request)
     {
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        abort_unless($organizer, 403);
+
         $validated = $request->validate([
-            'guide_id' => 'required|exists:guides,id|unique:guides_availabilities,guide_id',
             'status' => 'required|in:Available,Busy',
         ]);
 
-        Guides_availabilities::create($validated);
+        $guide = Guides::where('activity_organizer_id', $organizer->id)->firstOrFail();
+        abort_if(Guides_availabilities::where('guide_id', $guide->id)->exists(), 409);
+
+        Guides_availabilities::create([
+            'guide_id' => $guide->id,
+            'status' => $validated['status'],
+        ]);
 
         return redirect()->route('guide-availabilities.index')
             ->with('success', 'Guide availability created successfully');
@@ -70,6 +80,13 @@ class GuidesAvailabilitiesController extends Controller
     public function update(Request $request,$id)
     {
         $availability = Guides_availabilities::findOrFail($id);
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        abort_unless(
+            $organizer
+            && $availability->guide
+            && $availability->guide->activity_organizer_id === $organizer->id,
+            403
+        );
 
         $validated = $request->validate([
             'status' => 'sometimes|required|in:Available,Busy',
@@ -87,6 +104,13 @@ class GuidesAvailabilitiesController extends Controller
     public function destroy($id)
     {
         $availability = Guides_availabilities::findOrFail($id);
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        abort_unless(
+            $organizer
+            && $availability->guide
+            && $availability->guide->activity_organizer_id === $organizer->id,
+            403
+        );
 
         $availability->delete();
 

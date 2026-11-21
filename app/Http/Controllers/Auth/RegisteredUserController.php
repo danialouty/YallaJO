@@ -54,6 +54,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('bookings.index', absolute: false));
+        return redirect(route('adventuresAll.index', absolute: false));
     }
 }

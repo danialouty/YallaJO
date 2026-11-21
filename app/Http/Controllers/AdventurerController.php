@@ -85,7 +85,31 @@ class AdventurerController extends Controller
                 ->with('error', 'Please create your profile first.');
         }
 
-        return view('adventurers.show', compact('adventurer'));
+        $adventurer->load([
+            'bookings.adventure',
+            'reviews.adventure',
+        ]);
+
+        $bookingCount = $adventurer->bookings->count();
+        $confirmedBookingCount = $adventurer->bookings
+            ->whereIn('status', ['Accepted', 'Confirmed'])
+            ->count();
+        $pendingBookingCount = $adventurer->bookings
+            ->where('status', 'Pending')
+            ->count();
+        $reviewCount = $adventurer->reviews->count();
+        $recentBookings = $adventurer->bookings->sortByDesc('created_at')->take(4);
+        $recentReviews = $adventurer->reviews->sortByDesc('created_at')->take(3);
+
+        return view('adventurers.show', compact(
+            'adventurer',
+            'bookingCount',
+            'confirmedBookingCount',
+            'pendingBookingCount',
+            'reviewCount',
+            'recentBookings',
+            'recentReviews'
+        ));
     }
 
     /**

@@ -12,7 +12,6 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\ChatbotController;
 
 
 
@@ -60,6 +59,10 @@ Route::get('/', [HomeController::class, 'home'])->name('home');
 
 Route::get('/home/adventures', [AdventureController::class, 'indexAll'])
     ->name('adventuresAll.index');
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
 
 Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'showProfile'])
     ->name('adventures.profile');
@@ -166,10 +169,11 @@ if (app()->environment('local')) {
     Route::resource('payments', PaymentController::class)->middleware('auth');
 
     Route::resource('guides', GuidesController::class)
-        ->only(['index', 'update'])
-        ->middleware('auth');
+        ->only(['index', 'store', 'update'])
+        ->middleware(['auth', 'approved.organizer']);
 
-    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
+    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class)
+        ->middleware(['auth', 'approved.organizer']);
 
 
     Route::get('/bookings/{bookingId}/payments',
@@ -177,6 +181,6 @@ if (app()->environment('local')) {
     )->name('payments.byBooking');
 
 
-    Route::post('/chatbot', [ChatbotController::class, 'chat'])
+    Route::post('/chatbot', ['App\\Http\\Controllers\\ChatbotController', 'chat'])
     ->middleware('auth')
     ->name('chatbot.chat');
