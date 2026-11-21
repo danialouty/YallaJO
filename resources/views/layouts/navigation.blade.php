@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
                         المدفوعات
                     </x-nav-link>
+                    <x-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
+                        لوحة المرشد
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -84,6 +87,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
                 المدفوعات
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
+                المرشدون
             </x-responsive-nav-link>
         </div>
 

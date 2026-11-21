@@ -12,16 +12,15 @@ class PaymentController extends Controller
     public function index()
     {
         $payments = Payment::with('booking')->get();
+        $bookings = Booking::all();
 
-        return view('payments.index', compact('payments'));
+        return view('payments.index', compact('payments', 'bookings'));
     }
 
     
     public function create()
     {
-    $bookings = Booking::all();
-
-    return view('payments.create', compact('bookings'));
+        return redirect()->route('payments.index');
     }
 
     /**
@@ -108,10 +107,11 @@ class PaymentController extends Controller
 
     public function showByBooking($bookingId)
     {
-    $booking = Booking::findOrFail($bookingId);
+        $booking = Booking::findOrFail($bookingId);
 
         $payments = Payment::where('booking_id', $booking->id)->get();
+        $bookings = Booking::all();
 
-        return view('payments.index', compact('payments'));
-}
+        return view('payments.index', compact('payments', 'bookings'));
+    }
 }

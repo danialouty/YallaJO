@@ -6,11 +6,6 @@
                 <p class="text-sm text-gray-500 mt-1">تابع جميع المدفوعات وحالات تأكيدها في YallaJO</p>
             </div>
 
-            <a href="{{ route('payments.create') }}"
-               class="btn-yalla-primary inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-sm rounded-xl shadow-sm">
-                <span class="text-lg leading-none">+</span>
-                <span>إضافة دفعة جديدة</span>
-            </a>
         </div>
 
         @if (session('success'))
@@ -139,4 +134,5 @@
         }
         .btn-yalla-primary:hover { background-color: #8E3D22; }
     </style>
+
 </x-app-layout>

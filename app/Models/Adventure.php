@@ -33,12 +33,14 @@ class Adventure extends Model
         ];
     }
 
-    public function activityOrganizer(): BelongsTo {
+    public function activityOrganizer(): BelongsTo
+    {
         return $this->belongsTo(ActivityOrganizer::class);
     }
 
-    public function reviews(): HasMany{
-        return $this->hasMany(Review::class);   
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
     }
 
     public function schedules(): HasMany
@@ -54,5 +56,10 @@ class Adventure extends Model
     public function images(): HasMany
     {
         return $this->hasMany(Images::class);
+    }
+
+    public function days()
+    {
+        return $this->hasMany(AdventureDay::class)->orderBy('day_number');
     }
 }

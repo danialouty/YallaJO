@@ -1,195 +1,55 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<x-app-layout>
+    <main class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-8">
+            <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
+                <h1 class="text-2xl font-black text-slate-900">إضافة مغامرة</h1>
+                <a class="text-sm font-bold text-orange-700 hover:text-orange-900" href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
+            </header>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إضافة مغامرة | يلا جو</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #D95D39;
-            --neutral: #1E293B;
-            --muted: #64748B;
-            --border: #E8ECF3;
-        }
+            @if ($errors->any())
+                <div class="mb-5 rounded-lg bg-red-50 p-4 text-sm text-red-800" role="alert">
+                    <ul class="list-inside list-disc">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+                </div>
+            @endif
 
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            padding: 32px 16px;
-            background: #F7F8FC;
-            color: var(--neutral);
-            font-family: 'Cairo', sans-serif;
-        }
-
-        .page {
-            max-width: 760px;
-            margin: auto;
-            padding: 28px;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-        }
-
-        .page-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-
-        h1 { margin: 0; font-size: 24px; }
-        a { color: var(--primary); text-decoration: none; font-weight: 700; }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-        }
-
-        .form-field { display: flex; flex-direction: column; gap: 5px; }
-        .form-field.full { grid-column: 1 / -1; }
-        label { font-size: 12px; font-weight: 700; }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: #fff;
-            color: var(--neutral);
-            font: inherit;
-            font-size: 13px;
-        }
-
-        textarea { min-height: 90px; resize: vertical; }
-
-        .form-errors {
-            margin-bottom: 18px;
-            padding: 12px 16px;
-            border-radius: 8px;
-            background: #FEE2E2;
-            color: #B91C1C;
-            font-size: 12px;
-        }
-
-        .form-errors ul { margin: 0; padding-right: 20px; }
-
-        .actions { display: flex; gap: 10px; margin-top: 20px; }
-        .button {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px 18px;
-            border: 0;
-            border-radius: 8px;
-            font: inherit;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .submit { background: var(--primary); color: #fff; }
-        .cancel { background: #F1F5F9; color: var(--neutral); }
-
-        @media (max-width: 600px) {
-            body { padding: 12px; }
-            .page { padding: 18px; }
-            .form-grid { grid-template-columns: 1fr; }
-            .form-field.full { grid-column: auto; }
-            .page-heading { align-items: flex-start; }
-        }
-    </style>
-</head>
-
-<body>
-    <main class="page">
-        <div class="page-heading">
-            <h1>إضافة مغامرة</h1>
-            <a href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
+            <form action="{{ route('adventures.store') }}" method="POST">
+                @csrf
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <label class="text-sm font-bold text-slate-700">اسم المغامرة<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="title" value="{{ old('title') }}" required></label>
+                    <label class="text-sm font-bold text-slate-700">رقم المنظم<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" id="activity_organizer_id" type="number" name="activity_organizer_id" value="{{ old('activity_organizer_id') }}" required></label>
+                    <label class="text-sm font-bold text-slate-700 sm:col-span-2">الوصف<textarea class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="description" rows="4" required>{{ old('description') }}</textarea></label>
+                    <label class="text-sm font-bold text-slate-700">الصعوبة
+                        <select class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="difficulty_level" required>
+                            @foreach (['Easy' => 'سهل', 'Medium' => 'متوسط', 'Hard' => 'صعب'] as $value => $label)
+                                <option value="{{ $value }}" @selected(old('difficulty_level') === $value)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="text-sm font-bold text-slate-700">السعة<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" type="number" name="capacity" value="{{ old('capacity') }}" required></label>
+                    <label class="text-sm font-bold text-slate-700">التصنيف
+                        <select class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="category" required>
+                            @foreach (['Hiking', 'Diving', 'Camping', 'Cyciling', 'Zaitoon day out', 'kayaking', 'climbing', 'Sky Diving', 'Blimping', 'Toursim'] as $category)
+                                <option value="{{ $category }}" @selected(old('category') === $category)>{{ $category }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="text-sm font-bold text-slate-700">الموقع<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="location" value="{{ old('location') }}" required></label>
+                    <label class="text-sm font-bold text-slate-700">المدة بالساعات<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" type="number" step="0.01" name="duration_hours" value="{{ old('duration_hours') }}" required></label>
+                    <label class="text-sm font-bold text-slate-700">السعر<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" type="number" step="0.01" name="price" value="{{ old('price') }}" required></label>
+                    <label class="text-sm font-bold text-slate-700">الحالة
+                        <select class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="status" required>
+                            @foreach (['Active', 'Suspended'] as $status)
+                                <option value="{{ $status }}" @selected(old('status', 'Active') === $status)>{{ $status }}</option>
+                            @endforeach
+                        </select>
+                    </label>
+                    <label class="text-sm font-bold text-slate-700 sm:col-span-2">المتطلبات<textarea class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="requirements" rows="3" required>{{ old('requirements') }}</textarea></label>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800" type="submit">حفظ المغامرة</button>
+                    <a class="rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200" href="{{ route('adventures.index') }}">إلغاء</a>
+                </div>
+            </form>
         </div>
-
-        @if ($errors->any())
-            <div class="form-errors" role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <form action="{{ route('adventures.store') }}" method="POST">
-            @csrf
-            <div class="form-grid">
-                <div class="form-field">
-                    <label for="title">اسم المغامرة</label>
-                    <input id="title" name="title" value="{{ old('title') }}" required>
-                </div>
-                <div class="form-field">
-                    <label for="activity_organizer_id">رقم المنظم</label>
-                    <input id="activity_organizer_id" type="number" name="activity_organizer_id" value="{{ old('activity_organizer_id') }}" required>
-                </div>
-                <div class="form-field full">
-                    <label for="description">الوصف</label>
-                    <textarea id="description" name="description" required>{{ old('description') }}</textarea>
-                </div>
-                <div class="form-field">
-                    <label for="difficulty_level">الصعوبة</label>
-                    <select id="difficulty_level" name="difficulty_level" required>
-                        @foreach (['Easy' => 'سهل', 'Medium' => 'متوسط', 'Hard' => 'صعب'] as $value => $label)
-                            <option value="{{ $value }}" @selected(old('difficulty_level') === $value)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label for="capacity">السعة</label>
-                    <input id="capacity" type="number" name="capacity" value="{{ old('capacity') }}" required>
-                </div>
-                <div class="form-field">
-                    <label for="category">التصنيف</label>
-                    <select id="category" name="category" required>
-                        @foreach (['Hiking', 'Diving', 'Camping', 'Cyciling', 'Zaitoon day out', 'kayaking', 'climbing', 'Sky Diving', 'Blimping', 'Toursim'] as $category)
-                            <option value="{{ $category }}" @selected(old('category') === $category)>{{ $category }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label for="location">الموقع</label>
-                    <input id="location" name="location" value="{{ old('location') }}" required>
-                </div>
-                <div class="form-field">
-                    <label for="duration_hours">المدة بالساعات</label>
-                    <input id="duration_hours" type="number" step="0.01" name="duration_hours" value="{{ old('duration_hours') }}" required>
-                </div>
-                <div class="form-field">
-                    <label for="price">السعر</label>
-                    <input id="price" type="number" step="0.01" name="price" value="{{ old('price') }}" required>
-                </div>
-                <div class="form-field">
-                    <label for="status">الحالة</label>
-                    <select id="status" name="status" required>
-                        @foreach (['Active', 'Suspended'] as $status)
-                            <option value="{{ $status }}" @selected(old('status', 'Active') === $status)>{{ $status }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-field full">
-                    <label for="requirements">المتطلبات</label>
-                    <textarea id="requirements" name="requirements" required>{{ old('requirements') }}</textarea>
-                </div>
-            </div>
-
-            <div class="actions">
-                <button class="button submit" type="submit">حفظ المغامرة</button>
-                <a class="button cancel" href="{{ route('adventures.index') }}">إلغاء</a>
-            </div>
-        </form>
     </main>
-</body>
-
-</html>
+</x-app-layout>

@@ -60,6 +60,7 @@ class BookingController extends Controller
             'commission_rate' => $commissionRate,
             'total_amount' => $totalAmount,
             'status' => 'Pending',
+            'capacity'=>$adventure->capacity ?? $request->participants_count,
         ];
 
         Booking::create($dataToInsert);

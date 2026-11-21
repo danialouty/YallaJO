@@ -5,12 +5,15 @@ use App\Http\Controllers\AdminOrganizerController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdventureController;
+use App\Http\Controllers\AdventureDayController;
 use App\Http\Controllers\AdventureSchedulesController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ChatbotController;
+
 
 
 
@@ -64,6 +67,13 @@ Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'show
 
 Route::middleware('auth')->group(function () {
     Route::resource('adventures', AdventureController::class);
+    Route::resource('adventure-days', AdventureDayController::class);
+    Route::resource('adventure-schedules', AdventureSchedulesController::class)
+        ->parameters(['adventure-schedules' => 'adventure_schedules']);
+    Route::put(
+        '/adventure-schedules/{adventure_schedules}/days/{adventure_day}',
+        [AdventureSchedulesController::class, 'updateDay']
+    )->name('adventure-schedules.days.update');
     Route::post('/schedules', [AdventureSchedulesController::class, 'store'])
         ->name('schedules.store');
     Route::post('/adventure-images', [ImagesController::class, 'store'])
@@ -120,6 +130,9 @@ Route::controller(ReviewController::class)
 
     });
 
+    Route::resource('payments', PaymentController::class)
+        ->except(['create'])
+        ->middleware('auth');
 // Frontend preview - local development only
 if (app()->environment('local')) {
     Route::view('/ui-preview', 'pages.ui-preview')
@@ -152,7 +165,9 @@ if (app()->environment('local')) {
 }
     Route::resource('payments', PaymentController::class)->middleware('auth');
 
-    Route::resource('guides', GuidesController::class);
+    Route::resource('guides', GuidesController::class)
+        ->only(['index', 'update'])
+        ->middleware('auth');
 
     Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
 
@@ -160,3 +175,8 @@ if (app()->environment('local')) {
     Route::get('/bookings/{bookingId}/payments',
     [PaymentController::class, 'showByBooking']
     )->name('payments.byBooking');
+
+
+    Route::post('/chatbot', [ChatbotController::class, 'chat'])
+    ->middleware('auth')
+    ->name('chatbot.chat');
