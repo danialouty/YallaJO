@@ -4,16 +4,24 @@
 @section('meta_description', 'استكشف مغامرات الأردن واختر رحلتك حسب الموقع والنشاط والسعر.')
 
 @section('content')
-    <section class="border-b border-outline/30 bg-surface">
-        <div class="mx-auto max-w-[1360px] px-4 py-12 sm:px-6 lg:px-12 lg:py-16">
-            <div class="max-w-3xl">
-                <p class="mb-3 text-sm font-bold text-brand">اكتشف الأردن بطريقتك</p>
-                <h1 class="font-display text-4xl font-extrabold leading-tight text-ink md:text-5xl">
+    <section class="adventures-hero border-b border-outline/30">
+        <div class="adventures-hero-image" aria-hidden="true"></div>
+        <div class="adventures-hero-overlay" aria-hidden="true"></div>
+        <div class="mx-auto max-w-[1360px] px-4 py-14 text-white sm:px-6 lg:px-12 lg:py-20">
+            <div class="relative max-w-3xl reveal-up">
+                <p class="mb-3 text-sm font-bold text-orange-200">اكتشف الأردن بطريقتك</p>
+                <h1 class="font-display text-4xl font-extrabold leading-tight drop-shadow-lg md:text-5xl">
                     مغامرات قريبة، وتجارب لا تُنسى
                 </h1>
-                <p class="mt-4 max-w-2xl text-base leading-8 text-muted">
+                <p class="mt-4 max-w-2xl text-base leading-8 text-white/85">
                     اختر المغامرة المناسبة لمستوى خبرتك، وقارِن الوجهات والأسعار والمدة قبل الحجز.
                 </p>
+                <div class="mt-7 flex flex-wrap gap-2">
+                    <span class="adventures-hero-chip">🥾 هايكنج ومسارات</span>
+                    <span class="adventures-hero-chip">🏕️ تخييم ومبيت</span>
+                    <span class="adventures-hero-chip">🌊 غوص ومياه</span>
+                    <span class="adventures-hero-chip">🫒 تجارب ريفية</span>
+                </div>
             </div>
         </div>
     </section>
@@ -21,7 +29,7 @@
     <main class="bg-canvas">
         <div class="mx-auto max-w-[1360px] px-4 py-8 sm:px-6 lg:px-12">
             <form action="{{ route('adventuresAll.index') }}" method="GET"
-                  class="grid gap-3 rounded-card border border-outline/30 bg-surface p-4 shadow-card md:grid-cols-2 lg:grid-cols-[1fr_220px_220px_auto]">
+                  class="adventures-filter grid gap-3 rounded-card border border-outline/30 bg-surface p-4 shadow-card md:grid-cols-2 lg:grid-cols-[1fr_220px_220px_auto]">
                 <label class="block">
                     <span class="mb-2 block text-xs font-bold text-muted">ابحث باسم المغامرة</span>
                     <input type="search" name="search" value="{{ request('search') }}"
@@ -67,16 +75,16 @@
                 </span>
             </div>
 
-            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="adventure-grid grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 @forelse($adventures as $adventure)
-                    <article class="group flex h-full flex-col overflow-hidden rounded-card border border-outline/30 bg-surface shadow-card transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <article class="adventure-card reveal-card group flex h-full flex-col overflow-hidden rounded-card border border-outline/30 bg-surface shadow-card">
                         <a href="{{ route('adventures.profile', $adventure) }}" class="relative block aspect-[4/3] overflow-hidden bg-canvas">
                             <img
                                 src="{{ $adventure->images->isNotEmpty() ? asset('images/' . $adventure->images->first()->image_path) : 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900' }}"
                                 alt="{{ $adventure->title }}"
                                 loading="lazy"
                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
-                            <span class="absolute right-3 top-3 rounded-full bg-forest px-3 py-1.5 text-xs font-bold text-white">
+                            <span class="adventure-category absolute right-3 top-3 rounded-full px-3 py-1.5 text-xs font-bold text-white">
                                 {{ $adventure->category }}
                             </span>
                         </a>

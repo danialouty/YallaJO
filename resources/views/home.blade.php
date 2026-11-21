@@ -4,7 +4,8 @@
 @section('meta_description', 'احجز رحلات هايكنج وتخييم وغوص وتجارب ريفية في مختلف مناطق الأردن.')
 
 @section('content')
-    <section class="relative isolate min-h-[620px] overflow-hidden bg-ink text-white" aria-labelledby="hero-title">
+    <section class="landing-hero relative isolate min-h-[620px] overflow-hidden bg-ink text-white" aria-labelledby="hero-title">
+        <div class="landing-topography" aria-hidden="true"></div>
         <img
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyNMFQwtfryBGvkUx_KyP8NtN2rqpr7hbzgwob3Q8PXMjKxlX74mrKWxazvPmWr4zg05dDaeCdcKEYjY93G-9-C_hujFUJOY0ij5yBmb_M1QF35TrgMZltoYsYV-2zZoZrgg7ONHVkvUK4OGLyWtNHlVCA8xSqDLu4KKagoJWQ1k6KAzxKRFwfOVYktOeXJnpGfOhWMhlO3CP_ddtg54Exy9U8EVV43ZWTCivGr4s"
             alt=""
@@ -72,6 +73,21 @@
                 <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">مسار وادي الموجب</span>
                 <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">تخييم وادي رم</span>
                 <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">غوص العقبة</span>
+            </div>
+
+            <div class="mt-8 grid w-full max-w-4xl grid-cols-3 gap-3">
+                <div class="landing-stat">
+                    <strong>+50</strong>
+                    <span>مسار ومغامرة</span>
+                </div>
+                <div class="landing-stat">
+                    <strong>12</strong>
+                    <span>محافظة أردنية</span>
+                </div>
+                <div class="landing-stat">
+                    <strong>24/7</strong>
+                    <span>دعم وحجز</span>
+                </div>
             </div>
         </div>
     </section>
