@@ -118,11 +118,11 @@
                             <label class="text-sm font-semibold">العنوان
                                 <input type="text" name="days[{{ $index }}][title]"
                                     value="{{ is_array($day) ? ($day['title'] ?? '') : ($day?->title ?? '') }}"
-                                    maxlength="255" required class="mt-1 w-full rounded-lg border-slate-300 text-sm">
+                                    maxlength="255" required data-ai-day-title class="mt-1 w-full rounded-lg border-slate-300 text-sm">
                             </label>
                             <label class="text-sm font-semibold sm:col-span-2">الوصف
                                 <textarea name="days[{{ $index }}][description]" rows="2"
-                                    class="mt-1 w-full rounded-lg border-slate-300 text-sm">{{ is_array($day) ? ($day['description'] ?? '') : ($day?->description ?? '') }}</textarea>
+                                    data-ai-day-description class="mt-1 w-full rounded-lg border-slate-300 text-sm">{{ is_array($day) ? ($day['description'] ?? '') : ($day?->description ?? '') }}</textarea>
                             </label>
                         </div>
                     </fieldset>
@@ -130,6 +130,9 @@
                 </div>
 
                 <div class="mt-5 flex flex-wrap gap-3">
+                    <button type="button" id="generate-itinerary"
+                        data-endpoint="{{ route('adventure-schedules.days.generate', $schedule) }}"
+                        class="rounded-lg bg-emerald-100 px-5 py-2.5 text-sm font-bold text-emerald-900 hover:bg-emerald-200">✦ املأ الأيام بالذكاء الاصطناعي</button>
                     <button type="submit"
                         class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">حفظ
                         الأيام</button>
@@ -137,9 +140,49 @@
                         class="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200">إنهاء
                         بدون إضافة أيام</a>
                 </div>
+                <p id="ai-status" class="mt-3 text-sm text-slate-600" role="status" aria-live="polite"></p>
             </form>
             @endif
         </section>
     </main>
+
+    @if ($schedule)
+        <script>
+            const generateButton = document.getElementById('generate-itinerary');
+            const aiStatus = document.getElementById('ai-status');
+
+            generateButton.addEventListener('click', async () => {
+                generateButton.disabled = true;
+                aiStatus.textContent = 'يتم إعداد اقتراح البرنامج عبر Ollama المحلي...';
+
+                try {
+                    const response = await fetch(generateButton.dataset.endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        },
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'تعذر توليد البرنامج.');
+
+                    const rows = [...document.querySelectorAll('#day-rows .day-row')];
+                    if (!Array.isArray(result.days) || result.days.length !== rows.length) {
+                        throw new Error('أعاد Ollama عددًا غير متوقع من الأيام.');
+                    }
+
+                    rows.forEach((row, index) => {
+                        row.querySelector('[data-ai-day-title]').value = result.days[index].title;
+                        row.querySelector('[data-ai-day-description]').value = result.days[index].description;
+                    });
+                    aiStatus.textContent = 'تم ملء الأيام بالاقتراح. راجع التفاصيل قبل حفظها.';
+                } catch (error) {
+                    aiStatus.textContent = error.message;
+                } finally {
+                    generateButton.disabled = false;
+                }
+            });
+        </script>
+    @endif
 
 </x-app-layout>

@@ -67,18 +67,18 @@
                 <div class="space-y-4 sm:col-span-2">
                     <h2 class="text-lg font-black text-slate-900">برنامج أيام المغامرة</h2>
                     @forelse ($adventure_schedules->adventure->days as $day)
-                        <fieldset class="rounded-xl border border-slate-200 p-4">
+                        <fieldset class="ai-day-row rounded-xl border border-slate-200 p-4">
                             <legend class="px-2 text-sm font-bold text-slate-700">اليوم {{ $day->day_number }}</legend>
                             <div class="grid gap-3 sm:grid-cols-2">
                                 
                                 <label class="text-sm font-semibold text-slate-700">العنوان
                                     <input type="text" maxlength="255" name="days[{{ $day->id }}][title]"
                                         value="{{ old('days.' . $day->id . '.title', $day->title) }}" required
-                                        class="mt-1 w-full rounded-lg border-slate-300 text-sm">
+                                        data-ai-day-title class="mt-1 w-full rounded-lg border-slate-300 text-sm">
                                 </label>
                                 <label class="text-sm font-semibold text-slate-700 sm:col-span-2">الوصف
                                     <textarea name="days[{{ $day->id }}][description]" rows="3"
-                                        class="mt-1 w-full rounded-lg border-slate-300 text-sm">{{ old('days.' . $day->id . '.description', $day->description) }}</textarea>
+                                        data-ai-day-description class="mt-1 w-full rounded-lg border-slate-300 text-sm">{{ old('days.' . $day->id . '.description', $day->description) }}</textarea>
                                 </label>
                             </div>
                         </fieldset>
@@ -87,6 +87,14 @@
                             الآن.</p>
                     @endforelse
                 </div>
+                @if ($adventure_schedules->adventure->days->isNotEmpty())
+                    <div class="sm:col-span-2">
+                        <button type="button" id="generate-itinerary"
+                            data-endpoint="{{ route('adventure-schedules.days.generate', $adventure_schedules) }}"
+                            class="rounded-lg bg-emerald-100 px-5 py-2.5 text-sm font-bold text-emerald-900 hover:bg-emerald-200">✦ أعد ملء الأيام بالذكاء الاصطناعي</button>
+                        <p id="ai-status" class="mt-2 text-sm text-slate-600" role="status" aria-live="polite"></p>
+                    </div>
+                @endif
                 <div class="flex flex-wrap gap-3 sm:col-span-2">
                     <button type="submit"
                         class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">حفظ
@@ -97,4 +105,42 @@
             </form>
         </section>
     </main>
+    @if ($adventure_schedules->adventure->days->isNotEmpty())
+        <script>
+            const generateButton = document.getElementById('generate-itinerary');
+            const aiStatus = document.getElementById('ai-status');
+
+            generateButton.addEventListener('click', async () => {
+                generateButton.disabled = true;
+                aiStatus.textContent = 'يتم إعداد اقتراح البرنامج عبر Ollama المحلي...';
+
+                try {
+                    const response = await fetch(generateButton.dataset.endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        },
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'تعذر توليد البرنامج.');
+
+                    const rows = [...document.querySelectorAll('.ai-day-row')];
+                    if (!Array.isArray(result.days) || result.days.length !== rows.length) {
+                        throw new Error('أعاد Ollama عددًا غير متوقع من الأيام.');
+                    }
+
+                    rows.forEach((row, index) => {
+                        row.querySelector('[data-ai-day-title]').value = result.days[index].title;
+                        row.querySelector('[data-ai-day-description]').value = result.days[index].description;
+                    });
+                    aiStatus.textContent = 'تم ملء الأيام بالاقتراح. راجع التفاصيل قبل حفظها.';
+                } catch (error) {
+                    aiStatus.textContent = error.message;
+                } finally {
+                    generateButton.disabled = false;
+                }
+            });
+        </script>
+    @endif
 </x-app-layout>
