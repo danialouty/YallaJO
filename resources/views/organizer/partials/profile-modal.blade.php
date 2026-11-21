@@ -1,4 +1,4 @@
-<dialog id="organizer-profile-modal"
+<dialog id="organizer-profile-modal" data-profile-errors="{{ $errors->any() ? 'true' : 'false' }}"
     dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
     class="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-0 text-slate-100 shadow-2xl backdrop:bg-black/70">
     <div class="p-6">
@@ -7,7 +7,7 @@
                 {{ $organizer ? __('Edit Organizer Profile') : __('Complete Organizer Profile') }}
             </h2>
             <button type="button"
-                onclick="document.getElementById('organizer-profile-modal').close()"
+                data-close-organizer-profile
                 class="rounded-lg px-2.5 py-1 text-slate-400 hover:bg-slate-800 hover:text-white">
                 ✕
             </button>
@@ -80,7 +80,7 @@
 
             <div class="flex items-center justify-end gap-3 border-t border-slate-800 pt-4">
                 <button type="button"
-                    onclick="document.getElementById('organizer-profile-modal').close()"
+                    data-close-organizer-profile
                     class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800">
                     {{ __('Cancel') }}
                 </button>
@@ -93,27 +93,3 @@
     </div>
 </dialog>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('organizer-profile-modal');
-        const typeSelect = document.getElementById('organizer_type');
-        const licenseHint = document.getElementById('license-hint');
-
-        const syncHints = () => {
-            const isOffice = typeSelect.value === 'tourism_office';
-            licenseHint.textContent = isOffice
-                ? licenseHint.dataset.officeHint
-                : licenseHint.dataset.groupHint;
-            licenseHint.className = isOffice
-                ? 'text-xs text-amber-400'
-                : 'text-xs text-slate-400';
-        };
-
-        typeSelect.addEventListener('change', syncHints);
-        syncHints();
-
-        @if ($errors->any())
-            modal.showModal();
-        @endif
-    });
-</script>

@@ -70,7 +70,7 @@
     </main>
 
     @if ($optionalAdventure)
-        <dialog class="adventure-modal m-auto max-h-[calc(100vh-2rem)] w-[min(720px,calc(100%-2rem))] overflow-y-auto rounded-2xl border-0 p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60" id="optional-adventure-modal" dir="rtl">
+        <dialog class="adventure-modal m-auto max-h-[calc(100vh-2rem)] w-[min(720px,calc(100%-2rem))] overflow-y-auto rounded-2xl border-0 p-0 text-slate-800 shadow-2xl backdrop:bg-slate-950/60" id="optional-adventure-modal" data-open-optional="{{ $optionalAdventure && request('phase') === 'optional' ? 'true' : 'false' }}" dir="rtl">
             <div class="p-5 sm:p-7">
                 <div class="mb-5 flex items-start justify-between gap-4">
                     <div><h2 class="text-xl font-black">المرحلة الثانية: الصور</h2><p class="mt-1 text-sm text-slate-500">{{ $optionalAdventure->title }}</p></div>
@@ -97,13 +97,4 @@
         </dialog>
     @endif
 
-    <script>
-        document.querySelectorAll('.adventure-modal').forEach((modal) => {
-            modal.querySelectorAll('.modal-close, [data-close-modal]').forEach((button) => button.addEventListener('click', () => modal.close()));
-            modal.addEventListener('click', (event) => { if (event.target === modal) modal.close(); });
-        });
-        @if ($optionalAdventure && request('phase') === 'optional')
-            document.getElementById('optional-adventure-modal').showModal();
-        @endif
-    </script>
 </x-app-layout>

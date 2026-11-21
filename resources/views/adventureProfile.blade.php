@@ -33,7 +33,7 @@
         </section>
 
         <div class="mt-6 grid items-start gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
-            <aside class="space-y-4 lg:sticky lg:top-5">
+            <aside class="space-y-4 lg:sticky lg:top-5" data-adventure-booking data-price="{{ $adventure->price }}" data-capacity="{{ $adventure->capacity }}">
                 <div class="rounded-2xl bg-white p-5 shadow-sm">
                     <div class="mb-5 flex items-center justify-between gap-4">
                         <span class="text-sm text-slate-500">السعر للشخص</span>
@@ -57,7 +57,7 @@
                             <span>الإجمالي التقريبي</span>
                             <span class="text-xl text-orange-700"><span id="totalPrice">{{ number_format($adventure->price * 2, 2) }}</span> د.أ</span>
                         </div>
-                        <button type="button" class="mt-5 w-full rounded-lg bg-orange-700 px-4 py-3 font-extrabold text-white hover:bg-orange-800" onclick="alert('واجهة الحجز جاهزة، اربطها بمسار الحجز عند تفعيله.')">🔒 تأكيد الحجز الآن</button>
+                        <button type="button" id="confirmBooking" class="mt-5 w-full rounded-lg bg-orange-700 px-4 py-3 font-extrabold text-white hover:bg-orange-800">🔒 تأكيد الحجز الآن</button>
                         <p class="mt-3 text-center text-xs text-slate-500">السعر النهائي يعتمد على تفاصيل الحجز</p>
                     </form>
                 </div>
@@ -132,35 +132,5 @@
         </div>
     </main>
 
-    <script>
-        const price = Number(@json($adventure->price));
-        const capacity = Number(@json($adventure->capacity));
-        let people = 2;
-        const peopleCount = document.getElementById('peopleCount');
-        const peopleInput = document.getElementById('peopleInput');
-        const totalPrice = document.getElementById('totalPrice');
-
-        function updateBooking() {
-            peopleCount.textContent = people;
-            peopleInput.value = people;
-            totalPrice.textContent = (price * people).toFixed(2);
-        }
-
-        document.getElementById('increase').addEventListener('click', function () {
-            if (people < capacity) {
-                people++;
-                updateBooking();
-            }
-        });
-
-        document.getElementById('decrease').addEventListener('click', function () {
-            if (people > 1) {
-                people--;
-                updateBooking();
-            }
-        });
-
-        updateBooking();
-    </script>
 </body>
 </html>

@@ -37,7 +37,7 @@
                         </p>
                     </div>
                     <button type="button"
-                        onclick="document.getElementById('organizer-profile-modal').showModal()"
+                        data-open-organizer-profile
                         class="shrink-0 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-emerald-500">
                         {{ __('Complete Profile') }}
                     </button>
@@ -83,7 +83,7 @@
                     </div>
 
                     <button type="button"
-                        onclick="document.getElementById('organizer-profile-modal').showModal()"
+                        data-open-organizer-profile
                         class="shrink-0 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-700">
                         {{ __('Edit Profile') }}
                     </button>

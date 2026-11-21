@@ -126,13 +126,4 @@
         </div>
     </div>
 
-    <style>
-        .btn-yalla-primary {
-            background-color: #A94B2B;
-            color: #ffffff;
-            transition: background-color 0.2s ease;
-        }
-        .btn-yalla-primary:hover { background-color: #8E3D22; }
-    </style>
-
 </x-app-layout>
