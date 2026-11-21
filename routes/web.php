@@ -128,6 +128,9 @@ Route::controller(ReviewController::class)
 
     });
 
+    Route::resource('payments', PaymentController::class)
+        ->except(['create'])
+        ->middleware('auth');
 // Frontend preview - local development only
 if (app()->environment('local')) {
     Route::view('/ui-preview', 'pages.ui-preview')
@@ -160,7 +163,9 @@ if (app()->environment('local')) {
 }
     Route::resource('payments', PaymentController::class)->middleware('auth');
 
-    Route::resource('guides', GuidesController::class);
+    Route::resource('guides', GuidesController::class)
+        ->only(['index', 'update'])
+        ->middleware('auth');
 
     Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
 
