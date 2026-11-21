@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdventureController;
+use App\Http\Controllers\AdventureDayController;
 use App\Http\Controllers\AdventureSchedulesController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\HomeController;
@@ -46,6 +47,13 @@ Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'show
 
 Route::middleware('auth')->group(function () {
     Route::resource('adventures', AdventureController::class);
+    Route::resource('adventure-days', AdventureDayController::class);
+    Route::resource('adventure-schedules', AdventureSchedulesController::class)
+        ->parameters(['adventure-schedules' => 'adventure_schedules']);
+    Route::put(
+        '/adventure-schedules/{adventure_schedules}/days/{adventure_day}',
+        [AdventureSchedulesController::class, 'updateDay']
+    )->name('adventure-schedules.days.update');
     Route::post('/schedules', [AdventureSchedulesController::class, 'store'])
         ->name('schedules.store');
     Route::post('/adventure-images', [ImagesController::class, 'store'])
