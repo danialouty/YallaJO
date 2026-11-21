@@ -112,20 +112,18 @@
                 <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
                     <h2 class="mb-5 text-lg font-black">♧ برنامج الرحلة خطوة بخطوة</h2>
                     <div class="space-y-5 border-r-2 border-emerald-100 pr-5">
-                        @foreach([
-                            ['08:00 صباحاً', 'التجمع والانطلاق', 'الالتقاء بالمجموعة والانطلاق إلى موقع المغامرة.'],
-                            ['09:30 صباحاً', 'الوصول والتعرف على المنطقة', 'استكشاف المكان والتعرف على طبيعته وثقافته المحلية.'],
-                            ['10:15 صباحاً', 'بدء النشاط الرئيسي', 'الاستمتاع بالنشاط الأساسي والتجربة التي يقدمها المنظم.'],
-                            ['12:00 ظهراً', 'وجبة محلية واستراحة', 'الاستمتاع بوجبة محلية وأخذ استراحة مع المجموعة.'],
-                            ['02:00 ظهراً', 'نهاية الرحلة والعودة', 'اختتام التجربة والعودة من موقع المغامرة.'],
-                        ] as [$time, $title, $description])
+                        @forelse ($adventure->days as $day)
                             <div class="relative">
                                 <span class="absolute -right-[1.65rem] top-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-800 ring-2 ring-emerald-100"></span>
-                                <span class="text-xs font-bold text-orange-700">{{ $time }}</span>
-                                <h3 class="mt-1 font-bold">{{ $title }}</h3>
-                                <p class="mt-1 text-sm leading-6 text-slate-500">{{ $description }}</p>
+                                <span class="text-xs font-bold text-orange-700">اليوم {{ $day->day_number }}</span>
+                                <h3 class="mt-1 font-bold">{{ $day->title }}</h3>
+                                @if ($day->description)
+                                    <p class="mt-1 text-sm leading-6 text-slate-500">{{ $day->description }}</p>
+                                @endif
                             </div>
-                        @endforeach
+                        @empty
+                            <p class="text-sm text-slate-500">لم تتم إضافة برنامج الرحلة بعد.</p>
+                        @endforelse
                     </div>
                 </div>
             </section>

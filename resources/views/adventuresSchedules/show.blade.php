@@ -19,7 +19,7 @@
 
             <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <p class="rounded-lg bg-slate-50 p-4"><strong>رقم المغامرة:</strong> {{ $schedule->adventure_id }}</p>
-                <p class="rounded-lg bg-slate-50 p-4"><strong>رقم الدليل:</strong> {{ $schedule->guide_id }}</p>
+                <p class="rounded-lg bg-slate-50 p-4"><strong> الدليل:</strong> {{ $schedule->guide->ActivityOrganizer->user->name }}</p>
                 <p class="rounded-lg bg-slate-50 p-4"><strong>السعة:</strong> {{ $schedule->capacity }}</p>
                 <p class="rounded-lg bg-slate-50 p-4"><strong>يبدأ في:</strong> {{ $schedule->starts_at?->format('Y-m-d H:i') ?? '—' }}</p>
                 <p class="rounded-lg bg-slate-50 p-4"><strong>ينتهي في:</strong> {{ $schedule->ends_at?->format('Y-m-d H:i') ?? '—' }}</p>

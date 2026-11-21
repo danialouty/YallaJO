@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityOrganizer;
 use App\Models\Adventure;
 use Illuminate\Http\Request;
 
@@ -26,7 +27,8 @@ class AdventureController extends Controller
      */
     public function create()
     {
-        return view('adventures.create');
+        $organizers = ActivityOrganizer::all();
+        return view('adventures.create', compact('organizers'));
     }
 
     /**
@@ -46,7 +48,6 @@ class AdventureController extends Controller
             'duration_hours' => 'required',
             'price' => 'required',
             'requirements' => 'required|string',
-            'status' => 'required',
         ]);
         $adventure = Adventure::create($request->only([
             'title',
@@ -59,7 +60,6 @@ class AdventureController extends Controller
             'duration_hours',
             'price',
             'requirements',
-            'status',
         ]));
 
         return redirect()->route('adventures.index', [
@@ -176,7 +176,7 @@ class AdventureController extends Controller
 
     public function showProfile(Adventure $adventure)
     {
-        $adventure->load('images');
+        $adventure->load(['images', 'days']);
 
         return view('adventureProfile', compact('adventure'));
     }
