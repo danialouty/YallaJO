@@ -196,7 +196,7 @@ class AdventureSchedulesController extends Controller
         $adventure_schedules->update($validated);
 
         if ($request->routeIs('adventure-schedules.update')) {
-            return redirect()->route('adventure-schedules.show', $adventure_schedules)
+            return redirect()->route('adventure-schedules.index', $adventure_schedules)
                 ->with('success', 'Schedule updated successfully');
         }
 
