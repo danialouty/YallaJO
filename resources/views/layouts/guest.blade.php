@@ -12,10 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 antialiased">
 
@@ -24,7 +20,8 @@
 
         <div class="lg:w-5/12 bg-[#2D5041] text-white p-8 lg:p-12 flex flex-col justify-between relative overflow-hidden">
             <div>
-                <a href="/" class="inline-flex items-center gap-2 text-2xl font-extrabold tracking-wide">
+                <a href="/" class="inline-flex items-center gap-3 text-2xl font-extrabold tracking-wide">
+                    <x-application-logo class="block size-12 shrink-0" aria-hidden="true" />
                     <span>يلا جو | YallaJo</span>
                 </a>
                 <span class="block mt-2 text-xs text-emerald-200">منصة المغامرات والسياحة البيئية في الأردن</span>

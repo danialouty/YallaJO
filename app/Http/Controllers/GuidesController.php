@@ -6,7 +6,6 @@ use App\Models\Guides;
 use App\Models\ActivityOrganizer;
 use App\Models\Guides_availabilities;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class GuidesController extends Controller
@@ -16,7 +15,7 @@ class GuidesController extends Controller
      */
     public function index()
     {
-        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->firstOrFail();
         $guide = $organizer
             ? Guides::with([
                 'activityOrganizer.user',
@@ -45,8 +44,10 @@ class GuidesController extends Controller
      */
     public function create()
     {
-        $organizers = ActivityOrganizer::with('user')->get();
-        return view('guides.create', compact('organizers'));
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->firstOrFail();
+        abort_if(Guides::where('activity_organizer_id', $organizer->id)->exists(), 403, 'A guide profile already exists for this organizer.');
+
+        return view('guides.create', compact('organizer'));
     }
 
     /**
@@ -54,8 +55,11 @@ class GuidesController extends Controller
      */
     public function store(Request $request)
     {
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        abort_unless($organizer !== null, 403, 'لا تملك صلاحية إنشاء ملف مرشد');
+        abort_if(Guides::where('activity_organizer_id', $organizer->id)->exists(), 409, 'يوجد ملف مرشد لهذا المنظم بالفعل');
+
         $validated = $request->validate([
-            'activity_organizer_id' => 'required|exists:activity_organizers,id|unique:guides,activity_organizer_id',
             'bio' => 'required|string',
             'experience_years' => 'required|integer|min:0',
             'specialization' => 'required|string',
@@ -63,8 +67,15 @@ class GuidesController extends Controller
             'status' => 'sometimes|in:Available,Busy',
         ]);
         $validated['specialization'] = array_values(array_filter(array_map('trim', explode(',', $validated['specialization']))));
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->firstOrFail();
+        abort_if(Guides::where('activity_organizer_id', $organizer->id)->exists(), 403, 'A guide profile already exists for this organizer.');
+        $validated['activity_organizer_id'] = $organizer->id;
 
         $guide = Guides::create($validated);
+        Guides_availabilities::create([
+            'guide_id' => $guide->id,
+            'status' => $validated['status'],
+        ]);
 
         return redirect()->route('guides.index')
     ->with('success', 'تمت إضافة المرشد بنجاح');
@@ -98,21 +109,14 @@ class GuidesController extends Controller
     public function update(Request $request,$id)
     {
         $guide = Guides::findOrFail($id);
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
         abort_unless(
-            ActivityOrganizer::where('id', $guide->activity_organizer_id)
-                ->where('user_id', Auth::id())
-                ->exists(),
+            $organizer && $guide->activity_organizer_id === $organizer->id,
             403,
             'لا تملك صلاحية تعديل هذا المرشد'
         );
 
         $validated = $request->validate([
-            'activity_organizer_id' => [
-                'sometimes',
-                'required',
-                'exists:activity_organizers,id',
-                Rule::unique('guides', 'activity_organizer_id')->ignore($id),
-            ],
             'bio' => 'sometimes|required|string',
             'experience_years' => 'sometimes|required|integer|min:0',
             'specialization' => 'sometimes|required|string',
@@ -140,7 +144,8 @@ class GuidesController extends Controller
      */
     public function destroy($id)
     {
-        $guide = Guides::findOrFail($id);
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->firstOrFail();
+        $guide = Guides::where('activity_organizer_id', $organizer->id)->findOrFail($id);
 
         $guide->delete();
 

@@ -42,14 +42,8 @@
                 {{-- Dashboard Brand --}}
                 <div class="border-b border-white/15
                                    px-5 py-6">
-                    <div class="flex items-center gap-3">
-                        <span class="flex size-10
-                                           items-center justify-center
-                                           rounded-control bg-brand
-                                           font-display text-xl
-                                           font-bold text-white" aria-hidden="true">
-                            ي
-                        </span>
+                    <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="الانتقال إلى الصفحة الرئيسية">
+                        <x-application-logo class="block size-11 shrink-0" aria-hidden="true" />
 
                         <div>
                             <p class="font-display
@@ -60,8 +54,8 @@
                             <p class="text-xs text-white/70" lang="en" dir="ltr">
                                 YallaJO
                             </p>
-                        </div>
                     </div>
+                    </a>
 
                     <p class="mt-4 text-xs
                                        text-white/70">
@@ -104,49 +98,6 @@
                 @include('partials.dashboard.header', [
                     'dashboardUser' => $dashboardUser
                 ])
-
-                <div class="flex min-h-20
-                                       items-center justify-between
-                                       gap-4 px-4 py-3
-                                       sm:px-6 lg:px-8">
-
-                    <div class="min-w-0">
-
-                        <p class="mb-1 text-xs
-                                               text-muted">
-                            YallaJO
-
-                            <span aria-hidden="true">
-                                /
-                            </span>
-
-                            @yield(
-                                'dashboard-name',
-                                'بوابة التحكم'
-                            )
-                        </p>
-
-                        <h1 class="font-display
-                                               text-lg font-bold
-                                               text-ink sm:text-xl">
-                            @yield(
-                                'dashboard-title',
-                                'لوحة التحكم'
-                            )
-                        </h1>
-
-                    </div>
-
-                    {{-- Header Actions --}}
-                    <div class="flex shrink-0
-                                           items-center gap-3">
-                        @yield('dashboard-header-actions')
-                    </div>
-
-                </div>
-
-                </header>
-
 
                 {{-- Dashboard Page Content --}}
                 <main id="dashboard-main" class="w-full flex-1

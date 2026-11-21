@@ -1,123 +1,115 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>يلا جو | اكتشف الأردن</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-slate-50 font-sans text-slate-800">
-    <main>
-        <section class="relative isolate flex min-h-[520px] flex-col justify-between overflow-hidden px-5 py-8 text-white sm:px-10 lg:px-[5%]">
-            <img class="absolute inset-0 -z-20 h-full w-full object-cover" src="https://images.unsplash.com/photo-1547234935-80c7145ec969?q=85&w=2000" alt="">
-            <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/90 via-slate-900/65 to-slate-900/40"></div>
-            <nav class="mx-auto flex w-full max-w-7xl items-center justify-between">
-                <a href="{{ route('home') }}" class="text-2xl font-black">يلا جو</a>
-                <a href="{{ route('adventuresAll.index') }}" class="rounded-lg border border-white/50 px-4 py-2 text-sm font-bold transition hover:bg-white hover:text-slate-900">جميع المغامرات</a>
-            </nav>
+@extends('layouts.site')
 
-            <div class="mx-auto my-12 w-full max-w-4xl text-center">
-                <span class="inline-block rounded-full border border-white/30 bg-white/15 px-4 py-2 text-xs font-semibold backdrop-blur">✦ بوابتك لتجارب ومغامرات الطبيعة في الأردن</span>
-                <h1 class="mt-5 text-3xl font-black leading-relaxed sm:text-5xl">
-                    اكتشف مسارات الأردن<br><span class="text-orange-200">ومجتمعات المغامرة</span>
-                </h1>
-                <p class="mx-auto mt-4 max-w-2xl text-sm leading-8 text-slate-200 sm:text-base">
-                    احجز رحلتك، اكتشف تجارب جديدة، وخوض مغامرات فريدة مع مجموعات محلية ومرشدين محترفين في قلب الطبيعة الأردنية.
-                </p>
+@section('title', 'اكتشف مغامرات الأردن | YallaJO')
+@section('meta_description', 'احجز رحلات هايكنج وتخييم وغوص وتجارب ريفية في مختلف مناطق الأردن.')
 
-                <form action="{{ route('adventuresAll.index') }}" method="GET" class="mt-8 grid gap-2 rounded-2xl bg-white p-3 text-right text-slate-800 shadow-xl md:grid-cols-2 lg:grid-cols-5">
-                    <label class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600">
-                        📍 الوجهة
-                        <select name="location" class="mt-1 block w-full border-0 bg-transparent text-sm text-slate-800 focus:ring-0">
-                            <option value="">اختر الوجهة</option>
-                            <option value="عمان">عمان</option>
-                            <option value="وادي رم">وادي رم</option>
-                            <option value="البتراء">البتراء</option>
-                            <option value="العقبة">العقبة</option>
-                            <option value="عجلون">عجلون</option>
-                        </select>
-                    </label>
-                    <label class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600">
-                        🧭 نوع النشاط
-                        <select name="category" class="mt-1 block w-full border-0 bg-transparent text-sm text-slate-800 focus:ring-0">
-                            <option value="">جميع النشاطات</option>
-                            <option value="Hiking">المشي والمسارات</option>
-                            <option value="Camping">التخييم</option>
-                            <option value="Diving">الغوص</option>
-                            <option value="adventure">مغامرات</option>
-                        </select>
-                    </label>
-                    <label class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600">
-                        📅 تاريخ الرحلة
-                        <input type="date" name="date" class="mt-1 block w-full border-0 bg-transparent text-sm text-slate-800 focus:ring-0">
-                    </label>
-                    <label class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600">
-                        👥 عدد الأشخاص
-                        <select name="people" class="mt-1 block w-full border-0 bg-transparent text-sm text-slate-800 focus:ring-0">
-                            <option value="1">شخص واحد</option>
-                            <option value="2">شخصان</option>
-                            <option value="3">3 أشخاص</option>
-                            <option value="4">4 أشخاص</option>
-                            <option value="5">5 أشخاص أو أكثر</option>
-                        </select>
-                    </label>
-                    <button type="submit" class="rounded-xl bg-orange-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-800">🔍 ابحث الآن</button>
-                </form>
+@section('content')
+    <section class="landing-hero relative isolate min-h-[620px] overflow-hidden bg-ink text-white" aria-labelledby="hero-title">
+        <div class="landing-topography" aria-hidden="true"></div>
+        <img
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyNMFQwtfryBGvkUx_KyP8NtN2rqpr7hbzgwob3Q8PXMjKxlX74mrKWxazvPmWr4zg05dDaeCdcKEYjY93G-9-C_hujFUJOY0ij5yBmb_M1QF35TrgMZltoYsYV-2zZoZrgg7ONHVkvUK4OGLyWtNHlVCA8xSqDLu4KKagoJWQ1k6KAzxKRFwfOVYktOeXJnpGfOhWMhlO3CP_ddtg54Exy9U8EVV43ZWTCivGr4s"
+            alt=""
+            aria-hidden="true"
+            fetchpriority="high"
+            class="absolute inset-0 -z-20 h-full w-full object-cover">
+        <div class="absolute inset-0 -z-10 bg-gradient-to-b from-ink/85 via-ink/60 to-ink/95"></div>
 
-                <div class="mt-5 flex flex-wrap justify-center gap-2 text-xs text-slate-100">
-                    <span class="rounded-full bg-white/15 px-3 py-1.5">🥾 مسارات مشي</span>
-                    <span class="rounded-full bg-white/15 px-3 py-1.5">🏕️ تخييم ومبيت</span>
-                    <span class="rounded-full bg-white/15 px-3 py-1.5">🚵 مغامرات</span>
-                    <span class="rounded-full bg-white/15 px-3 py-1.5">🌊 تجارب مائية</span>
+        <div class="mx-auto flex min-h-[620px] max-w-[1360px] flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-12">
+            <p class="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-5 py-2 text-sm text-white backdrop-blur-sm">
+                <span class="text-orange-200" aria-hidden="true">✦</span>
+                بوابتك لتجارب ومغامرات الطبيعة في الأردن
+            </p>
+
+            <h1 id="hero-title" class="max-w-4xl font-display text-4xl font-extrabold leading-tight tracking-tight drop-shadow-lg md:text-6xl lg:text-7xl">
+                اكتشف مسارات الأردن
+                <span class="mt-2 block text-orange-200">ومجتمعات المغامرة</span>
+            </h1>
+
+            <p class="mt-7 max-w-2xl text-base leading-8 text-white/90 md:text-lg">
+                احجز رحلات هايكنج، تخييم، غطس وتجارب ريفية،
+                واكتشف مغامرات جديدة مع مرشدين ومجموعات محلية موثوقة.
+            </p>
+
+            <form action="{{ route('adventuresAll.index') }}" method="GET"
+                  class="mt-10 grid w-full max-w-5xl gap-3 rounded-card bg-surface p-3 text-right text-ink shadow-2xl md:grid-cols-2 lg:grid-cols-4">
+                <label class="flex min-h-20 items-center gap-3 rounded-xl bg-[#eef1ff] px-4 py-3">
+                    <span aria-hidden="true" class="text-xl text-brand">⌖</span>
+                    <span class="min-w-0 flex-1">
+                        <span class="mb-1 block text-xs font-bold text-muted">الوجهة والمكان</span>
+                        <input name="location" type="text" placeholder="الموجب، رم، عجلون"
+                               class="w-full border-0 bg-transparent p-0 text-sm focus:outline-none focus:ring-0">
+                    </span>
+                </label>
+
+                <label class="flex min-h-20 items-center gap-3 rounded-xl bg-[#eef1ff] px-4 py-3">
+                    <span aria-hidden="true" class="text-xl text-forest">◉</span>
+                    <span class="min-w-0 flex-1">
+                        <span class="mb-1 block text-xs font-bold text-muted">نوع التجربة</span>
+                        <select name="category" class="w-full border-0 bg-transparent p-0 text-sm focus:outline-none focus:ring-0">
+                            <option value="">كل الفعاليات</option>
+                            <option value="Hiking">هايكنج ومسارات</option>
+                            <option value="Camping">تخييم ورصد نجوم</option>
+                            <option value="Diving">غوص ورياضات بحرية</option>
+                            <option value="Zaitoon day out">تجارب ريفية وحصاد</option>
+                        </select>
+                    </span>
+                </label>
+
+                <label class="flex min-h-20 items-center gap-3 rounded-xl bg-[#eef1ff] px-4 py-3">
+                    <span aria-hidden="true" class="text-xl text-accent">▣</span>
+                    <span class="min-w-0 flex-1">
+                        <span class="mb-1 block text-xs font-bold text-muted">الموعد</span>
+                        <input name="date" type="date" class="w-full border-0 bg-transparent p-0 text-sm focus:outline-none focus:ring-0">
+                    </span>
+                </label>
+
+                <button type="submit" class="min-h-20 rounded-xl bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-dark">
+                    ابحث عن مغامرة
+                </button>
+            </form>
+
+            <div class="mt-5 flex flex-wrap items-center justify-center gap-3 text-sm text-white/90" aria-label="أنشطة رائجة">
+                <span class="font-bold text-orange-200">رائج الآن:</span>
+                <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">مسار وادي الموجب</span>
+                <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">تخييم وادي رم</span>
+                <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">غوص العقبة</span>
+            </div>
+
+            <div class="mt-8 grid w-full max-w-4xl grid-cols-3 gap-3">
+                <div class="landing-stat">
+                    <strong>+50</strong>
+                    <span>مسار ومغامرة</span>
+                </div>
+                <div class="landing-stat">
+                    <strong>12</strong>
+                    <span>محافظة أردنية</span>
+                </div>
+                <div class="landing-stat">
+                    <strong>24/7</strong>
+                    <span>دعم وحجز</span>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="mx-auto flex w-full max-w-7xl flex-wrap justify-between gap-3 text-xs font-semibold text-emerald-100">
-                <span>♧ تجارب محلية أصيلة</span>
-                <span>✦ اكتشف أجمل مناطق الأردن</span>
-                <span>♡ مغامرات تناسب الجميع</span>
-            </div>
-        </section>
+    @include('partials.home.featured-adventures')
 
-        <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <span class="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">✧ ابدأ رحلتك القادمة</span>
-                    <h2 class="mt-2 text-2xl font-black text-slate-900">مغامرات وتجارب لأول مرة</h2>
-                    <p class="mt-2 text-sm text-slate-500">تجارب مميزة، ومسارات مختارة بعناية لتعيش أجمل لحظات المغامرة.</p>
-                </div>
-                <a href="{{ route('adventuresAll.index') }}" class="font-bold text-orange-700 hover:text-orange-900">عرض كل المغامرات ←</a>
+    <section class="bg-[#f5f7f4] px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="organizer-join-title">
+        <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-3xl bg-forest px-6 py-8 text-white sm:px-10 sm:py-10 md:flex-row md:items-center">
+            <div class="max-w-2xl">
+                <p class="text-sm font-bold text-orange-200">لأصحاب التجارب المحلية</p>
+                <h2 id="organizer-join-title" class="mt-2 text-2xl font-extrabold sm:text-3xl">سجّل كمنظّم مغامرات</h2>
+                <p class="mt-3 text-sm leading-7 text-white/80">أنشئ حساب منظّم، أضف مغامراتك ومرشدك، وتابع الحجوزات بعد مراجعة طلبك والموافقة عليه.</p>
             </div>
-
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                @forelse($adventures as $adventure)
-                    <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                        <div class="relative h-44">
-                            <img class="h-full w-full object-cover" src="{{ $adventure->images->isNotEmpty() ? asset('images/' . $adventure->images->first()->image_path) : 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600' }}" alt="{{ $adventure->title }}">
-                            <span class="absolute right-3 top-3 rounded-full bg-emerald-800 px-3 py-1 text-xs font-bold text-white">{{ $adventure->category }}</span>
-                            <span class="absolute left-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white/90 text-slate-600">♡</span>
-                        </div>
-                        <div class="p-4">
-                            <p class="text-xs text-slate-500">📍 {{ $adventure->location }}</p>
-                            <h3 class="mt-2 min-h-12 font-extrabold leading-6 text-slate-900">{{ $adventure->title }}</h3>
-                            <div class="mt-3 flex justify-between text-xs text-slate-500">
-                                <span>⏱ {{ $adventure->duration_hours }} ساعات</span>
-                                <span>👥 {{ $adventure->capacity }} مقاعد</span>
-                            </div>
-                            <div class="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
-                                <a href="{{ route('adventures.profile', $adventure) }}" class="rounded-lg bg-orange-700 px-3 py-2 text-xs font-bold text-white hover:bg-orange-800">احجز الآن</a>
-                                <div class="text-left">
-                                    <p class="text-[11px] text-slate-500">السعر للشخص</p>
-                                    <p class="font-black text-orange-700">{{ number_format($adventure->price, 0) }} د.أ</p>
-                                </div>
-                            </div>
-                        </div>
-                    </article>
-                @empty
-                    <div class="col-span-full rounded-2xl bg-white p-10 text-center text-slate-500">لا توجد مغامرات متاحة حالياً.</div>
-                @endforelse
-            </div>
-        </section>
-    </main>
-</body>
-</html>
+            @guest
+                <a href="{{ route('register', ['role' => 'Activity_Organizer']) }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A94B2B] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#8E3D22]">ابدأ تسجيل المنظّم</a>
+            @else
+                @if (auth()->user()->role === 'Activity_Organizer')
+                    <a href="{{ route('organizers.index') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A94B2B] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#8E3D22]">ملف المنظّم</a>
+                @else
+                    <p class="text-sm text-white/80">لتسجيل حساب منظّم جديد، سجّل الخروج أولًا ثم ابدأ طلبك.</p>
+                @endif
+            @endguest
+        </div>
+    </section>
+@endsection

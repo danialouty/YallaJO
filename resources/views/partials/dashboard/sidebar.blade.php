@@ -13,30 +13,21 @@
             'icon' => 'dashboard',
         ],
         [
-            'label' => 'مغامراتي ورحلاتي',
-            'route' => 'organizer.adventures.index',
+            'label' => 'المرشدون',
+            'route' => 'guides.index',
+            'icon' => 'guides',
+        ],
+        [
+            'label' => 'المغامرات',
+            'route' => 'adventures.index',
             'icon' => 'adventures',
         ],
         [
-            'label' => 'إضافة مغامرة جديدة',
-            'route' => 'organizer.adventures.create',
-            'icon' => 'add',
-        ],
-        [
-            'label' => 'الحجوزات والمشاركون',
-            'route' => 'organizer.bookings.index',
+            'label' => 'مواعيد المغامرات',
+            'route' => 'adventure-schedules.index',
             'icon' => 'bookings',
         ],
-        [
-            'label' => 'إدارة مجتمعي',
-            'route' => 'organizer.communities.index',
-            'icon' => 'community',
-        ],
-        [
-            'label' => 'الأرباح والمدفوعات',
-            'route' => 'organizer.payments.index',
-            'icon' => 'payments',
-        ],
+    
     ];
 
     $adminMenu = [
@@ -85,6 +76,9 @@
 
         'adventures' =>
             'M3 20 9 9l4 7 3-4 5 8H3Z',
+
+        'guides' =>
+            'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2 M9 11a4 4 0 1 0 0-8a4 4 0 0 0 0 8 M19 8v6 M16 11h6',
 
         'add' =>
             'M12 5v14 M5 12h14',

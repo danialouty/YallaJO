@@ -13,9 +13,14 @@ class AdventureController extends Controller
     public function index()
     {
         //
-        $adventures = Adventure::with(['images', 'schedules'])->latest()->paginate(5);
+        $organizerId = (int) request()->user()->activityOrganizer->id;
+        $adventures = Adventure::with(['images', 'schedules'])
+            ->where('activity_organizer_id', $organizerId)
+            ->latest()->paginate(5);
         $optionalAdventure = request('phase') === 'optional'
-            ? Adventure::with(['images', 'schedules'])->find(request('adventure_id'))
+            ? Adventure::with(['images', 'schedules'])
+                ->where('activity_organizer_id', $organizerId)
+                ->find(request('adventure_id'))
             : null;
 
         return view('adventures.index', compact('adventures', 'optionalAdventure'));
@@ -35,10 +40,9 @@ class AdventureController extends Controller
     public function store(Request $request)
     {
         //
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:255',
-            'activity_organizer_id' => 'required',
             'difficulty_level' => 'required',
             'capacity' => 'required',
             'category' => 'required',
@@ -46,21 +50,9 @@ class AdventureController extends Controller
             'duration_hours' => 'required',
             'price' => 'required',
             'requirements' => 'required|string',
-            'status' => 'required',
         ]);
-        $adventure = Adventure::create($request->only([
-            'title',
-            'description',
-            'activity_organizer_id',
-            'difficulty_level',
-            'capacity',
-            'category',
-            'location',
-            'duration_hours',
-            'price',
-            'requirements',
-            'status',
-        ]));
+        $validated['activity_organizer_id'] = $request->user()->activityOrganizer->id;
+        $adventure = Adventure::create($validated);
 
         return redirect()->route('adventures.index', [
             'phase' => 'optional',
@@ -74,7 +66,7 @@ class AdventureController extends Controller
      */
     public function show(Adventure $adventure)
     {
-        //
+        $this->ensureOwnedByCurrentOrganizer($adventure);
         $adventure->load(['images', 'schedules']);
         return view('adventures.show', compact('adventure'));
     }
@@ -84,6 +76,7 @@ class AdventureController extends Controller
      */
     public function edit(Adventure $adventure)
     {
+        $this->ensureOwnedByCurrentOrganizer($adventure);
         $adventure->load(['images', 'schedules']);
 
         return view('adventures.edit', compact('adventure'));
@@ -94,11 +87,10 @@ class AdventureController extends Controller
      */
     public function update(Request $request, Adventure $adventure)
     {
-        //
-        $request->validate([
+        $this->ensureOwnedByCurrentOrganizer($adventure);
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:255',
-            'activity_organizer_id' => 'required',
             'difficulty_level' => 'required',
             'capacity' => 'required',
             'category' => 'required',
@@ -109,19 +101,7 @@ class AdventureController extends Controller
             'status' => 'required',
         ]);
 
-        $adventure->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'activity_organizer_id' => $request->activity_organizer_id,
-            'difficulty_level' => $request->difficulty_level,
-            'capacity' => $request->capacity,
-            'category' => $request->category,
-            'location' => $request->location,
-            'duration_hours' => $request->duration_hours,
-            'price' => $request->price,
-            'requirements' => $request->requirements,
-            'status' => $request->status,
-        ]);
+        $adventure->update($validated);
 
         return redirect()->route('adventures.index')
             ->with('success', 'Adventure updated successfully');
@@ -132,7 +112,7 @@ class AdventureController extends Controller
      */
     public function destroy(Adventure $adventure)
     {
-        //
+        $this->ensureOwnedByCurrentOrganizer($adventure);
         $adventure->delete();
         return redirect()->route('adventures.index')
             ->with('success', 'Adventure deleted successfully');
@@ -140,7 +120,7 @@ class AdventureController extends Controller
 
     public function indexAll(Request $request)
     {
-        $query = Adventure::query();
+        $query = Adventure::where('status', 'Active');
 
         // Search by adventure name
         if ($request->filled('search')) {
@@ -176,8 +156,16 @@ class AdventureController extends Controller
 
     public function showProfile(Adventure $adventure)
     {
-        $adventure->load('images');
+        $adventure->load(['images', 'days']);
 
         return view('adventureProfile', compact('adventure'));
+    }
+
+    private function ensureOwnedByCurrentOrganizer(Adventure $adventure): void
+    {
+        abort_unless(
+            (int) $adventure->activity_organizer_id === (int) request()->user()->activityOrganizer->id,
+            404
+        );
     }
 }

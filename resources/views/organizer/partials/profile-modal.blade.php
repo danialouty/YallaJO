@@ -1,4 +1,5 @@
 <dialog id="organizer-profile-modal"
+    @if ($errors->any()) data-modal-reopen @endif
     dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}"
     class="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-0 text-slate-100 shadow-2xl backdrop:bg-black/70">
     <div class="p-6">
@@ -7,7 +8,7 @@
                 {{ $organizer ? __('Edit Organizer Profile') : __('Complete Organizer Profile') }}
             </h2>
             <button type="button"
-                onclick="document.getElementById('organizer-profile-modal').close()"
+                data-modal-close
                 class="rounded-lg px-2.5 py-1 text-slate-400 hover:bg-slate-800 hover:text-white">
                 ✕
             </button>
@@ -29,12 +30,12 @@
                 <select id="organizer_type" name="organizer_type" required
                     class="mt-1.5 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
                     @php
-                        $selectedType = old('organizer_type', $organizer?->organizer_type ?? 'tourism_office');
+                        $selectedType = old('organizer_type', $organizer?->organizer_type ?? 'Tourism_office');
                     @endphp
-                    <option value="tourism_office" @selected($selectedType === 'tourism_office')>
+                    <option value="Tourism_office" @selected($selectedType === 'Tourism_office')>
                         {{ __('Tourism Office (Licensed Agency)') }}
                     </option>
-                    <option value="hike_group" @selected($selectedType === 'hike_group')>
+                    <option value="Adventure_group" @selected($selectedType === 'Adventure_group')>
                         {{ __('Hike / Adventure Group') }}
                     </option>
                 </select>
@@ -80,7 +81,7 @@
 
             <div class="flex items-center justify-end gap-3 border-t border-slate-800 pt-4">
                 <button type="button"
-                    onclick="document.getElementById('organizer-profile-modal').close()"
+                    data-modal-close
                     class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800">
                     {{ __('Cancel') }}
                 </button>
@@ -92,28 +93,3 @@
         </form>
     </div>
 </dialog>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const modal = document.getElementById('organizer-profile-modal');
-        const typeSelect = document.getElementById('organizer_type');
-        const licenseHint = document.getElementById('license-hint');
-
-        const syncHints = () => {
-            const isOffice = typeSelect.value === 'tourism_office';
-            licenseHint.textContent = isOffice
-                ? licenseHint.dataset.officeHint
-                : licenseHint.dataset.groupHint;
-            licenseHint.className = isOffice
-                ? 'text-xs text-amber-400'
-                : 'text-xs text-slate-400';
-        };
-
-        typeSelect.addEventListener('change', syncHints);
-        syncHints();
-
-        @if ($errors->any())
-            modal.showModal();
-        @endif
-    });
-</script>
