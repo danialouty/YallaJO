@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Adventure;
+use App\Models\Community;
 
 class HomeController extends Controller
 {
@@ -15,6 +16,11 @@ class HomeController extends Controller
         ->take(4)
         ->get();
 
-    return view('home', compact('adventures'));
+    $communities = Community::withCount('members')
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return view('home', compact('adventures', 'communities'));
 }
 }

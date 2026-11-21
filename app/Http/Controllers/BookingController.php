@@ -15,6 +15,10 @@ class BookingController extends Controller
 {
     public function index()
     {
+        abort_unless(auth()->user()->role === 'Adventurer', 403, 'صفحة الحجوزات متاحة للمغامرين فقط.');
+
+        abort_unless(auth()->user()->role === 'Adventurer', 403, 'صفحة الحجوزات متاحة للمغامرين فقط.');
+
         $bookings = $this->ownedBookings()->with('adventure')
             ->withExists(['payment', 'review'])->latest()->get();
         $adventures = Adventure::where('status', 'Active')->get();
@@ -29,6 +33,15 @@ class BookingController extends Controller
 
     public function store(CreateBookingValidationRequest $request)
     {
+        if ($request->user()->role !== 'Adventurer') {
+            $destination = $request->user()->role === 'Activity_Organizer'
+                ? 'organizer.dashboard'
+                : 'dashboard';
+
+            return redirect()->route($destination)
+                ->with('error', 'الحجز متاح لحسابات المغامرين فقط.');
+        }
+
         $validated = $request->validated();
 
         DB::transaction(function () use ($request, $validated) {

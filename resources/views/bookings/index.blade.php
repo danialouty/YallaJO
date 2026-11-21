@@ -17,8 +17,32 @@
 
         <!-- رسائل النجاح والخطأ -->
         @if (session('success'))
-            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium">
-                {{ session('success') }}
+            <div id="booking-success-modal"
+                 class="booking-success-backdrop"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="booking-success-title"
+                 data-booking-success="{{ session('success') }}">
+                <div class="booking-success-card">
+                    <div class="booking-success-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="m5 12.5 4.2 4.2L19 7" />
+                        </svg>
+                    </div>
+                    <p class="booking-success-kicker">تم إنشاء الحجز</p>
+                    <h2 id="booking-success-title" class="booking-success-title">حجزك جاهز للمتابعة</h2>
+                    <p class="booking-success-message">
+                        تم إرسال طلب الحجز بنجاح، ويمكنك متابعة حالته من سجل حجوزاتك.
+                    </p>
+                    <div class="booking-success-actions">
+                        <button type="button" data-close-success-modal class="booking-success-primary">
+                            عرض حجوزاتي
+                        </button>
+                        <button type="button" data-close-success-modal class="booking-success-secondary">
+                            إغلاق
+                        </button>
+                    </div>
+                </div>
             </div>
         @endif
 

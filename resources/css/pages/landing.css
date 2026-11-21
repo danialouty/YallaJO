@@ -71,7 +71,7 @@
 
 .landing-destination-card {
     position: relative;
-    min-height: 230px;
+    min-height: 190px;
     overflow: hidden;
     border-radius: 16px;
     background: #111c2d;
@@ -164,6 +164,37 @@
     height: 220px;
     border: 38px solid rgba(255, 255, 255, 0.06);
     border-radius: 50%;
+}
+
+.landing-community-card {
+    border: 1px solid rgba(223, 192, 183, 0.48);
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(35, 48, 64, 0.06);
+    transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.landing-community-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 38px rgba(35, 48, 64, 0.12);
+}
+
+.landing-community-cover {
+    height: 190px;
+    overflow: hidden;
+    background: #3f6653;
+}
+
+.landing-community-cover img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 500ms ease;
+}
+
+.landing-community-card:hover .landing-community-cover img {
+    transform: scale(1.05);
 }
 
 @media (max-width: 640px) {

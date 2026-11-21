@@ -3,96 +3,142 @@
 @section('title', $community->name . ' | يلا جو')
 
 @section('content')
-    <main class="bg-slate-50">
-        <section class="border-b border-slate-200 bg-white">
-            <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-                <a href="{{ route('communities.index') }}" class="text-sm font-bold text-slate-500 hover:text-emerald-800">← جميع المجتمعات</a>
-                <div class="mt-5 flex flex-wrap items-start justify-between gap-5">
+    <main class="min-h-screen bg-canvas">
+        <section class="community-detail-cover" aria-label="صورة المجتمع">
+            @if ($community->cover_image)
+                <img src="{{ $community->cover_image }}" alt="" fetchpriority="high">
+            @endif
+            <div class="absolute bottom-0 right-0 z-10 w-full px-4 pb-7 text-white sm:px-6 lg:px-12">
+                <div class="mx-auto max-w-[1360px]">
+                    <p class="text-sm font-bold text-[#f1b84b]">{{ $community->activity_style }}</p>
+                    <h1 class="mt-2 font-display text-3xl font-extrabold sm:text-4xl">{{ $community->name }}</h1>
+                </div>
+            </div>
+        </section>
+
+        <section class="border-b border-outline/30 bg-surface">
+            <div class="mx-auto max-w-[1360px] px-4 py-7 sm:px-6 lg:px-12">
+                <a href="{{ route('communities.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-muted transition hover:text-brand">
+                    <span aria-hidden="true">→</span>
+                    جميع المجتمعات
+                </a>
+                <div class="mt-5 flex flex-col items-start justify-between gap-5 md:flex-row md:items-center">
                     <div>
-                        <div class="flex flex-wrap gap-2 text-xs font-bold">
-                            <span class="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">{{ $community->region }}</span>
-                            <span class="rounded-full bg-orange-100 px-3 py-1 text-orange-800">{{ $community->activity_style }}</span>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="rounded-full bg-forest/10 px-3 py-1 text-xs font-bold text-forest">{{ $community->region }}</span>
+                            <span class="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">{{ $community->activity_style }}</span>
                         </div>
-                        <h1 class="mt-3 text-3xl font-black text-slate-900">{{ $community->name }}</h1>
-                        <p class="mt-3 max-w-3xl leading-8 text-slate-600">{{ $community->description }}</p>
-                        <p class="mt-3 text-sm text-slate-500">{{ $community->members_count }} عضو</p>
+                        <p class="mt-3 max-w-3xl text-sm leading-8 text-muted">{{ $community->description }}</p>
+                        <p class="mt-3 flex items-center gap-2 text-sm font-semibold text-muted">
+                            <span class="size-2 rounded-full bg-forest" aria-hidden="true"></span>
+                            {{ $community->members_count }} عضو
+                        </p>
                     </div>
 
                     @auth
-                        @if ($isMember)
-                            <form method="POST" action="{{ route('communities.memberships.destroy', [$community, $membership]) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50">مغادرة</button>
-                            </form>
+                        @if (auth()->user()->role === 'Adventurer')
+                            @if ($isMember)
+                                <form method="POST" action="{{ route('communities.memberships.destroy', [$community, $membership]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="min-h-12 rounded-control border border-outline/60 px-5 text-sm font-bold text-muted transition hover:border-danger/40 hover:bg-danger/5 hover:text-danger">مغادرة المجتمع</button>
+                                </form>
+                            @else
+                                <form method="POST" action="{{ route('communities.memberships.store', $community) }}">
+                                    @csrf
+                                    <button type="submit" class="min-h-12 rounded-control bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-dark">انضم إلى المجتمع</button>
+                                </form>
+                            @endif
                         @else
-                            <form method="POST" action="{{ route('communities.memberships.store', $community) }}">
-                                @csrf
-                                <button type="submit" class="rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-900">انضم إلى المجتمع</button>
-                            </form>
+                            <span class="rounded-control border border-outline/50 bg-canvas px-5 py-3 text-sm font-bold text-muted">متاح لمغامري يلا جو</span>
                         @endif
                     @else
-                        <a href="{{ route('login') }}" class="rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white">سجّل للدخول والانضمام</a>
+                        <a href="{{ route('login') }}" class="min-h-12 inline-flex items-center rounded-control bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-dark">سجّل للدخول والانضمام</a>
                     @endauth
                 </div>
             </div>
         </section>
 
         @session('success')
-            <div class="mx-auto mt-6 max-w-5xl px-4 sm:px-6">
-                <div class="rounded-lg bg-emerald-100 px-4 py-3 text-sm font-semibold text-emerald-900">{{ $value }}</div>
+            <div class="mx-auto mt-5 max-w-[1360px] px-4 sm:px-6 lg:px-12">
+                <div class="rounded-control border border-forest/20 bg-forest/10 px-4 py-3 text-sm font-semibold text-forest">{{ $value }}</div>
             </div>
         @endsession
 
         @if ($errors->any())
-            <div class="mx-auto mt-6 max-w-5xl px-4 sm:px-6">
-                <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-800">
+            <div class="mx-auto mt-5 max-w-[1360px] px-4 sm:px-6 lg:px-12">
+                <div class="rounded-control border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
                     @foreach ($errors->all() as $error)<p>{{ $error }}</p>@endforeach
                 </div>
             </div>
         @endif
 
-        <div class="mx-auto grid max-w-5xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_280px]">
-            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 class="text-xl font-black text-slate-900">دردشة المجتمع</h2>
+        <div class="mx-auto grid max-w-[1360px] gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:px-12">
+            <section class="rounded-card border border-outline/35 bg-surface p-5 shadow-card sm:p-6">
+                <div class="flex items-center justify-between border-b border-outline/30 pb-4">
+                    <div>
+                        <p class="text-xs font-bold text-brand">المحادثة</p>
+                        <h2 class="mt-1 font-display text-xl font-bold text-ink">دردشة المجتمع</h2>
+                    </div>
+                    <span class="rounded-full bg-forest/10 px-3 py-1 text-xs font-bold text-forest">{{ $community->messages->count() }} رسالة</span>
+                </div>
 
                 @if ($isMember)
-                    <form method="POST" action="{{ route('communities.messages.store', $community) }}" class="mt-4">
+                    <form method="POST" action="{{ route('communities.messages.store', $community) }}" class="mt-5">
                         @csrf
-                        <div class="flex gap-3">
-                            <input type="text" name="body" required maxlength="2000" placeholder="اكتب رسالة…" class="min-w-0 flex-1 rounded-lg border-slate-300 text-sm">
-                            <button type="submit" class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white">إرسال</button>
+                        <div class="flex items-end gap-3">
+                            <label class="min-w-0 flex-1">
+                                <span class="sr-only">اكتب رسالة للمجتمع</span>
+                                <textarea name="body" required maxlength="2000" rows="2" placeholder="اكتب رسالة للمجتمع..."
+                                          class="block w-full resize-none rounded-control border-outline/50 text-sm leading-7 text-ink placeholder:text-muted/60 focus:border-brand focus:ring-brand"></textarea>
+                            </label>
+                            <button type="submit" class="min-h-12 shrink-0 rounded-control bg-brand px-5 text-sm font-bold text-white transition hover:bg-brand-dark">إرسال</button>
                         </div>
                     </form>
                 @endif
 
-                <div class="mt-5 divide-y divide-slate-100">
+                <div class="mt-5 space-y-3">
                     @forelse ($community->messages as $message)
-                        <article class="py-4 first:pt-0">
+                        <article class="{{ $message->user_id === auth()->id() ? 'community-message community-message-own' : 'community-message' }} p-4">
                             <div class="flex items-center justify-between gap-3">
-                                <p class="text-sm font-bold text-slate-800">{{ $message->user->name }}</p>
-                                <time class="text-xs text-slate-400">{{ $message->created_at->diffForHumans() }}</time>
+                                <p class="text-sm font-bold text-ink">{{ $message->user->name }}</p>
+                                <time class="shrink-0 text-xs text-muted/70">{{ $message->created_at->diffForHumans() }}</time>
                             </div>
-                            <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-600">{{ $message->body }}</p>
+                            <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted">{{ $message->body }}</p>
                         </article>
                     @empty
-                        <p class="py-10 text-center text-sm text-slate-500">
-                            {{ $isMember ? 'ابدأ المحادثة بكتابة أول رسالة.' : 'انضم للمجتمع لقراءة المحادثة والمشاركة.' }}
-                        </p>
+                        <div class="py-12 text-center">
+                            <span class="mx-auto grid size-12 place-items-center rounded-full bg-forest/10 text-xl text-forest" aria-hidden="true">💬</span>
+                            <p class="mt-3 text-sm font-semibold text-muted">
+                                {{ $isMember ? 'ابدأ المحادثة بكتابة أول رسالة.' : 'انضم للمجتمع للمشاركة في المحادثة.' }}
+                            </p>
+                        </div>
                     @endforelse
                 </div>
+
+                @if (!$isMember)
+                    @guest
+                        <div class="mt-5 rounded-control border border-brand/15 bg-brand/5 px-4 py-4 text-center text-sm text-muted">
+                            سجّل الدخول وانضم إلى المجتمع لتتمكن من إرسال الرسائل.
+                            <a href="{{ route('login') }}" class="mr-1 font-bold text-brand hover:underline">تسجيل الدخول</a>
+                        </div>
+                    @endguest
+                @endif
             </section>
 
-            <aside class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h2 class="font-black text-slate-900">الأعضاء</h2>
-                <div class="mt-4 space-y-3">
+            <aside class="h-fit rounded-card border border-outline/35 bg-surface p-5 shadow-card">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-display text-lg font-bold text-ink">الأعضاء</h2>
+                    <span class="rounded-full bg-canvas px-3 py-1 text-xs font-bold text-muted">{{ $community->members_count }}</span>
+                </div>
+                <div class="mt-4 max-h-[420px] space-y-3 overflow-y-auto">
                     @forelse ($community->members->take(20) as $member)
                         <div class="flex items-center gap-3">
-                            <div class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-emerald-100 font-black text-emerald-800">{{ mb_substr($member->name, 0, 1) }}</div>
-                            <span class="text-sm font-semibold text-slate-700">{{ $member->name }}</span>
+                            <div class="grid size-10 shrink-0 place-items-center rounded-full bg-forest/10 font-display text-sm font-bold text-forest">{{ mb_substr($member->name, 0, 1) }}</div>
+                            <span class="min-w-0 truncate text-sm font-semibold text-ink">{{ $member->name }}</span>
                         </div>
                     @empty
-                        <p class="text-sm text-slate-500">لا يوجد أعضاء بعد.</p>
+                        <div class="rounded-control bg-canvas px-4 py-6 text-center text-sm text-muted">كن أول من ينضم إلى المجتمع.</div>
                     @endforelse
                 </div>
             </aside>

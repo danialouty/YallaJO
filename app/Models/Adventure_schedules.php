@@ -12,6 +12,11 @@ class Adventure_schedules extends Model
     /** @use HasFactory<AdventureSchedulesFactory> */
     use HasFactory;
 
+    protected static function newFactory(): AdventureSchedulesFactory
+    {
+        return AdventureSchedulesFactory::new();
+    }
+
     protected $table = 'adventure_schedules';
 
     protected $fillable = [

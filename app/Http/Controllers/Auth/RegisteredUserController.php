@@ -80,6 +80,6 @@ class RegisteredUserController extends Controller
 
         return $user->role === 'Activity_Organizer'
             ? redirect()->route('organizers.index')
-            : redirect(route('bookings.index', absolute: false));
+            : redirect(route('adventuresAll.index', absolute: false));
     }
 }

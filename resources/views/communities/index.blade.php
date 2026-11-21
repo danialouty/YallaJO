@@ -3,72 +3,86 @@
 @section('title', 'المجتمعات | يلا جو')
 
 @section('content')
-    <main class="bg-slate-50">
-        <section class="border-b border-slate-200 bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-900 text-white">
-            <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-                <p class="text-sm font-bold text-emerald-200">اتصل بالمغامرين القريبين منك</p>
-                <h1 class="mt-2 text-3xl font-black sm:text-4xl">مجتمعات المغامرة</h1>
-                <p class="mt-3 max-w-2xl leading-8 text-emerald-100">
-                    انضم إلى مجموعة حسب منطقتك أو نوع نشاطك، وتحدث مع المغامرين الذين يشاركونك الاهتمامات.
-                </p>
+    <main class="bg-canvas">
+        <section class="communities-hero border-b border-white/10 text-white">
+            <div class="mx-auto max-w-[1360px] px-4 py-12 sm:px-6 sm:py-16 lg:px-12">
+                <div class="max-w-2xl">
+                    <p class="text-sm font-bold text-[#f1b84b]">اتصل بالمغامرين القريبين منك</p>
+                    <h1 class="mt-2 font-display text-3xl font-extrabold sm:text-5xl">مجتمعات المغامرة</h1>
+                    <p class="mt-4 text-sm leading-8 text-white/90 sm:text-base">
+                        انضم إلى مجموعة حسب منطقتك أو نوع نشاطك، وتحدث مع المغامرين الذين يشاركونك الاهتمامات.
+                    </p>
+                </div>
             </div>
         </section>
 
-        <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <form method="GET" action="{{ route('communities.index') }}" class="mb-8 grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-3">
-                <label class="text-xs font-bold text-slate-600">
-                    البحث
-                    <input type="search" name="search" value="{{ request('search') }}" placeholder="اسم المجتمع أو المنطقة" class="mt-1 block w-full rounded-lg border-slate-300 text-sm text-slate-900">
+        <section class="mx-auto max-w-[1360px] px-4 py-8 sm:px-6 lg:px-12">
+            <form method="GET" action="{{ route('communities.index') }}" class="mb-8 grid items-end gap-3 rounded-card border border-outline/40 bg-surface p-3 shadow-card md:grid-cols-[1.4fr_1fr_1fr_auto]">
+                <label class="min-w-0">
+                    <span class="mb-2 block text-xs font-bold text-muted">البحث</span>
+                    <input type="search" name="search" value="{{ request('search') }}" placeholder="اسم المجتمع أو المنطقة..."
+                           class="block min-h-12 w-full rounded-control border-outline/50 text-sm text-ink placeholder:text-muted/60 focus:border-brand focus:ring-brand">
                 </label>
-                <label class="text-xs font-bold text-slate-600">
-                    المنطقة
-                    <select name="region" class="mt-1 block w-full rounded-lg border-slate-300 text-sm text-slate-900">
+                <label>
+                    <span class="mb-2 block text-xs font-bold text-muted">المنطقة</span>
+                    <select name="region" class="block min-h-12 w-full rounded-control border-outline/50 text-sm text-ink focus:border-brand focus:ring-brand">
                         <option value="">كل المناطق</option>
                         @foreach ($regions as $region)
                             <option value="{{ $region }}" @selected(request('region') === $region)>{{ $region }}</option>
                         @endforeach
                     </select>
                 </label>
-                <label class="text-xs font-bold text-slate-600">
-                    نوع النشاط
-                    <select name="activity_style" class="mt-1 block w-full rounded-lg border-slate-300 text-sm text-slate-900">
+                <label>
+                    <span class="mb-2 block text-xs font-bold text-muted">نوع النشاط</span>
+                    <select name="activity_style" class="block min-h-12 w-full rounded-control border-outline/50 text-sm text-ink focus:border-brand focus:ring-brand">
                         <option value="">كل الأنشطة</option>
                         @foreach ($activityStyles as $activityStyle)
                             <option value="{{ $activityStyle }}" @selected(request('activity_style') === $activityStyle)>{{ $activityStyle }}</option>
                         @endforeach
                     </select>
                 </label>
-                <div class="md:col-span-3 flex gap-2">
-                    <button type="submit" class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">تصفية</button>
-                    <a href="{{ route('communities.index') }}" class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50">مسح</a>
+                <div class="flex gap-2">
+                    <button type="submit" class="min-h-12 flex-1 rounded-control bg-brand px-5 text-sm font-bold text-white transition hover:bg-brand-dark">تصفية</button>
+                    @if(request()->hasAny(['search', 'region', 'activity_style']))
+                        <a href="{{ route('communities.index') }}" class="grid min-h-12 min-w-12 place-items-center rounded-control border border-outline/50 px-3 text-lg text-muted transition hover:border-brand/40 hover:bg-brand/5" title="مسح التصفية" aria-label="مسح التصفية">×</a>
+                    @endif
                 </div>
             </form>
 
+            <div class="mb-5 flex items-end justify-between">
+                <div>
+                    <p class="text-xs font-bold text-brand">المجتمعات المتاحة</p>
+                    <h2 class="mt-1 font-display text-2xl font-bold text-ink">اعثر على مجموعة تشبه اهتماماتك</h2>
+                </div>
+                <p class="hidden text-sm text-muted sm:block">{{ $communities->total() }} مجتمع</p>
+            </div>
+
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @forelse ($communities as $community)
-                    <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                        <div class="h-36 bg-gradient-to-br from-emerald-600 to-orange-500">
+                    <article class="community-card">
+                        <div class="community-cover">
                             @if ($community->cover_image)
                                 <img src="{{ $community->cover_image }}" alt="{{ $community->name }}" class="h-full w-full object-cover">
                             @endif
                         </div>
                         <div class="p-5">
-                            <div class="flex flex-wrap gap-2 text-xs font-bold">
-                                <span class="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">{{ $community->region }}</span>
-                                <span class="rounded-full bg-orange-100 px-3 py-1 text-orange-800">{{ $community->activity_style }}</span>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="rounded-full bg-forest/10 px-3 py-1 text-xs font-bold text-forest">{{ $community->region }}</span>
+                                <span class="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">{{ $community->activity_style }}</span>
                             </div>
-                            <h2 class="mt-4 text-xl font-black text-slate-900">{{ $community->name }}</h2>
-                            <p class="mt-2 line-clamp-3 min-h-16 text-sm leading-7 text-slate-600">{{ $community->description }}</p>
+                            <h3 class="mt-4 font-display text-xl font-bold text-ink">{{ $community->name }}</h3>
+                            <p class="mt-2 line-clamp-3 min-h-16 text-sm leading-7 text-muted">{{ $community->description }}</p>
                             <div class="mt-5 flex items-center justify-between">
-                                <span class="text-xs text-slate-500">{{ $community->members_count }} عضو</span>
-                                <a href="{{ route('communities.show', $community) }}" class="rounded-lg bg-emerald-800 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-900">استكشف المجتمع</a>
+                                <span class="text-xs font-semibold text-muted">{{ $community->members_count }} عضو</span>
+                                <a href="{{ route('communities.show', $community) }}" class="inline-flex min-h-11 items-center rounded-control bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark">استكشف المجتمع</a>
                             </div>
                         </div>
                     </article>
                 @empty
-                    <div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
-                        <p class="font-bold text-slate-700">لا توجد مجتمعات مطابقة لبحثك.</p>
-                        <a href="{{ route('communities.index') }}" class="mt-3 inline-block text-sm font-bold text-orange-700">عرض جميع المجتمعات</a>
+                    <div class="col-span-full rounded-card border border-dashed border-outline/60 bg-surface px-6 py-14 text-center">
+                        <span class="mx-auto grid size-14 place-items-center rounded-full bg-brand/10 text-2xl text-brand" aria-hidden="true">⌕</span>
+                        <p class="mt-4 font-display text-lg font-bold text-ink">لا توجد مجتمعات مطابقة لبحثك</p>
+                        <a href="{{ route('communities.index') }}" class="mt-4 inline-flex min-h-11 items-center rounded-control bg-brand px-5 text-sm font-bold text-white">عرض جميع المجتمعات</a>
                     </div>
                 @endforelse
             </div>

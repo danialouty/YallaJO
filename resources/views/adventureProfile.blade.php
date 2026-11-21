@@ -19,18 +19,53 @@
     <main class="container" data-adventure-booking
           data-price="{{ $adventure->price }}"
           data-capacity="{{ $adventure->capacity }}">
-        <section class="gallery" aria-label="صور المغامرة">
-            <div class="gallery-left">
-                @foreach($adventure->images->skip(1)->take(2) as $image)
-                    <img src="{{ asset('images/' . $image->image_path) }}" alt="{{ $adventure->title }}">
+        @php
+            $galleryImages = $adventure->images
+                ->map(fn ($image) => asset('images/' . $image->image_path))
+                ->values()
+                ->all();
+
+            $fallbackImages = [
+                'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1600&q=85',
+                'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85',
+                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=85',
+                'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85',
+            ];
+
+            foreach ($fallbackImages as $fallbackImage) {
+                if (count($galleryImages) >= 4) {
+                    break;
+                }
+                if (!in_array($fallbackImage, $galleryImages, true)) {
+                    $galleryImages[] = $fallbackImage;
+                }
+            }
+
+            $mainGalleryImage = $galleryImages[0] ?? $fallbackImages[0];
+        @endphp
+
+        <section class="gallery" data-adventure-gallery aria-label="صور المغامرة">
+            <figure class="gallery-main">
+                <img id="gallery-main-image"
+                     src="{{ $mainGalleryImage }}"
+                     alt="{{ $adventure->title }}"
+                     loading="eager"
+                     fetchpriority="high">
+                <button type="button" class="gallery-expand" data-gallery-expand aria-label="عرض الصورة بالحجم الكامل">
+                    عرض الصورة
+                </button>
+                <span class="gallery-count">{{ count($galleryImages) }} صور</span>
+            </figure>
+
+            <div class="gallery-thumbnails" aria-label="صور مصغرة للمغامرة">
+                @foreach(array_slice($galleryImages, 0, 4) as $index => $galleryImage)
+                    <button type="button"
+                            class="gallery-thumbnail {{ $index === 0 ? 'is-active' : '' }}"
+                            data-gallery-src="{{ $galleryImage }}"
+                            aria-label="عرض الصورة رقم {{ $index + 1 }}">
+                        <img src="{{ $galleryImage }}" alt="{{ $adventure->title }} - صورة {{ $index + 1 }}" loading="lazy">
+                    </button>
                 @endforeach
-            </div>
-            <div class="gallery-main">
-                @if($adventure->images->isNotEmpty())
-                    <img src="{{ asset('images/' . $adventure->images->first()->image_path) }}" alt="{{ $adventure->title }}">
-                @else
-                    <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200" alt="{{ $adventure->title }}">
-                @endif
             </div>
         </section>
 
@@ -52,7 +87,12 @@
                     @if ($adventure->status !== 'Active' || $adventure->capacity < 1)
                         <p class="booking-note">الحجز غير متاح لهذه المغامرة حاليًا.</p>
                     @elseif (auth()->check() && auth()->user()->role !== 'Adventurer')
-                        <p class="booking-note">الحجز متاح لحسابات المغامرين.</p>
+                        <p class="booking-note">الحجز متاح لحسابات المغامرين فقط.</p>
+                    @elseif (!auth()->check())
+                        <a href="{{ route('login', ['redirect' => request()->fullUrl()]) }}"
+                           class="book-button block text-center">
+                            سجل دخولك لتأكيد الحجز
+                        </a>
                     @else
                     <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                         @csrf

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Database\Factories\GuideFactory;
+use Database\Factories\GuidesFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Guides extends Model
 {
-    /** @use HasFactory<GuideFactory> */
+    /** @use HasFactory<GuidesFactory> */
     use HasFactory;
 
     protected $table = 'guides';

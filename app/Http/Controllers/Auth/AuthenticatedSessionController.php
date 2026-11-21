@@ -16,6 +16,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        if (request()->filled('redirect')) {
+            session()->put('url.intended', request()->query('redirect'));
+        }
+
         return view('auth.login');
     }
 
@@ -31,7 +35,7 @@ class AuthenticatedSessionController extends Controller
         $destination = match ($request->user()->role) {
             'Admin' => 'admin.dashboard',
             'Activity_Organizer' => $request->user()->isApprovedOrganizer() ? 'organizer.dashboard' : 'organizers.index',
-            'Adventurer' => 'bookings.index',
+            'Adventurer' => 'adventuresAll.index',
             default => 'dashboard',
         };
 

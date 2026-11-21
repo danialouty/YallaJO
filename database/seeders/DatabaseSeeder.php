@@ -35,6 +35,40 @@ class DatabaseSeeder extends Seeder
         // 3. Seed Fresh Organizer User (no profile yet, to test your Create Modal)
         $this->upsertFactoryUser('organizer', 'neworganizer@yallajo.com', 'Jordan Hike Club', '0790000003');
 
+        $communities = [
+            [
+                'name' => 'Wadi Mujib Trail Seekers',
+                'slug' => 'wadi-mujib-trail-seekers',
+                'description' => 'مجتمع لعشاق مسارات وادي الموجب، من أول الرحلات إلى المغامرين ذوي الخبرة.',
+                'region' => 'وادي الموجب',
+                'activity_style' => 'المشي والمسارات',
+                'cover_image' => 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=85',
+            ],
+            [
+                'name' => 'Jordan Weekend Campers',
+                'slug' => 'jordan-weekend-campers',
+                'description' => 'نخطط لرحلات تخييم ونشاطات نهاية الأسبوع حول مختلف مناطق الأردن.',
+                'region' => 'الأردن',
+                'activity_style' => 'التخييم',
+                'cover_image' => 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=85',
+            ],
+            [
+                'name' => 'Solo Female Hikers JO',
+                'slug' => 'solo-female-hikers-jo',
+                'description' => 'مجتمع آمن ومشجع للنساء لاستكشاف مسارات الأردن والمشاركة في الرحلات الجماعية.',
+                'region' => 'عمان',
+                'activity_style' => 'المشي النسائي',
+                'cover_image' => 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=900&q=85',
+            ],
+        ];
+
+        foreach ($communities as $community) {
+            Community::updateOrCreate(
+                ['slug' => $community['slug']],
+                $community
+            );
+        }
+
         // Additional approved organizer and related records for manual testing.
         $this->call(DemoSeeder::class);
     }
@@ -64,35 +98,5 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $communities = [
-            [
-                'name' => 'Wadi Mujib Trail Seekers',
-                'slug' => 'wadi-mujib-trail-seekers',
-                'description' => 'مجتمع لعشاق مسارات وادي الموجب، من أول الرحلات إلى المغامرين ذوي الخبرة.',
-                'region' => 'وادي الموجب',
-                'activity_style' => 'المشي والمسارات',
-            ],
-            [
-                'name' => 'Jordan Weekend Campers',
-                'slug' => 'jordan-weekend-campers',
-                'description' => 'نخطط لرحلات تخييم ونشاطات نهاية الأسبوع حول مختلف مناطق الأردن.',
-                'region' => 'الأردن',
-                'activity_style' => 'التخييم',
-            ],
-            [
-                'name' => 'Solo Female Hikers JO',
-                'slug' => 'solo-female-hikers-jo',
-                'description' => 'مجتمع آمن ومشجع للنساء لاستكشاف مسارات الأردن والمشاركة في الرحلات الجماعية.',
-                'region' => 'عمان',
-                'activity_style' => 'المشي النسائي',
-            ],
-        ];
-
-        foreach ($communities as $community) {
-            Community::updateOrCreate(
-                ['slug' => $community['slug']],
-                $community
-            );
-        }
     }
 }

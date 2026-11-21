@@ -1,16 +1,16 @@
-<section class="bg-surface py-12 md:py-16" aria-labelledby="featured-adventures-heading">
+<section class="bg-surface py-10 md:py-12" aria-labelledby="featured-adventures-heading">
     <div class="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
         <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div class="max-w-2xl">
-                <p class="landing-eyebrow">اختيارات مختارة</p>
+                <p class="landing-eyebrow">أبرز التجارب</p>
                 <h2 id="featured-adventures-heading" class="mt-2 font-display text-3xl font-bold text-ink">
-                    مغامرات وتجارب رائجة
+                    مغامرات وتجارب الأردن
                 </h2>
                 <p class="mt-2 text-sm leading-7 text-muted">
                     اكتشف مجموعة من التجارب المستوحاة من طبيعة الأردن وثقافاته المحلية.
                 </p>
             </div>
-            <a href="{{ route('adventuresAll.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-control border border-outline/50 px-4 text-sm font-bold text-brand transition hover:border-brand hover:bg-brand/5">
+            <a href="{{ route('adventuresAll.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark">
                 عرض كل المغامرات
             </a>
         </div>
