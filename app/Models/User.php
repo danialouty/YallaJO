@@ -60,6 +60,13 @@ class User extends Authenticatable
         return $this->hasOne(Adventurer::class);
     }
 
+    public function communities()
+    {
+        return $this->belongsToMany(Community::class, 'community_memberships')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
     /**
      * The activity organizer has 2 foreign keys connected to the
      * user account one for the activity organizer own account and
