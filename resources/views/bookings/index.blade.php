@@ -1,20 +1,19 @@
-{{-- TODO: بس يخلص زميلك الـ Layout، بدّل <x-app-layout> بـ @extends('layouts.dashboard') و @section('content') --}}
-<x-app-layout>
-    <div dir="rtl" class="yallajo-bookings-wrapper py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+@extends('layouts.dashboard')
 
-        <!-- رأس الصفحة + زر فتح Pop-up حجز جديد -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-                <h1 class="text-2xl font-extrabold text-gray-900">إدارة حجوزاتي</h1>
-                <p class="text-sm text-gray-500 mt-1">تابع حالة طلبات الحجز الخاصة بك أو احجز مغامرة جديدة في الأردن</p>
-            </div>
+@section('dashboard-theme', 'adventurer')
+@section('dashboard-name', 'بوابة المغامر')
+@section('dashboard-title', 'إدارة حجوزاتي')
 
-            <button type="button" data-open-create-modal
-                    class="btn-yalla-primary inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-sm rounded-xl shadow-sm cursor-pointer">
-                <span>+</span>
-                <span>حجز مغامرة جديدة</span>
-            </button>
-        </div>
+@section('dashboard-header-actions')
+    <button type="button" data-open-create-modal
+            class="btn-yalla-primary inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-sm rounded-xl shadow-sm cursor-pointer">
+        <span>+</span>
+        <span>حجز مغامرة جديدة</span>
+    </button>
+@endsection
+
+@section('content')
+    <div class="yallajo-bookings-wrapper">
 
         <!-- رسائل النجاح والخطأ -->
         @if (session('success'))
@@ -276,4 +275,4 @@
 
     </div>
 
-</x-app-layout>
+@endsection

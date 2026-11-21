@@ -2,15 +2,25 @@
     $item = $data ?? $booking;
 @endphp
 
-{{-- TODO: بس يخلص زميلك الـ Layout، بدّل <x-app-layout> بـ @extends('layouts.dashboard') و @section('content') --}}
-<x-app-layout>
-    <div dir="rtl" class="yallajo-show-wrapper py-10 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto">
+@extends('layouts.dashboard')
 
-        <!-- شريط التنقل العلوي وحالة الحجز -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <a href="{{ route('bookings.index') }}" class="text-sm font-bold text-[#2D5041] hover:underline">
-                &rarr; العودة إلى حجوزاتي
-            </a>
+@section('dashboard-theme', 'adventurer')
+@section('dashboard-name', 'بوابة المغامر')
+@section('dashboard-title', 'تفاصيل الحجز #' . $item->id)
+
+@section('dashboard-header-actions')
+    <a href="{{ route('bookings.index') }}"
+       class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-[#2D5041] shadow-sm transition hover:bg-gray-50">
+        <span>&rarr; العودة إلى حجوزاتي</span>
+    </a>
+@endsection
+
+@section('content')
+    <div class="yallajo-show-wrapper max-w-4xl mx-auto">
+
+        <!-- حالة الحجز -->
+        <div class="mb-5 flex items-center justify-between">
+            <span class="text-sm font-semibold text-gray-500">حالة الطلب الحالية:</span>
 
             @if ($item->status === 'Confirmed')
                 <span class="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
@@ -31,7 +41,7 @@
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="bg-[#2D5041] text-white p-6">
                 <p class="text-xs text-emerald-200 mb-1">رقم المرجع: #{{ $item->id }}</p>
-                <h1 class="text-2xl font-extrabold">{{ $item->adventure->title ?? 'مغامرة #' . $item->adventure_id }}</h1>
+                <h2 class="text-2xl font-extrabold">{{ $item->adventure->title ?? 'مغامرة #' . $item->adventure_id }}</h2>
             </div>
 
             <div class="p-6 space-y-6">
@@ -80,4 +90,4 @@
         </div>
     </div>
 
-</x-app-layout>
+@endsection
