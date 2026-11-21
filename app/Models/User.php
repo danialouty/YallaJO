@@ -77,10 +77,6 @@ class User extends Authenticatable
 
     public function isApprovedOrganizer(): bool {
         return $this->role === 'Activity_Organizer'
-            && in_array(
-                $this->activityOrganizer?->approval_status,
-                ['Approved', 'approved'],
-                true
-            );
+            && $this->activityOrganizer?->approval_status === 'Approved';
     }
 }

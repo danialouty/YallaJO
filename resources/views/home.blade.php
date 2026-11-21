@@ -77,4 +77,23 @@
     </section>
 
     @include('partials.home.featured-adventures')
+
+    <section class="bg-[#f5f7f4] px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="organizer-join-title">
+        <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-3xl bg-forest px-6 py-8 text-white sm:px-10 sm:py-10 md:flex-row md:items-center">
+            <div class="max-w-2xl">
+                <p class="text-sm font-bold text-orange-200">لأصحاب التجارب المحلية</p>
+                <h2 id="organizer-join-title" class="mt-2 text-2xl font-extrabold sm:text-3xl">سجّل كمنظّم مغامرات</h2>
+                <p class="mt-3 text-sm leading-7 text-white/80">أنشئ حساب منظّم، أضف مغامراتك ومرشدك، وتابع الحجوزات بعد مراجعة طلبك والموافقة عليه.</p>
+            </div>
+            @guest
+                <a href="{{ route('register', ['role' => 'Activity_Organizer']) }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A94B2B] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#8E3D22]">ابدأ تسجيل المنظّم</a>
+            @else
+                @if (auth()->user()->role === 'Activity_Organizer')
+                    <a href="{{ route('organizers.index') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A94B2B] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#8E3D22]">ملف المنظّم</a>
+                @else
+                    <p class="text-sm text-white/80">لتسجيل حساب منظّم جديد، سجّل الخروج أولًا ثم ابدأ طلبك.</p>
+                @endif
+            @endguest
+        </div>
+    </section>
 @endsection

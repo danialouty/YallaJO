@@ -1,17 +1,4 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-    <div class="sm:col-span-2">
-        <label for="activity_organizer_id" class="block text-sm font-bold text-gray-700 mb-2">المنظم</label>
-        <select id="activity_organizer_id" name="activity_organizer_id" required
-                class="w-full rounded-xl border-gray-200 text-sm focus:border-[#A94B2B] focus:ring-[#A94B2B]">
-            <option value="">اختر المنظم</option>
-            @foreach ($organizers as $organizer)
-                <option value="{{ $organizer->id }}"
-                    @selected(old('activity_organizer_id', $guide?->activity_organizer_id) == $organizer->id)>
-                    {{ $organizer->user?->name ?? 'منظم #' . $organizer->id }}
-                </option>
-            @endforeach
-        </select>
-    </div>
     <div>
         <label for="experience_years" class="block text-sm font-bold text-gray-700 mb-2">سنوات الخبرة</label>
         <input id="experience_years" name="experience_years" type="number" min="0"

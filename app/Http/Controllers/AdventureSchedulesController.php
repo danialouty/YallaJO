@@ -19,11 +19,16 @@ class AdventureSchedulesController extends Controller
      */
     public function index(Request $request)
     {
+        $organizerId = (int) $request->user()->activityOrganizer->id;
         $validated = $request->validate([
-            'adventure_id' => ['nullable', 'integer', 'exists:adventures,id'],
+            'adventure_id' => [
+                'nullable', 'integer',
+                Rule::exists('adventures', 'id')->where('activity_organizer_id', $organizerId),
+            ],
         ]);
 
         $schedules = Adventure_schedules::with(['adventure', 'guide'])
+            ->whereHas('adventure', fn (Builder $query) => $query->where('activity_organizer_id', $organizerId))
             ->when(
                 filled($validated['adventure_id'] ?? null),
                 fn (Builder $query) => $query->where('adventure_id', $validated['adventure_id'])
@@ -31,7 +36,7 @@ class AdventureSchedulesController extends Controller
             ->latest('starts_at')
             ->paginate(15)
             ->withQueryString();
-        $adventures = Adventure::orderBy('title')->get();
+        $adventures = Adventure::where('activity_organizer_id', $organizerId)->orderBy('title')->get();
 
         return view('adventuresSchedules.index', compact('schedules', 'adventures'));
     }
@@ -49,12 +54,14 @@ class AdventureSchedulesController extends Controller
 
             $schedule = Adventure_schedules::with(['adventure.days'])
                 ->findOrFail($request->query('schedule_id'));
+            $this->ensureOwnedSchedule($schedule, $request);
             $dayCount = $schedule->starts_at->copy()->startOfDay()
                 ->diffInDays($schedule->ends_at->copy()->startOfDay()) + 1;
         }
 
-        $adventures = $schedule ? collect() : Adventure::orderBy('title')->get();
-        $guides = Guides::all();
+        $organizerId = (int) $request->user()->activityOrganizer->id;
+        $adventures = $schedule ? collect() : Adventure::where('activity_organizer_id', $organizerId)->orderBy('title')->get();
+        $guides = Guides::where('activity_organizer_id', $organizerId)->get();
 
         return view('adventuresSchedules.create', compact('schedule', 'adventures', 'dayCount', 'guides'));
     }
@@ -68,9 +75,10 @@ class AdventureSchedulesController extends Controller
             return $this->storeDays($request);
         }
 
+        $organizerId = (int) $request->user()->activityOrganizer->id;
         $validated = $request->validate([
-            'adventure_id' => ['required', 'integer', 'exists:adventures,id'],
-            'guide_id' => ['required', 'integer', 'exists:guides,id'],
+            'adventure_id' => ['required', 'integer', Rule::exists('adventures', 'id')->where('activity_organizer_id', $organizerId)],
+            'guide_id' => ['required', 'integer', Rule::exists('guides', 'id')->where('activity_organizer_id', $organizerId)],
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
             'capacity' => ['required', 'integer', 'min:1'],
@@ -101,6 +109,7 @@ class AdventureSchedulesController extends Controller
      */
     public function show(Adventure_schedules $adventure_schedules)
     {
+        $this->ensureOwnedSchedule($adventure_schedules);
         $adventure_schedules->load(['adventure.days', 'guide']);
 
         return view('adventuresSchedules.show', ['schedule' => $adventure_schedules]);
@@ -109,6 +118,7 @@ class AdventureSchedulesController extends Controller
     /** Generate suggested itinerary text without saving it. */
     public function generateDays(Adventure_schedules $adventure_schedules, OllamaAdventureDayGenerator $generator)
     {
+        $this->ensureOwnedSchedule($adventure_schedules);
         $adventure_schedules->load('adventure');
         $dayCount = $adventure_schedules->adventure->days()->count();
         if ($dayCount === 0) {
@@ -137,6 +147,7 @@ class AdventureSchedulesController extends Controller
         Adventure_schedules $adventure_schedules,
         AdventureDay $adventure_day
     ) {
+        $this->ensureOwnedSchedule($adventure_schedules);
         abort_unless(
             (int) $adventure_day->adventure_id === (int) $adventure_schedules->adventure_id,
             404
@@ -166,9 +177,11 @@ class AdventureSchedulesController extends Controller
      */
     public function edit(Adventure_schedules $adventure_schedules)
     {
+        $this->ensureOwnedSchedule($adventure_schedules);
         $adventure_schedules->load(['adventure.days', 'guide.activityOrganizer.user']);
-        $adventures = Adventure::orderBy('title')->get();
-        $guides = Guides::with('activityOrganizer.user')->orderBy('id')->get();
+        $organizerId = (int) request()->user()->activityOrganizer->id;
+        $adventures = Adventure::where('activity_organizer_id', $organizerId)->orderBy('title')->get();
+        $guides = Guides::with('activityOrganizer.user')->where('activity_organizer_id', $organizerId)->orderBy('id')->get();
 
         return view('adventuresSchedules.edit', compact('adventure_schedules', 'adventures', 'guides'));
     }
@@ -178,9 +191,11 @@ class AdventureSchedulesController extends Controller
      */
     public function update(Request $request, Adventure_schedules $adventure_schedules)
     {
+        $this->ensureOwnedSchedule($adventure_schedules, $request);
+        $organizerId = (int) $request->user()->activityOrganizer->id;
         $validated = $request->validate([
-            'adventure_id' => ['required', 'integer', 'exists:adventures,id'],
-            'guide_id' => ['required', 'integer', 'exists:guides,id'],
+            'adventure_id' => ['required', 'integer', Rule::exists('adventures', 'id')->where('activity_organizer_id', $organizerId)],
+            'guide_id' => ['required', 'integer', Rule::exists('guides', 'id')->where('activity_organizer_id', $organizerId)],
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
             'capacity' => ['required', 'integer', 'min:1'],
@@ -217,6 +232,7 @@ class AdventureSchedulesController extends Controller
      */
     public function destroy(Adventure_schedules $adventure_schedules)
     {
+        $this->ensureOwnedSchedule($adventure_schedules);
         $adventure_schedules->delete();
 
         return redirect()->route('adventure-schedules.index')
@@ -229,6 +245,7 @@ class AdventureSchedulesController extends Controller
             'schedule_id' => ['required', 'integer', 'exists:adventure_schedules,id'],
         ]);
         $schedule = Adventure_schedules::findOrFail($validatedSchedule['schedule_id']);
+        $this->ensureOwnedSchedule($schedule, $request);
 
         $expectedDayCount = $schedule->starts_at->copy()->startOfDay()
             ->diffInDays($schedule->ends_at->copy()->startOfDay()) + 1;
@@ -252,5 +269,14 @@ class AdventureSchedulesController extends Controller
 
         return redirect()->route('adventure-schedules.show', $schedule)
             ->with('success', 'Adventure itinerary added successfully');
+    }
+
+    private function ensureOwnedSchedule(Adventure_schedules $schedule, ?Request $request = null): void
+    {
+        $request ??= request();
+        abort_unless(
+            (int) $schedule->adventure->activity_organizer_id === (int) $request->user()->activityOrganizer->id,
+            404
+        );
     }
 }

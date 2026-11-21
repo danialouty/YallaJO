@@ -19,16 +19,6 @@
                 @method('PUT')
                 <div class="grid gap-4 sm:grid-cols-2">
                     <label class="text-sm font-bold text-slate-700">اسم المغامرة<input class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="title" name="title" value="{{ old('title', $adventure->title) }}" required></label>
-                    <label class="text-sm font-bold text-slate-700">المنظم
-                        <select class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="activity_organizer_id" name="activity_organizer_id" required>
-                            <option value="">اختر المنظم</option>
-                            @foreach ($organizers as $organizer)
-                                <option value="{{ $organizer->id }}" @selected((string) old('activity_organizer_id', $adventure->activity_organizer_id) === (string) $organizer->id)>
-                                    {{ $organizer->user?->name ?? ('المنظم رقم ' . $organizer->id) }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </label>
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">الوصف<textarea class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="description" name="description" rows="4" required>{{ old('description', $adventure->description) }}</textarea></label>
                     <label class="text-sm font-bold text-slate-700">الصعوبة
                         <select class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="difficulty_level" name="difficulty_level" required>
