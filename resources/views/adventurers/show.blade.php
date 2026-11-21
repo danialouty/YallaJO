@@ -251,6 +251,7 @@
                     <a
                         id="adventurer-edit-link"
                         href="{{ route('adventurer.edit') }}"
+                        data-modal-open="{{ $editModalName }}"
                         aria-haspopup="dialog"
                         aria-controls="{{ $editModalName }}"
                         class="inline-flex min-h-11 items-center
@@ -284,39 +285,3 @@
 </x-ui.modal>
 
 @endsection
-
-@push('scripts')
-    <script>
-        (() => {
-            const editLink = document.getElementById('adventurer-edit-link');
-            const dialog = document.getElementById(editLink?.getAttribute('aria-controls'));
-
-            if (typeof dialog?.showModal !== 'function') {
-                return;
-            }
-
-            editLink.addEventListener('click', (event) => {
-                const target = editLink.getAttribute('target');
-
-                if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey
-                    || event.shiftKey || event.altKey || (target && target.toLowerCase() !== '_self')) {
-                    return;
-                }
-
-                try {
-                    if (!dialog.open) {
-                        dialog.showModal();
-                    }
-                } catch {
-                    return;
-                }
-
-                if (dialog.open) {
-                    event.preventDefault();
-                }
-            });
-
-            dialog.addEventListener('close', () => editLink.focus());
-        })();
-    </script>
-@endpush

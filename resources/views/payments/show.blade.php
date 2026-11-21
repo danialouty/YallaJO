@@ -47,8 +47,7 @@
                    class="px-5 py-2.5 bg-[#E8F1ED] hover:bg-[#d5e6de] text-[#2D5041] font-bold text-sm rounded-xl">
                     تعديل الدفعة
                 </a>
-                <form action="{{ route('payments.destroy', $payment->id) }}" method="POST"
-                      onsubmit="return confirm('هل أنت متأكد من حذف هذه الدفعة؟')">
+                <form action="{{ route('payments.destroy', $payment->id) }}" method="POST" data-confirm="هل أنت متأكد من حذف هذه الدفعة؟">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
