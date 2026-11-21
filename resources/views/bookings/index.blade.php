@@ -1,15 +1,22 @@
 @extends('layouts.dashboard')
 
-@section('dashboard-theme', 'adventurer')
-@section('dashboard-name', 'بوابة المغامر')
-@section('dashboard-title', 'إدارة حجوزاتي')
+@section('dashboard-theme', $isOrganizer ? 'organizer' : 'adventurer')
+@section('dashboard-name', $isOrganizer ? 'مساحة المنظّم' : 'بوابة المغامر')
+@section('dashboard-title', $isOrganizer ? 'حجوزات مغامراتي' : 'إدارة حجوزاتي')
 
 @section('dashboard-header-actions')
+    @unless ($isOrganizer)
+    <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-xl border border-outline px-4 py-2.5 text-sm font-bold text-ink hover:bg-canvas">
+        العودة للرئيسية
+    </a>
+    @endunless
+    @unless ($isOrganizer)
     <button type="button" data-open-create-modal
             class="btn-yalla-primary inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-sm rounded-xl shadow-sm cursor-pointer">
         <span>+</span>
         <span>حجز مغامرة جديدة</span>
     </button>
+    @endunless
 @endsection
 
 @section('content')
@@ -96,8 +103,8 @@
         <!-- جدول الحجوزات -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h2 class="font-bold text-gray-800">سجل حجوزاتك</h2>
-                <span class="text-xs text-gray-400">يمكنك تعديل عدد المشاركين طالما الحجز "قيد الانتظار"</span>
+                <h2 class="font-bold text-gray-800">{{ $isOrganizer ? 'حجوزات مغامرات منظمتك' : 'سجل حجوزاتك' }}</h2>
+                <span class="text-xs text-gray-400">{{ $isOrganizer ? 'تظهر الحجوزات المرتبطة بمغامراتك فقط' : 'يمكنك تعديل عدد المشاركين طالما الحجز "قيد الانتظار"' }}</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -117,6 +124,9 @@
                             <tr class="hover:bg-gray-50/60 transition">
                                 <td class="py-4 px-6">
                                     <p class="font-bold text-gray-900">{{ $booking->adventure->title ?? 'مغامرة #' . $booking->adventure_id }}</p>
+                                    @if ($isOrganizer)
+                                        <p class="text-xs text-gray-400 mt-0.5">{{ $booking->adventurer->user->name }}</p>
+                                    @endif
                                     <p class="text-xs text-gray-400 mt-0.5">تاريخ الطلب: {{ $booking->created_at->format('Y/m/d') }}</p>
                                 </td>
 
@@ -149,7 +159,7 @@
                                         </a>
 
                                         <!-- زر Edit Pop-up (يظهر فقط إذا كانت الحالة Pending) -->
-                                        @if ($booking->isChangeable() && $booking->adventure?->status === 'Active')
+                                        @if (!$isOrganizer && $booking->isChangeable() && $booking->adventure?->status === 'Active')
                                             <button type="button"
                                                     data-open-edit-modal
                                                     data-id="{{ $booking->id }}"
@@ -162,7 +172,7 @@
                                         @endif
 
                                         <!-- إلغاء الحجز -->
-                                        @if ($booking->isChangeable())
+                                        @if (!$isOrganizer && $booking->isChangeable())
                                         <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" data-confirm="هل أنت متأكد من إلغاء هذا الحجز؟">
                                             @csrf
                                             @method('DELETE')
@@ -179,9 +189,11 @@
                             <tr>
                                 <td colspan="6" class="py-12 text-center">
                                     <p class="text-gray-500 font-medium mb-3">لا يوجد لديك أي حجوزات حالياً</p>
-                                    <button type="button" data-open-create-modal class="text-sm font-bold text-[#A94B2B] underline cursor-pointer">
-                                        احجز مغامرتك الأولى الآن
-                                    </button>
+                                    @unless ($isOrganizer)
+                                        <button type="button" data-open-create-modal class="text-sm font-bold text-[#A94B2B] underline cursor-pointer">
+                                            احجز مغامرتك الأولى الآن
+                                        </button>
+                                    @endunless
                                 </td>
                             </tr>
                         @endforelse

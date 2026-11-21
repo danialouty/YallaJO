@@ -69,6 +69,19 @@
             </div>
         </section>
 
+        @if (session('booking_success'))
+            <div id="adventure-booking-success" class="adventure-booking-success-backdrop"
+                 role="dialog" aria-modal="true" aria-labelledby="adventure-booking-success-title">
+                <section class="adventure-booking-success-card" dir="rtl">
+                    <div class="adventure-booking-success-icon" aria-hidden="true">✓</div>
+                    <p class="adventure-booking-success-kicker">اكتمل الحجز</p>
+                    <h2 id="adventure-booking-success-title">تم إرسال طلبك بنجاح</h2>
+                    <p>{{ session('booking_success') }}</p>
+                    <button type="button" data-close-adventure-booking-success autofocus>متابعة التصفح</button>
+                </section>
+            </div>
+        @endif
+
         <div class="details-layout">
             <aside>
                 <div class="card booking-card">
@@ -93,14 +106,13 @@
                            class="book-button block text-center">
                             سجل دخولك لتأكيد الحجز
                         </a>
+                    @elseif ($alreadyBooked)
+                        <div class="booking-note" role="status">سبق وقدّمت طلب حجز لهذه المغامرة. يمكنك متابعة حالته من صفحة حجوزاتي.</div>
+                        <a href="{{ route('bookings.index') }}" class="book-button block text-center">متابعة حالة الحجز</a>
                     @else
                     <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                         @csrf
                         <input type="hidden" name="adventure_id" value="{{ $adventure->id }}">
-
-                        <label for="bookingDate" class="booking-label">تاريخ الرحلة</label>
-                        <input id="bookingDate" type="date" name="booking_date" class="booking-input"
-                               min="{{ date('Y-m-d') }}" required>
 
                         <label class="booking-label">عدد الأشخاص</label>
                         <div class="people-control">

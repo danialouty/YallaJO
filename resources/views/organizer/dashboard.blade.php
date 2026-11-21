@@ -40,6 +40,10 @@
         </section>
 
         <section class="grid gap-4 sm:grid-cols-2">
+            <a href="{{ route('bookings.index') }}" class="rounded-2xl border border-outline/30 bg-surface p-5 transition hover:border-brand">
+                <h2 class="font-bold text-ink">إدارة الحجوزات</h2>
+                <p class="mt-1 text-sm text-muted">راجع حجوزات المغامرات التابعة لمنظمتك.</p>
+            </a>
             <a href="{{ route('adventures.index') }}" class="rounded-2xl border border-outline/30 bg-surface p-5 transition hover:border-brand">
                 <h2 class="font-bold text-ink">إدارة المغامرات</h2>
                 <p class="mt-1 text-sm text-muted">أضف مغامراتك وحدّث بياناتها وصورها.</p>

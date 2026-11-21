@@ -65,8 +65,8 @@ Route::get('/dashboard', function () {
     if ($user->role === 'Activity_Organizer') {
         return redirect()->route(
             $user->isApprovedOrganizer()
-                ? 'organizer.dashboard'
-                : 'organizers.index'
+            ? 'organizer.dashboard'
+            : 'organizers.index'
         );
     }
 
@@ -78,9 +78,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-Route::resource('bookings', BookingController::class)
-    ->middleware(['auth', 'can:viewAny,App\Models\Booking']);
 
 require __DIR__ . '/auth.php';
 use App\Http\Controllers\AdventurerController;
@@ -102,10 +99,10 @@ Route::get('/about', function () {
 
 Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'showProfile'])
     ->name('adventures.profile');
-Route::get('/adventures', [AdventureController::class, 'index'])->name('adventures.index');
 
 
 Route::middleware(['auth', 'approved.organizer'])->group(function () {
+    Route::get('/adventures', [AdventureController::class, 'index'])->name('adventures.index');
     Route::resource('guides', GuidesController::class)
         ->only(['index', 'create', 'store', 'update']);
     Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
@@ -130,6 +127,13 @@ Route::middleware(['auth', 'approved.organizer'])->group(function () {
         ->name('schedules.update');
 
 });
+
+Route::get('/bookings', [BookingController::class, 'index'])
+    ->middleware(['auth', 'booking.viewer'])
+    ->name('bookings.index');
+Route::resource('bookings', BookingController::class)
+    ->except('index')
+    ->middleware(['auth', 'adventurer']);
 
 Route::middleware('auth')->controller(AdventurerController::class)->prefix('adventurer/profile')
     ->name('adventurer.')->group(function () {
@@ -221,13 +225,13 @@ Route::post('/chatbot', [ChatbotController::class, 'chat'])
     ->middleware('auth')
     ->name('chatbot.chat');
 
-    Route::resource('communities', CommunityController::class)
-        ->only(['index', 'show']);
+Route::resource('communities', CommunityController::class)
+    ->only(['index', 'show']);
 
-    Route::middleware('auth')->group(function () {
-        Route::resource('communities.memberships', CommunityMembershipController::class)
-            ->only(['store', 'destroy']);
+Route::middleware('auth')->group(function () {
+    Route::resource('communities.memberships', CommunityMembershipController::class)
+        ->only(['store', 'destroy']);
 
-        Route::resource('communities.messages', CommunityMessageController::class)
-            ->only(['store']);
-    });
+    Route::resource('communities.messages', CommunityMessageController::class)
+        ->only(['store']);
+});

@@ -60,7 +60,7 @@ class SecurityIntegrationTest extends TestCase
         $this->postJson(route('bookings.store'), array_replace($guestPayload, ['participants_count' => 3]))
             ->assertUnprocessable()->assertJsonValidationErrors('participants_count');
         $this->post(route('bookings.store'), array_replace($guestPayload, ['participants_count' => 2, 'total_amount' => 1]))
-            ->assertRedirectToRoute('bookings.index');
+            ->assertRedirectToRoute('bookings.index')->assertSessionHas('success');
         $booking = Booking::where('adventurer_id', $adventurer->adventurer()->firstOrFail()->id)->firstOrFail();
         $this->assertSame('25.10', $booking->total_amount);
         $this->assertDatabaseHas('payments', [
@@ -128,8 +128,11 @@ class SecurityIntegrationTest extends TestCase
             $this->json($method, route($name, $parameters))->assertUnauthorized();
         }
 
-        $this->get(route('adventures.index'))->assertRedirectToRoute('adventuresAll.index');
+        $this->get(route('adventures.index'))->assertRedirectToRoute('login');
         $this->actingAs($this->user('Adventurer'))->postJson(route('adventures.store'))->assertForbidden();
+        $this->get(route('adventures.index'))->assertForbidden();
+        $this->actingAs($this->user('Activity_Organizer'))->get(route('bookings.index'))->assertForbidden();
+        $this->get(route('bookings.create'))->assertForbidden();
     }
 
     public function test_account_deletion_preserves_history_for_customer_organizer_and_approving_admin(): void
@@ -172,7 +175,7 @@ class SecurityIntegrationTest extends TestCase
         $adventure = $this->adventure($this->organizer());
         $this->actingAs($owner)->post(route('bookings.store'), [
             'adventure_id' => $adventure->id, 'participants_count' => 1,
-        ])->assertRedirectToRoute('bookings.index');
+        ])->assertRedirectToRoute('bookings.index')->assertSessionHas('success');
         $booking = $owner->adventurer()->firstOrFail()->bookings()->sole();
         $payment = $booking->payment()->sole();
 
@@ -254,6 +257,9 @@ class SecurityIntegrationTest extends TestCase
         $this->assertSame('Updated itinerary', $day->fresh()->title);
 
         $booking = $this->booking($adventure, $this->user('Adventurer'), 'Accepted');
+        $this->booking($foreignAdventure, $this->user('Adventurer'), 'Pending');
+        $this->actingAs($owner->user)->get(route('bookings.index'))->assertOk()
+            ->assertSee($adventure->title)->assertDontSee($foreignAdventure->title);
         $this->deleteJson(route('adventures.destroy', $adventure))->assertUnprocessable();
         $this->assertDatabaseHas('bookings', ['id' => $booking->id]);
         $this->assertDatabaseHas('images', ['id' => $image->id]);
@@ -303,6 +309,36 @@ class SecurityIntegrationTest extends TestCase
                 $this->assertContains('auth', $route->gatherMiddleware());
                 $this->assertContains('admin', $route->gatherMiddleware());
             }
+        }
+    }
+
+    public function test_all_organizer_management_routes_require_approved_organizer_middleware(): void
+    {
+        $organizerRouteNames = [
+            'organizer.dashboard',
+            'adventures.index', 'adventures.create', 'adventures.store', 'adventures.show',
+            'adventures.edit', 'adventures.update', 'adventures.destroy',
+            'guides.index', 'guides.create', 'guides.store', 'guides.update',
+            'guide-availabilities.index', 'guide-availabilities.create', 'guide-availabilities.store',
+            'guide-availabilities.show', 'guide-availabilities.edit', 'guide-availabilities.update',
+            'guide-availabilities.destroy',
+            'adventure-schedules.index', 'adventure-schedules.create', 'adventure-schedules.store',
+            'adventure-schedules.show', 'adventure-schedules.edit', 'adventure-schedules.update',
+            'adventure-schedules.destroy', 'adventure-schedules.days.generate',
+            'adventure-schedules.days.update', 'schedules.store', 'schedules.update',
+            'images.store', 'images.update',
+        ];
+
+        $registeredNames = collect(Route::getRoutes()->getRoutes())
+            ->map(fn ($route) => $route->getName())
+            ->filter()
+            ->all();
+
+        foreach ($organizerRouteNames as $name) {
+            $this->assertContains($name, $registeredNames, "Expected organizer route [{$name}] to be registered.");
+            $route = Route::getRoutes()->getByName($name);
+            $this->assertContains('auth', $route->gatherMiddleware(), "Route [{$name}] must require authentication.");
+            $this->assertContains('approved.organizer', $route->gatherMiddleware(), "Route [{$name}] must require an approved organizer.");
         }
     }
 

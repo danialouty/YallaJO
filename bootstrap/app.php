@@ -9,6 +9,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'approved.organizer' => \App\Http\Middleware\EnsureOrganizerIsApproved::class,
+            'adventurer' => \App\Http\Middleware\EnsureAdventurer::class,
+            'booking.viewer' => \App\Http\Middleware\EnsureBookingViewer::class,
         ]);
     })
     ->withRouting(

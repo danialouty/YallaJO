@@ -31,6 +31,7 @@
 
         <div class="min-h-screen lg:flex">
 
+            @unless ($dashboardTheme === 'adventurer')
             {{-- Desktop Sidebar --}}
             <aside id="dashboard-sidebar" aria-label="القائمة الجانبية" class="hidden text-white
                                lg:sticky lg:top-0 lg:flex
@@ -89,6 +90,7 @@
                 'dashboardTheme' => $dashboardTheme,
                 'dashboardUser' => $dashboardUser
             ])
+            @endunless
 
             {{-- Dashboard Main Area --}}
             <div class="flex min-h-screen

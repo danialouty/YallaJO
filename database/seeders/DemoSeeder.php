@@ -61,8 +61,11 @@ class DemoSeeder extends Seeder
 
         $adventurers = [];
         foreach ([
-            [1, 'Lina Tester', 'demo.adventurer1@yallajo.com', '0790000101', 'Beginner', ['Hiking', 'Camping'], 'Amman'],
-            [2, 'Omar Tester', 'demo.adventurer2@yallajo.com', '0790000102', 'Intermediate', ['Hiking', 'Culture'], 'Irbid'],
+            [1, 'Lina Haddad', 'demo.adventurer1@yallajo.com', '0790000101', 'Beginner', ['Hiking', 'Camping'], 'عمّان'],
+            [2, 'Omar Khoury', 'demo.adventurer2@yallajo.com', '0790000102', 'Intermediate', ['Hiking', 'Culture'], 'إربد'],
+            [3, 'Rana Al-Khatib', 'demo.adventurer3@yallajo.com', '0790000103', 'Advanced', ['Diving', 'Hiking'], 'العقبة'],
+            [4, 'Yazan Masri', 'demo.adventurer4@yallajo.com', '0790000104', 'Beginner', ['Camping', 'Hiking'], 'مادبا'],
+            [5, 'Noor Abu Rumman', 'demo.adventurer5@yallajo.com', '0790000105', 'Intermediate', ['Hiking', 'Culture'], 'السلط'],
         ] as [$index, $name, $email, $phone, $level, $interests, $location]) {
             $user = $this->upsertFactoryUser('adventurer', $email, $name, $phone);
 
@@ -109,6 +112,57 @@ class DemoSeeder extends Seeder
                 'days' => [
                     [1, 'Dana village to the canyon', 'Start in Dana village and hike with the guide to the canyon overlook.'],
                     [2, 'Morning trail and return', 'Follow a shorter morning trail, take a break at the reserve, and return to the village.'],
+                ],
+            ],
+            [
+                'title' => 'Demo: Ajloun Forest Reserve Walk',
+                'description' => 'A guided weekend walk through Ajloun Forest Reserve, with oak woodland views and a visit to a local nature trail.',
+                'difficulty_level' => 'Easy',
+                'capacity' => 14,
+                'category' => 'Hiking',
+                'location' => 'Ajloun Forest Reserve, Ajloun Governorate, Jordan',
+                'duration_hours' => 12,
+                'price' => 42,
+                'requirements' => 'Bring walking shoes, water, and a light jacket.',
+                'starts_at' => Carbon::parse('2027-06-12 08:00:00'),
+                'ends_at' => Carbon::parse('2027-06-13 15:00:00'),
+                'days' => [
+                    [1, 'Forest trail and reserve visit', 'Meet the local guide, walk the reserve trail, and stop at scenic viewpoints in the forest.'],
+                    [2, 'Village path and return', 'Explore a nearby village path, enjoy a picnic break, and return to the reserve entrance.'],
+                ],
+            ],
+            [
+                'title' => 'Demo: Wadi Mujib Canyon Weekend',
+                'description' => 'A two-day outdoor escape near the Dead Sea with a guided nature walk around the Wadi Mujib area.',
+                'difficulty_level' => 'Hard',
+                'capacity' => 12,
+                'category' => 'Hiking',
+                'location' => 'Wadi Mujib, Madaba Governorate, Jordan',
+                'duration_hours' => 14,
+                'price' => 70,
+                'requirements' => 'Bring sturdy footwear, a change of clothes, drinking water, and sun protection.',
+                'starts_at' => Carbon::parse('2027-07-17 07:00:00'),
+                'ends_at' => Carbon::parse('2027-07-18 16:00:00'),
+                'days' => [
+                    [1, 'Mujib viewpoint walk', 'Follow the guide along a marked nature route and take breaks at the canyon viewpoints.'],
+                    [2, 'Dead Sea overlook and return', 'Take a morning walk near the reserve, visit a Dead Sea overlook, and return with the group.'],
+                ],
+            ],
+            [
+                'title' => 'Demo: Petra Back Trails Explorer',
+                'description' => 'Explore Petra and its surrounding trails with a local guide over a two-day hiking and heritage weekend.',
+                'difficulty_level' => 'Medium',
+                'capacity' => 16,
+                'category' => 'Hiking',
+                'location' => 'Petra, Ma’an Governorate, Jordan',
+                'duration_hours' => 18,
+                'price' => 95,
+                'requirements' => 'Bring hiking shoes, water, a hat, and a small day pack.',
+                'starts_at' => Carbon::parse('2027-09-04 07:00:00'),
+                'ends_at' => Carbon::parse('2027-09-05 17:00:00'),
+                'days' => [
+                    [1, 'Petra main trail', 'Walk the main Petra route with the guide and learn about the carved monuments along the way.'],
+                    [2, 'High place trail and return', 'Take a guided morning trail to a Petra viewpoint before returning to the visitor area.'],
                 ],
             ],
         ];
@@ -164,8 +218,14 @@ class DemoSeeder extends Seeder
         foreach ($adventures as $adventureIndex => $adventure) {
             foreach ($adventurers as $adventurerIndex => $adventurer) {
                 $isReviewedBooking = $adventureIndex === 0 && $adventurerIndex === 1;
-                $status = $isReviewedBooking ? 'Accepted' : ($adventurerIndex === 1 ? 'Pending' : 'Accepted');
-                $participants = $adventurerIndex === 1 ? 2 : 1;
+                $status = $isReviewedBooking
+                    ? 'Accepted'
+                    : match (($adventureIndex + $adventurerIndex) % 5) {
+                        0 => 'Pending',
+                        1 => 'Cancelled',
+                        default => 'Accepted',
+                    };
+                $participants = 1 + (($adventureIndex + $adventurerIndex) % 2);
 
                 $bookingData = Booking::factory()->make([
                     'adventure_id' => $adventure->id,
@@ -176,7 +236,7 @@ class DemoSeeder extends Seeder
                     'total_amount' => $adventure->price * $participants,
                     'status' => $status,
                     'capacity' => $adventure->capacity,
-                    'cancelled_at' => null,
+                    'cancelled_at' => $status === 'Cancelled' ? now()->subDays(3) : null,
                 ]);
                 $booking = Booking::updateOrCreate(
                     [
@@ -191,7 +251,11 @@ class DemoSeeder extends Seeder
                     [
                         'total_amount' => $booking->total_amount,
                         'method' => $adventurerIndex === 0 ? 'Cash' : 'Visa',
-                        'status' => $status === 'Accepted' ? 'Confirmed' : 'Pending',
+                        'status' => match ($status) {
+                            'Accepted' => 'Confirmed',
+                            'Cancelled' => 'Canceled',
+                            default => 'Pending',
+                        },
                         'paid_at' => $status === 'Accepted' ? now()->subDays(2) : null,
                     ]
                 );

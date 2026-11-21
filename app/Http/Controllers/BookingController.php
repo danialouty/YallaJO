@@ -15,15 +15,15 @@ class BookingController extends Controller
 {
     public function index()
     {
-        abort_unless(auth()->user()->role === 'Adventurer', 403, 'صفحة الحجوزات متاحة للمغامرين فقط.');
+        $user = auth()->user();
+        $isOrganizer = $user->role === 'Activity_Organizer';
+        $bookings = $isOrganizer
+            ? Booking::whereHas('adventure', fn (Builder $query) => $query->where('activity_organizer_id', $user->activityOrganizer->id))
+                ->with(['adventure', 'adventurer.user', 'payment'])->latest()->get()
+            : $this->ownedBookings()->with('adventure')->withExists(['payment', 'review'])->latest()->get();
+        $adventures = $isOrganizer ? collect() : Adventure::where('status', 'Active')->get();
 
-        abort_unless(auth()->user()->role === 'Adventurer', 403, 'صفحة الحجوزات متاحة للمغامرين فقط.');
-
-        $bookings = $this->ownedBookings()->with('adventure')
-            ->withExists(['payment', 'review'])->latest()->get();
-        $adventures = Adventure::where('status', 'Active')->get();
-
-        return view('bookings.index', ['data' => $bookings, 'adventures' => $adventures]);
+        return view('bookings.index', compact('bookings', 'adventures', 'isOrganizer') + ['data' => $bookings]);
     }
 
     public function create()
@@ -44,7 +44,7 @@ class BookingController extends Controller
 
         $validated = $request->validated();
 
-        DB::transaction(function () use ($request, $validated) {
+        $booking = DB::transaction(function () use ($request, $validated) {
             $adventure = Adventure::query()->lockForUpdate()->findOrFail($validated['adventure_id']);
             if ($adventure->status !== 'Active') {
                 throw ValidationException::withMessages(['adventure_id' => 'الحجز غير متاح لهذه المغامرة.']);
@@ -72,9 +72,12 @@ class BookingController extends Controller
                 'method' => 'Cash',
                 'status' => 'Pending',
             ]);
+
+            return $booking;
         });
 
-        return redirect()->route('bookings.index')->with('success', 'تم إنشاء الحجز والدفع المعلق بنجاح');
+        return redirect()->route('bookings.index')
+            ->with('success', 'تم إرسال طلب الحجز بنجاح. يمكنك متابعة حالته من سجل حجوزاتك.');
     }
 
     public function show(string $booking)

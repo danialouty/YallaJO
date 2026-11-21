@@ -148,7 +148,7 @@ class PaymentAuthorizationTest extends TestCase
         $this->actingAs($customer)->post(route('bookings.store'), [
             'adventure_id' => $adventureId,
             'participants_count' => 2,
-        ])->assertRedirect(route('bookings.index'));
+        ])->assertRedirect(route('bookings.index'))->assertSessionHas('success');
 
         $booking = $profile->bookings()->sole();
         $this->assertDatabaseHas('payments', [
