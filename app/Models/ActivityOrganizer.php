@@ -9,6 +9,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ActivityOrganizer extends Model
 {
+    public const PENDING = 'Pending';
+    public const APPROVED = 'Approved';
+    public const REJECTED = 'Rejected';
+    public const BANNED = 'Banned';
+
+    public const ADVENTURE_GROUP = 'Adventure_group';
+    public const TOURISM_OFFICE = 'Tourism_office';
+
     protected $table = 'activity_organizers';
 
     protected $fillable = [

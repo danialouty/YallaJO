@@ -16,7 +16,6 @@
                 @csrf
                 <div class="grid gap-4 sm:grid-cols-2">
                     <label class="text-sm font-bold text-slate-700">اسم المغامرة<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="title" value="{{ old('title') }}" required></label>
-                    <label class="text-sm font-bold text-slate-700">رقم المنظم<input class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" id="activity_organizer_id" type="number" name="activity_organizer_id" value="{{ old('activity_organizer_id') }}" required></label>
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">الوصف<textarea class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="description" rows="4" required>{{ old('description') }}</textarea></label>
                     <label class="text-sm font-bold text-slate-700">الصعوبة
                         <select class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700" name="difficulty_level" required>

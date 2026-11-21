@@ -28,7 +28,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('bookings.index', absolute: false));
+        $destination = match ($request->user()->role) {
+            'Admin' => 'admin.dashboard',
+            'Activity_Organizer' => 'organizers.index',
+            'Adventurer' => 'bookings.index',
+            default => 'dashboard',
+        };
+
+        return redirect()->intended(route($destination, absolute: false));
     }
 
     /**

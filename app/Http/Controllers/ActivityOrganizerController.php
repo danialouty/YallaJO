@@ -6,6 +6,8 @@ use App\Models\ActivityOrganizer;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ActivityOrganizerController extends Controller
 {
@@ -15,7 +17,7 @@ class ActivityOrganizerController extends Controller
      */
     public function dashboard()
     {
-        $organizer = auth()->user()->activity_organizer;
+        $organizer = auth()->user()->activityOrganizer;
         return view('organizer.dashboard', compact('organizer'));
     }
     /**
@@ -49,7 +51,7 @@ class ActivityOrganizerController extends Controller
 
         $request->user()->activityOrganizer()->create([
             ...$validated,
-            'approval_status' => 'pending',
+            'approval_status' => ActivityOrganizer::PENDING,
         ]);
 
         return redirect()
@@ -83,13 +85,15 @@ class ActivityOrganizerController extends Controller
 
         $validated = $this->validateProfile($request);
 
-        if ($organizer->approval_status === 'rejected') {
-            $validated['approval_status'] = 'pending';
-            $validated['approved_by'] = null;
-            $validated['approved_at'] = null;
-        }
+        DB::transaction(function () use ($organizer, $validated) {
+            $current = ActivityOrganizer::query()->lockForUpdate()->findOrFail($organizer->getKey());
 
-        $organizer->update($validated);
+            if ($current->approval_status === ActivityOrganizer::REJECTED) {
+                $validated['approval_status'] = ActivityOrganizer::PENDING;
+            }
+
+            $current->update($validated);
+        });
 
         return redirect()
             ->route('organizers.index')
@@ -106,12 +110,16 @@ class ActivityOrganizerController extends Controller
 
     private function validateProfile(Request $request): array
     {
-        return $request->validate([
-            'organizer_type'    => ['required', 'in:tourism_office,hike_group'],
-            'license_number'    => ['nullable', 'required_if:organizer_type,tourism_office', 'string', 'max:100'],
+        $validated = $request->validate([
+            'organizer_type'    => ['required', Rule::in([ActivityOrganizer::TOURISM_OFFICE, ActivityOrganizer::ADVENTURE_GROUP])],
+            'license_number'    => ['nullable', 'required_if:organizer_type,'.ActivityOrganizer::TOURISM_OFFICE, 'string', 'max:100'],
             'social_handle_url' => ['nullable', 'url', 'max:255'],
         ], [
             'license_number.required_if' => 'A Ministry of Tourism license number is required for registered tourism offices.',
         ]);
+
+        $validated['license_number'] = $validated['license_number'] ?? '';
+
+        return $validated;
     }
 }

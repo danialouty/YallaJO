@@ -42,20 +42,6 @@
                 </div>
             </div>
 
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex flex-wrap justify-end gap-3">
-                <a href="{{ route('payments.edit', $payment->id) }}"
-                   class="px-5 py-2.5 bg-[#E8F1ED] hover:bg-[#d5e6de] text-[#2D5041] font-bold text-sm rounded-xl">
-                    تعديل الدفعة
-                </a>
-                <form action="{{ route('payments.destroy', $payment->id) }}" method="POST" data-confirm="هل أنت متأكد من حذف هذه الدفعة؟">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                            class="px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm rounded-xl">
-                        حذف الدفعة
-                    </button>
-                </form>
-            </div>
         </div>
     </div>
 </x-app-layout>

@@ -42,7 +42,15 @@
                     @if(session('error'))
                         <p class="booking-note text-red-600">{{ session('error') }}</p>
                     @endif
+                    @foreach ($errors->all() as $error)
+                        <p class="booking-note text-red-600" role="alert">{{ $error }}</p>
+                    @endforeach
 
+                    @if ($adventure->status !== 'Active' || $adventure->capacity < 1)
+                        <p class="booking-note">الحجز غير متاح لهذه المغامرة حاليًا.</p>
+                    @elseif (auth()->check() && auth()->user()->role !== 'Adventurer')
+                        <p class="booking-note">الحجز متاح لحسابات المغامرين.</p>
+                    @else
                     <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                         @csrf
                         <input type="hidden" name="adventure_id" value="{{ $adventure->id }}">
@@ -54,15 +62,15 @@
                         <label class="booking-label">عدد الأشخاص</label>
                         <div class="people-control">
                             <button type="button" id="increase" aria-label="زيادة عدد الأشخاص">+</button>
-                            <strong id="peopleCount">2</strong>
+                            <strong id="peopleCount">1</strong>
                             <button type="button" id="decrease" aria-label="تقليل عدد الأشخاص">−</button>
                         </div>
-                        <input type="hidden" name="participants_count" id="peopleInput" value="2">
+                        <input type="hidden" name="participants_count" id="peopleInput" value="1">
 
                         <div class="total">
                             <span>الإجمالي التقريبي</span>
                             <span class="total-price">
-                                <span id="totalPrice">{{ number_format($adventure->price * 2, 2) }}</span> د.أ
+                                <span id="totalPrice">{{ number_format($adventure->price, 2) }}</span> د.أ
                             </span>
                         </div>
 
@@ -71,6 +79,7 @@
                         </button>
                         <p class="booking-note">سيتم إنشاء الحجز والدفع المعلق تلقائيًا بعد التأكيد.</p>
                     </form>
+                    @endif
                 </div>
 
                 <div class="card benefits">

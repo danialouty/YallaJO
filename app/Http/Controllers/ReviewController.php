@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use App\Models\Adventure;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
@@ -90,31 +92,42 @@ class ReviewController extends Controller
             ],
         ]);
 
-        $booking = $adventurer->bookings()
-            ->whereKey($validated['booking_id'])
-            ->where('adventure_id', $adventure->id)
-            ->firstOrFail();
+        try {
+            $created = DB::transaction(function () use ($adventurer, $adventure, $validated) {
+                $booking = $adventurer->bookings()
+                    ->where('adventure_id', $adventure->id)
+                    ->lockForUpdate()
+                    ->findOrFail($validated['booking_id']);
 
-        abort_unless(
-            $booking->status === 'Accepted',
-            403,
-            'Only accepted bookings can be reviewed.'
-        );
+                abort_unless($booking->status === 'Accepted', 403, 'Only accepted bookings can be reviewed.');
 
-        if (Review::where('booking_id', $booking->id)->exists()) {
+                if ($booking->review()->exists()) {
+                    return false;
+                }
+
+                $booking->review()->create([
+                    'adventure_id' => $booking->adventure_id,
+                    'adventurer_id' => $booking->adventurer_id,
+                    'rating' => $validated['rating'],
+                    'comment' => $validated['comment'],
+                ]);
+
+                return true;
+            });
+        } catch (UniqueConstraintViolationException $exception) {
+            if (! Review::where('booking_id', $validated['booking_id'])->exists()) {
+                throw $exception;
+            }
+            $created = false;
+        }
+
+        if (! $created) {
             return redirect()
                 ->route('reviews.index', [
                     'adventure' => $adventure->id,
                 ])
-                ->with('error', 'This booking has already been reviewed.');
+                ->with('error', 'أُضيف تقييم لهذا الحجز من قبل.');
         }
-
-        $adventurer->reviews()->create([
-            'adventure_id' => $adventure->id,
-            'booking_id' => $booking->id,
-            'rating' => $validated['rating'],
-            'comment' => $validated['comment'],
-        ]);
 
         return redirect()
             ->route('reviews.index', [

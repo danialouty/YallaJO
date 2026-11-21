@@ -2,116 +2,73 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
-use Illuminate\Http\Request;
 use App\Models\Booking;
+use App\Models\Payment;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class PaymentController extends Controller
 {
-    
-    public function index()
+    public function index(Request $request): View
     {
-        $payments = Payment::with('booking')->get();
-        $bookings = Booking::all();
+        Gate::authorize('viewAny', Payment::class);
 
-        return view('payments.index', compact('payments', 'bookings'));
+        $query = Payment::query()->latest('id');
+        $user = $request->user();
+
+        if (! $user->isAdmin()) {
+            $query->whereHas('booking.adventurer', fn ($adventurers) => $adventurers->where('user_id', $user->id));
+        }
+
+        return view('payments.index', ['payments' => $query->get()]);
     }
 
-    
-    public function create()
+    public function create(): RedirectResponse
     {
+        Gate::authorize('viewAny', Payment::class);
+
         return redirect()->route('payments.index');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(): void
     {
-       $validated = $request->validate([
-            'booking_id' => 'required|exists:bookings,id',
-            'method' => 'required|in:Visa,Cash',
-        ]);
-
-        $booking = Booking::findOrFail($validated['booking_id']);
-
-        Payment::create([
-            'booking_id' => $booking->id,
-            'total_amount' => $booking->total_amount,
-            'method' => $validated['method'],
-            'status' => 'Pending',
-        ]);
-
-        return redirect()->route('payments.index')
-            ->with('success', 'تم إنشاء الدفعة بنجاح');
+        Gate::authorize('create', Payment::class);
     }
 
-    // Display one payment
-    public function show($id)
+    public function show(Payment $payment): View
     {
-        $payment = Payment::with('booking')->findOrFail($id);
+        Gate::authorize('viewAny', Payment::class);
+        Gate::authorize('view', $payment);
 
         return view('payments.show', compact('payment'));
-        
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function edit(Payment $payment): void
     {
-        $payment = Payment::findOrFail($id);
-
-        return view('payments.edit', compact('payment'));
+        Gate::authorize('update', $payment);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
+    public function update(Payment $payment): void
     {
-    $payment = Payment::findOrFail($id);
-
-    $validated = $request->validate([
-        'method' => 'sometimes|required|in:Visa,Cash',
-        'status' => 'sometimes|required|in:Pending,Canceled,Confirmed',  
-          ]);
-
-    $payment->update($validated);
-
-    if ($payment->status === 'Confirmed' && $payment->paid_at === null) {
-    $payment->update([
-        'paid_at' => now()
-    ]);
+        Gate::authorize('update', $payment);
     }
 
-    return redirect()->route('payments.index')
-        ->with('success', 'تم تعديل الدفعة بنجاح');
-
-    }
-
-    
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function destroy(Payment $payment): void
     {
-        $payment = Payment::findOrFail($id);
-
-        $payment->delete();
-
-        return redirect()->route('payments.index')
-            ->with('success', 'تم حذف الدفعة بنجاح');
+        Gate::authorize('delete', $payment);
     }
 
-    public function showByBooking($bookingId)
+    public function showByBooking(string $bookingId): View
     {
+        Gate::authorize('viewAny', Payment::class);
+
         $booking = Booking::findOrFail($bookingId);
+        Gate::authorize('viewForBooking', [Payment::class, $booking]);
 
-        $payments = Payment::where('booking_id', $booking->id)->get();
-        $bookings = Booking::all();
+        $payments = Payment::where('booking_id', $booking->id)->latest('id')->get();
 
-        return view('payments.index', compact('payments', 'bookings'));
+        return view('payments.index', compact('payments'));
     }
 }

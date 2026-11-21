@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function syncHints() {
         if (!typeSelect || !licenseHint) return;
-        const isOffice = typeSelect.value === 'tourism_office';
+        const isOffice = typeSelect.value === typeSelect.dataset.officeType;
         licenseHint.textContent = isOffice
             ? licenseHint.dataset.officeHint
             : licenseHint.dataset.groupHint;

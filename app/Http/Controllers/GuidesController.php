@@ -99,7 +99,7 @@ class GuidesController extends Controller
     {
         $guide = Guides::findOrFail($id);
         abort_unless(
-            ActivityOrganizer::where('id', $guide->activity_organizer_id)
+            $request->user()->isApprovedOrganizer() && ActivityOrganizer::where('id', $guide->activity_organizer_id)
                 ->where('user_id', Auth::id())
                 ->exists(),
             403,
@@ -110,8 +110,7 @@ class GuidesController extends Controller
             'activity_organizer_id' => [
                 'sometimes',
                 'required',
-                'exists:activity_organizers,id',
-                Rule::unique('guides', 'activity_organizer_id')->ignore($id),
+                Rule::in([$guide->activity_organizer_id]),
             ],
             'bio' => 'sometimes|required|string',
             'experience_years' => 'sometimes|required|integer|min:0',
@@ -123,6 +122,7 @@ class GuidesController extends Controller
             $validated['specialization'] = array_values(array_filter(array_map('trim', explode(',', $validated['specialization']))));
         }
 
+        unset($validated['activity_organizer_id']);
         $guide->update($validated);
         if (isset($validated['status'])) {
             Guides_availabilities::updateOrCreate(

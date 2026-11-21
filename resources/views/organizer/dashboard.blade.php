@@ -27,6 +27,12 @@
             </div>
         @endif
 
+        @if (session('error'))
+            <div role="alert" class="mt-6 rounded-control border border-danger/30 bg-danger/5 p-4 text-sm text-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <div class="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
             @if (!$organizer)
                 <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -45,8 +51,8 @@
             @else
                 @php
                     $badgeStyles = match ($organizer->approval_status) {
-                        'approved' => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-                        'rejected' => 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+                        \App\Models\ActivityOrganizer::APPROVED => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                        \App\Models\ActivityOrganizer::REJECTED, \App\Models\ActivityOrganizer::BANNED => 'bg-rose-500/15 text-rose-400 border-rose-500/30',
                         default    => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
                     };
                 @endphp

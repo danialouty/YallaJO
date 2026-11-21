@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Adventure;
 use App\Models\AdventureDay;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class AdventureDayController extends Controller
@@ -15,6 +16,7 @@ class AdventureDayController extends Controller
     public function index()
     {
         $adventureDays = AdventureDay::with('adventure')
+            ->whereIn('adventure_id', auth()->user()->activityOrganizer->adventures()->select('id'))
             ->orderBy('adventure_id')
             ->orderBy('day_number')
             ->paginate(15);
@@ -27,7 +29,7 @@ class AdventureDayController extends Controller
      */
     public function create()
     {
-        $adventures = Adventure::orderBy('title')->get();
+        $adventures = auth()->user()->activityOrganizer->adventures()->orderBy('title')->get();
 
         return view('adventure_days.create', compact('adventures'));
     }
@@ -50,6 +52,8 @@ class AdventureDayController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
+        $adventure = Adventure::findOrFail($validated['adventure_id']);
+        Gate::authorize('manage', $adventure);
         AdventureDay::create($validated);
 
         return redirect()->route('adventure-days.index')
@@ -61,7 +65,7 @@ class AdventureDayController extends Controller
      */
     public function show(AdventureDay $adventureDay)
     {
-        $adventureDay->load('adventure');
+        Gate::authorize('manage', $adventureDay->adventure);
 
         return view('adventure_days.show', compact('adventureDay'));
     }
@@ -71,7 +75,8 @@ class AdventureDayController extends Controller
      */
     public function edit(AdventureDay $adventureDay)
     {
-        $adventures = Adventure::orderBy('title')->get();
+        Gate::authorize('manage', $adventureDay->adventure);
+        $adventures = auth()->user()->activityOrganizer->adventures()->orderBy('title')->get();
 
         return view('adventure_days.edit', compact('adventureDay', 'adventures'));
     }
@@ -81,6 +86,7 @@ class AdventureDayController extends Controller
      */
     public function update(Request $request, AdventureDay $adventureDay)
     {
+        Gate::authorize('manage', $adventureDay->adventure);
         $validated = $request->validate([
             'adventure_id' => ['required', 'integer', 'exists:adventures,id'],
             'day_number' => [
@@ -95,6 +101,7 @@ class AdventureDayController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
+        Gate::authorize('manage', Adventure::findOrFail($validated['adventure_id']));
         $adventureDay->update($validated);
 
         return redirect()->route('adventure-days.index')
@@ -106,6 +113,7 @@ class AdventureDayController extends Controller
      */
     public function destroy(AdventureDay $adventureDay)
     {
+        Gate::authorize('manage', $adventureDay->adventure);
         $adventureDay->delete();
 
         return redirect()->route('adventure-days.index')

@@ -28,14 +28,15 @@
                     {{ __('Organizer Type') }} <span class="text-rose-400">*</span>
                 </label>
                 <select id="organizer_type" name="organizer_type" required
+                    data-office-type="{{ \App\Models\ActivityOrganizer::TOURISM_OFFICE }}"
                     class="mt-1.5 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
                     @php
-                        $selectedType = old('organizer_type', $organizer?->organizer_type ?? 'tourism_office');
+                        $selectedType = old('organizer_type', $organizer?->organizer_type ?? \App\Models\ActivityOrganizer::TOURISM_OFFICE);
                     @endphp
-                    <option value="tourism_office" @selected($selectedType === 'tourism_office')>
+                    <option value="{{ \App\Models\ActivityOrganizer::TOURISM_OFFICE }}" @selected($selectedType === \App\Models\ActivityOrganizer::TOURISM_OFFICE)>
                         {{ __('Tourism Office (Licensed Agency)') }}
                     </option>
-                    <option value="hike_group" @selected($selectedType === 'hike_group')>
+                    <option value="{{ \App\Models\ActivityOrganizer::ADVENTURE_GROUP }}" @selected($selectedType === \App\Models\ActivityOrganizer::ADVENTURE_GROUP)>
                         {{ __('Hike / Adventure Group') }}
                     </option>
                 </select>

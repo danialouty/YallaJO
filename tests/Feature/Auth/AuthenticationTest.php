@@ -8,16 +8,30 @@ test('login screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+test('users land on an accessible page after login', function (string $role, string $destination) {
+    $user = User::factory()->create(['role' => $role]);
 
     $response = $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    $this->assertAuthenticatedAs($user);
+    $response->assertRedirect(route($destination, absolute: false));
+    $this->get(route($destination))->assertOk();
+})->with([
+    'adventurer' => ['Adventurer', 'bookings.index'],
+    'organizer' => ['Activity_Organizer', 'organizers.index'],
+    'admin' => ['Admin', 'admin.dashboard'],
+]);
+
+test('login returns the user to the originally requested page', function () {
+    $user = User::factory()->create(['role' => 'Admin']);
+    $this->get(route('admin.users.index'))->assertRedirectToRoute('login');
+
+    $this->post('/login', ['email' => $user->email, 'password' => 'password'])
+        ->assertRedirectToRoute('admin.users.index');
+    $this->assertAuthenticatedAs($user);
 });
 
 test('users can not authenticate with invalid password', function () {

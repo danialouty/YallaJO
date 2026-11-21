@@ -97,18 +97,6 @@
                                            class="px-3 py-1.5 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition">
                                             التفاصيل
                                         </a>
-                                        <a href="{{ route('payments.edit', $payment->id) }}"
-                                           class="px-3 py-1.5 text-xs font-semibold bg-[#E8F1ED] hover:bg-[#d5e6de] text-[#2D5041] rounded-lg transition">
-                                            تعديل
-                                        </a>
-                                        <form action="{{ route('payments.destroy', $payment->id) }}" method="POST" data-confirm="هل أنت متأكد من حذف هذه الدفعة؟">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="px-3 py-1.5 text-xs font-semibold bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition cursor-pointer">
-                                                حذف
-                                            </button>
-                                        </form>
                                     </div>
                                 </td>
                             </tr>

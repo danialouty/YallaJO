@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Adventure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class AdventureController extends Controller
 {
@@ -12,10 +15,15 @@ class AdventureController extends Controller
      */
     public function index()
     {
-        //
-        $adventures = Adventure::with(['images', 'schedules'])->latest()->paginate(5);
+        $user = auth()->user();
+        if (! $user?->isApprovedOrganizer()) {
+            return redirect()->route('adventuresAll.index');
+        }
+
+        $owned = $user->activityOrganizer->adventures();
+        $adventures = (clone $owned)->with(['images', 'schedules'])->latest()->paginate(5);
         $optionalAdventure = request('phase') === 'optional'
-            ? Adventure::with(['images', 'schedules'])->find(request('adventure_id'))
+            ? $owned->with(['images', 'schedules'])->find(request()->integer('adventure_id'))
             : null;
 
         return view('adventures.index', compact('adventures', 'optionalAdventure'));
@@ -34,33 +42,8 @@ class AdventureController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'activity_organizer_id' => 'required',
-            'difficulty_level' => 'required',
-            'capacity' => 'required',
-            'category' => 'required',
-            'location' => 'required|string|max:255',
-            'duration_hours' => 'required',
-            'price' => 'required',
-            'requirements' => 'required|string',
-            'status' => 'required',
-        ]);
-        $adventure = Adventure::create($request->only([
-            'title',
-            'description',
-            'activity_organizer_id',
-            'difficulty_level',
-            'capacity',
-            'category',
-            'location',
-            'duration_hours',
-            'price',
-            'requirements',
-            'status',
-        ]));
+        $adventure = $request->user()->activityOrganizer->adventures()
+            ->create($request->validate($this->rules()));
 
         return redirect()->route('adventures.index', [
             'phase' => 'optional',
@@ -74,7 +57,7 @@ class AdventureController extends Controller
      */
     public function show(Adventure $adventure)
     {
-        //
+        Gate::authorize('manage', $adventure);
         $adventure->load(['images', 'schedules']);
         return view('adventures.show', compact('adventure'));
     }
@@ -84,6 +67,7 @@ class AdventureController extends Controller
      */
     public function edit(Adventure $adventure)
     {
+        Gate::authorize('manage', $adventure);
         $adventure->load(['images', 'schedules']);
 
         return view('adventures.edit', compact('adventure'));
@@ -94,34 +78,17 @@ class AdventureController extends Controller
      */
     public function update(Request $request, Adventure $adventure)
     {
-        //
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'activity_organizer_id' => 'required',
-            'difficulty_level' => 'required',
-            'capacity' => 'required',
-            'category' => 'required',
-            'location' => 'required|string|max:255',
-            'duration_hours' => 'required',
-            'price' => 'required',
-            'requirements' => 'required|string',
-            'status' => 'required',
-        ]);
+        Gate::authorize('manage', $adventure);
+        $validated = $request->validate($this->rules());
 
-        $adventure->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'activity_organizer_id' => $request->activity_organizer_id,
-            'difficulty_level' => $request->difficulty_level,
-            'capacity' => $request->capacity,
-            'category' => $request->category,
-            'location' => $request->location,
-            'duration_hours' => $request->duration_hours,
-            'price' => $request->price,
-            'requirements' => $request->requirements,
-            'status' => $request->status,
-        ]);
+        DB::transaction(function () use ($adventure, $validated) {
+            $current = Adventure::query()->lockForUpdate()->findOrFail($adventure->id);
+            if ($validated['capacity'] < $current->capacity
+                && $validated['capacity'] < $current->reservedBookings()->sum('participants_count')) {
+                throw ValidationException::withMessages(['capacity' => 'السعة أقل من المقاعد المحجوزة.']);
+            }
+            $current->update($validated);
+        });
 
         return redirect()->route('adventures.index')
             ->with('success', 'Adventure updated successfully');
@@ -132,10 +99,34 @@ class AdventureController extends Controller
      */
     public function destroy(Adventure $adventure)
     {
-        //
-        $adventure->delete();
+        Gate::authorize('manage', $adventure);
+
+        DB::transaction(function () use ($adventure) {
+            $current = Adventure::query()->lockForUpdate()->findOrFail($adventure->id);
+            if ($current->bookings()->exists() || $current->reviews()->exists() || $current->images()->exists()) {
+                throw ValidationException::withMessages(['adventure' => 'علّق المغامرة للإبقاء على الحجوزات والتقييمات والصور المرتبطة بها.']);
+            }
+            $current->delete();
+        });
+
         return redirect()->route('adventures.index')
             ->with('success', 'Adventure deleted successfully');
+    }
+
+    private function rules(): array
+    {
+        return [
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:255'],
+            'difficulty_level' => ['required', 'in:Easy,Medium,Hard'],
+            'capacity' => ['required', 'integer', 'between:1,2147483647'],
+            'category' => ['required', 'in:Hiking,Diving,Camping,Cyciling,Zaitoon day out,kayaking,climbing,Sky Diving,Blimping,Toursim'],
+            'location' => ['required', 'string', 'max:255'],
+            'duration_hours' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:999.99'],
+            'price' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999.99'],
+            'requirements' => ['required', 'string', 'max:10000'],
+            'status' => ['required', 'in:Active,Suspended'],
+        ];
     }
 
     public function indexAll(Request $request)
