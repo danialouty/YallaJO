@@ -6,6 +6,8 @@ import './components/adventure-profile';
 import './components/adventure-modals';
 import './components/organizer-profile';
 import './components/navigation';
+import './components/confirm-forms';
+import './components/review-modals';
 
 import Alpine from 'alpinejs';
 

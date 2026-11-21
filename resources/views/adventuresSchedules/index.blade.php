@@ -55,7 +55,7 @@
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('adventure-schedules.show', $schedule) }}" class="rounded-md bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200">عرض</a>
                                     <a href="{{ route('adventure-schedules.edit', $schedule) }}" class="rounded-md bg-orange-100 px-3 py-2 text-xs font-bold text-orange-800 hover:bg-orange-200">تعديل</a>
-                                    <form action="{{ route('adventure-schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('هل تريد حذف هذا الموعد؟')">
+                                    <form action="{{ route('adventure-schedules.destroy', $schedule) }}" method="POST" data-confirm="هل تريد حذف هذا الموعد؟">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="rounded-md bg-red-100 px-3 py-2 text-xs font-bold text-red-700 hover:bg-red-200">حذف</button>

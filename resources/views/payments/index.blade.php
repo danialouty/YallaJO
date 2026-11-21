@@ -102,7 +102,7 @@
                                             تعديل
                                         </a>
                                         <form action="{{ route('payments.destroy', $payment->id) }}" method="POST"
-                                              onsubmit="return confirm('هل أنت متأكد من حذف هذه الدفعة؟')">
+                                              data-confirm="هل أنت متأكد من حذف هذه الدفعة؟">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

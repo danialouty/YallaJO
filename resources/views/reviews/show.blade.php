@@ -54,6 +54,7 @@
                 <a
                     id="{{ $modalName }}-link"
                     href="{{ route('reviews.edit', ['adventure' => $adventure, 'review' => $review]) }}"
+                    data-modal-open="{{ $modalName }}"
                     aria-haspopup="dialog" aria-controls="{{ $modalName }}"
                     class="mt-5 inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-5
                            py-3 text-sm font-semibold text-white hover:bg-brand-dark focus-visible:outline-2
@@ -65,6 +66,7 @@
                 <details id="{{ $deleteModalName }}-fallback" class="mt-4">
                     <summary
                         id="{{ $deleteModalName }}-trigger"
+                        data-review-delete-trigger="{{ $deleteModalName }}"
                         class="inline-flex min-h-11 cursor-pointer items-center rounded-control border border-danger/40
                                px-5 py-3 text-sm font-semibold text-danger hover:bg-danger/5 focus-visible:outline-2
                                focus-visible:outline-offset-2 focus-visible:outline-danger"
@@ -88,6 +90,7 @@
                         <div class="flex flex-wrap gap-3">
                             <a
                                 id="{{ $deleteModalName }}-cancel"
+                                data-review-delete-cancel="{{ $deleteModalName }}"
                                 href="{{ route('reviews.show', ['adventure' => $adventure, 'review' => $review]) }}"
                                 class="inline-flex min-h-11 items-center justify-center rounded-control border border-outline
                                        px-4 py-2 text-sm font-semibold text-ink hover:bg-brand/5 focus-visible:outline-2
@@ -119,89 +122,5 @@
             :aria-describedby="$deleteModalName . '-warning'">
             <div id="{{ $deleteModalName }}-content"></div>
         </x-ui.modal>
-
-        @push('scripts')
-            <script>
-                (() => {
-                    const editLink = document.getElementById(@js($modalName . '-link'));
-                    const dialog = document.getElementById(editLink?.getAttribute('aria-controls'));
-
-                    if (typeof dialog?.showModal !== 'function') {
-                        return;
-                    }
-
-                    editLink.addEventListener('click', (event) => {
-                        const target = editLink.getAttribute('target');
-
-                        if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey
-                            || event.shiftKey || event.altKey || (target && target.toLowerCase() !== '_self')) {
-                            return;
-                        }
-
-                        try {
-                            if (!dialog.open) {
-                                dialog.showModal();
-                            }
-                        } catch {
-                            return;
-                        }
-
-                        if (dialog.open) {
-                            event.preventDefault();
-                        }
-                    });
-
-                    dialog.addEventListener('close', () => editLink.focus());
-                })();
-
-                (() => {
-                    const id = @js($deleteModalName);
-                    const dialog = document.getElementById(id);
-
-                    if (typeof dialog?.showModal !== 'function') {
-                        return;
-                    }
-
-                    const fallback = document.getElementById(id + '-fallback');
-                    const trigger = document.getElementById(id + '-trigger');
-                    const form = document.getElementById(id + '-form');
-                    const content = document.getElementById(id + '-content');
-                    const cancel = document.getElementById(id + '-cancel');
-
-                    trigger.setAttribute('aria-haspopup', 'dialog');
-
-                    trigger.addEventListener('click', (event) => {
-                        if (event.defaultPrevented || dialog.open) {
-                            return;
-                        }
-
-                        content.append(form);
-
-                        try {
-                            dialog.showModal();
-                        } catch {
-                            fallback.append(form);
-                            return;
-                        }
-
-                        event.preventDefault();
-                        fallback.open = false;
-                        cancel.focus();
-                    });
-
-                    cancel.addEventListener('click', (event) => {
-                        if (dialog.open) {
-                            event.preventDefault();
-                            dialog.close();
-                        }
-                    });
-
-                    dialog.addEventListener('close', () => {
-                        fallback.append(form);
-                        trigger.focus();
-                    });
-                })();
-            </script>
-        @endpush
     @endif
 @endsection

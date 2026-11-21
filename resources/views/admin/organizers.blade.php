@@ -119,7 +119,7 @@
                                     @endif
 
                                     <form method="POST" action="{{ route('admin.organizers.destroy', $org) }}"
-                                        onsubmit="return confirm('{{ __('Delete this organizer profile?') }}')">
+                                        data-confirm="{{ __('Delete this organizer profile?') }}">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"

@@ -129,7 +129,7 @@
 
                                         <!-- إلغاء الحجز -->
                                         <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST"
-                                              onsubmit="return confirm('هل أنت متأكد من إلغاء وحذف هذا الحجز؟')">
+                                              data-confirm="هل أنت متأكد من إلغاء وحذف هذا الحجز؟">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"

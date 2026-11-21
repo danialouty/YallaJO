@@ -78,7 +78,7 @@
                 <!-- زر الإلغاء -->
                 <div class="border-t border-gray-100 pt-5 flex items-center justify-end gap-3">
                     <form action="{{ route('bookings.destroy', $item->id) }}" method="POST"
-                          onsubmit="return confirm('هل أنت متأكد من إلغاء هذا الحجز؟')">
+                          data-confirm="هل أنت متأكد من إلغاء هذا الحجز؟">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="px-5 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm rounded-xl transition cursor-pointer">
