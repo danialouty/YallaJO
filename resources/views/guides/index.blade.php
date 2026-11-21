@@ -6,7 +6,7 @@
                 <p class="text-sm text-gray-500 mt-1">هذه لوحة إدارة رحلاتك وجداولك كمَرشد</p>
             </div>
             @if (! $guide)
-                <span class="inline-flex px-4 py-1.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">ملف غير مكتمل</span>
+                <a href="{{ route('guides.create') }}" class="inline-flex rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">إضافة مرشد</a>
             @elseif ($guide->status === 'Available')
                 <span class="inline-flex px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">متاح للعمل</span>
             @else

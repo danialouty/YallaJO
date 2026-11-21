@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Guides_availabilities;
-use App\Models\Guides;
 use App\Models\ActivityOrganizer;
+use App\Models\Guides;
+use App\Models\Guides_availabilities;
+use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class GuidesAvailabilitiesController extends Controller
 {
@@ -15,7 +16,10 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function index()
     {
-         $availabilities = Guides_availabilities::with('guide')->get();
+        $organizerId = (int) request()->user()->activityOrganizer->id;
+        $availabilities = Guides_availabilities::with('guide')
+            ->whereHas('guide', fn ($query) => $query->where('activity_organizer_id', $organizerId))
+            ->get();
 
         return view('guide_availabilities.index', compact('availabilities'));
     }
@@ -25,9 +29,7 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function create()
     {
-         $availabilities = Guides_availabilities::with('guide')->get();
-
-        return view('guide_availabilities.index', compact('availabilities'));
+        return $this->index();
     }
 
     /**
@@ -36,9 +38,14 @@ class GuidesAvailabilitiesController extends Controller
     public function store(Request $request)
     {
         $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
-        abort_unless($organizer, 403);
+        abort_unless($organizer !== null, 403);
 
         $validated = $request->validate([
+            'guide_id' => [
+                'required',
+                Rule::exists('guides', 'id')->where('activity_organizer_id', $request->user()->activityOrganizer->id),
+                'unique:guides_availabilities,guide_id',
+            ],
             'status' => 'required|in:Available,Busy',
         ]);
 
@@ -59,7 +66,7 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function show($id)
     {
-        $availability = Guides_availabilities::with('guide')->findOrFail($id);
+        $availability = $this->ownedAvailability($id);
 
         return view('guide_availabilities.show', compact('availability'));
     }
@@ -69,7 +76,7 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function edit($id)
     {
-        $availability = Guides_availabilities::findOrFail($id);
+        $availability = $this->ownedAvailability($id);
 
         return view('guide_availabilities.edit', compact('availability'));
     }
@@ -79,14 +86,7 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function update(Request $request,$id)
     {
-        $availability = Guides_availabilities::findOrFail($id);
-        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
-        abort_unless(
-            $organizer
-            && $availability->guide
-            && $availability->guide->activity_organizer_id === $organizer->id,
-            403
-        );
+        $availability = $this->ownedAvailability($id);
 
         $validated = $request->validate([
             'status' => 'sometimes|required|in:Available,Busy',
@@ -103,18 +103,21 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function destroy($id)
     {
-        $availability = Guides_availabilities::findOrFail($id);
-        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
-        abort_unless(
-            $organizer
-            && $availability->guide
-            && $availability->guide->activity_organizer_id === $organizer->id,
-            403
-        );
+        $availability = $this->ownedAvailability($id);
 
         $availability->delete();
 
         return redirect()->route('guide-availabilities.index')
             ->with('success', 'Guide availability deleted successfully');
+    }
+
+    private function ownedAvailability(int $id): Guides_availabilities
+    {
+        $organizerId = (int) request()->user()->activityOrganizer->id;
+
+        return Guides_availabilities::whereHas(
+            'guide',
+            fn ($query) => $query->where('activity_organizer_id', $organizerId)
+        )->findOrFail($id);
     }
 }

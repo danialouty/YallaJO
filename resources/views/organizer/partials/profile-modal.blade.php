@@ -30,12 +30,12 @@
                 <select id="organizer_type" name="organizer_type" required
                     class="mt-1.5 w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none">
                     @php
-                        $selectedType = old('organizer_type', $organizer?->organizer_type ?? 'tourism_office');
+                        $selectedType = old('organizer_type', $organizer?->organizer_type ?? 'Tourism_office');
                     @endphp
-                    <option value="tourism_office" @selected($selectedType === 'tourism_office')>
+                    <option value="Tourism_office" @selected($selectedType === 'Tourism_office')>
                         {{ __('Tourism Office (Licensed Agency)') }}
                     </option>
-                    <option value="hike_group" @selected($selectedType === 'hike_group')>
+                    <option value="Adventure_group" @selected($selectedType === 'Adventure_group')>
                         {{ __('Hike / Adventure Group') }}
                     </option>
                 </select>

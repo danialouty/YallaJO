@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Images;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -15,8 +16,9 @@ class ImagesController extends Controller
     public function store(Request $request)
     {
         //
+        $organizerId = (int) $request->user()->activityOrganizer->id;
         $validated = $request->validate([
-            'adventure_id' => 'required|exists:adventures,id',
+            'adventure_id' => ['required', Rule::exists('adventures', 'id')->where('activity_organizer_id', $organizerId)],
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'image_files' => 'nullable|array',
             'image_files.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -54,6 +56,10 @@ class ImagesController extends Controller
      */
     public function update(Request $request, Images $image)
     {
+        abort_unless(
+            (int) $image->adventure->activity_organizer_id === (int) $request->user()->activityOrganizer->id,
+            404
+        );
         $request->validate([
             'image_path' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);

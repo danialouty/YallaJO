@@ -35,10 +35,10 @@ class DatabaseSeeder extends Seeder
         ActivityOrganizer::updateOrCreate(
             ['user_id' => $pendingOrganizer->id],
             [
-                'organizer_type' => 'tourism_office',
+                'organizer_type' => 'Tourism_office',
                 'license_number' => 'JO-MOTA-1045',
                 'social_handle_url' => 'https://instagram.com/wadirumadventures',
-                'approval_status' => 'pending',
+                'approval_status' => 'Pending',
             ]
         );
 

@@ -21,18 +21,6 @@
                     <label class="text-sm font-bold text-slate-700">اسم المغامرة<input
                             class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
                             name="title" value="{{ old('title') }}" required></label>
-                    <label class="text-sm font-bold text-slate-700">المنظم
-                        <select
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
-                            id="activity_organizer_id" name="activity_organizer_id" required>
-                            <option value="">اختر المنظم</option>
-                            @foreach ($organizers as $organizer)
-                                <option value="{{ $organizer->id }}" {{ old('activity_organizer_id') == $organizer->id ? 'selected' : '' }}>
-                                    {{ $organizer->user->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </label> 
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">الوصف<textarea
                             class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
                             name="description" rows="4" required>{{ old('description') }}</textarea></label>

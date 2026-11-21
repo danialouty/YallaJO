@@ -19,7 +19,7 @@ class AdminOrganizerController extends Controller
 
         // Platform revenue & activity metrics
         $totalRevenue = Payment::where('status', 'Confirmed')->sum('total_amount');        $totalBookings = Booking::count();
-        $pendingCount = $organizers->where('approval_status', 'pending')->count();
+        $pendingCount = $organizers->where('approval_status', 'Pending')->count();
 
         return view('admin.organizers', compact(
             'organizers',
@@ -32,10 +32,10 @@ class AdminOrganizerController extends Controller
     public function update(Request $request, ActivityOrganizer $organizer): RedirectResponse
     {
         $validated = $request->validate([
-            'approval_status' => ['required', 'in:approved,rejected'],
+            'approval_status' => ['required', 'in:Approved,Rejected'],
         ]);
 
-        $isApproved = $validated['approval_status'] === 'approved';
+        $isApproved = $validated['approval_status'] === 'Approved';
 
         $organizer->update([
             'approval_status' => $validated['approval_status'],
