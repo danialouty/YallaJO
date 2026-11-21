@@ -55,6 +55,10 @@ class GuidesController extends Controller
      */
     public function store(Request $request)
     {
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        abort_unless($organizer !== null, 403, 'لا تملك صلاحية إنشاء ملف مرشد');
+        abort_if(Guides::where('activity_organizer_id', $organizer->id)->exists(), 409, 'يوجد ملف مرشد لهذا المنظم بالفعل');
+
         $validated = $request->validate([
             'bio' => 'required|string',
             'experience_years' => 'required|integer|min:0',
@@ -68,6 +72,10 @@ class GuidesController extends Controller
         $validated['activity_organizer_id'] = $organizer->id;
 
         $guide = Guides::create($validated);
+        Guides_availabilities::create([
+            'guide_id' => $guide->id,
+            'status' => $validated['status'],
+        ]);
 
         return redirect()->route('guides.index')
     ->with('success', 'تمت إضافة المرشد بنجاح');
@@ -101,10 +109,9 @@ class GuidesController extends Controller
     public function update(Request $request,$id)
     {
         $guide = Guides::findOrFail($id);
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
         abort_unless(
-            ActivityOrganizer::where('id', $guide->activity_organizer_id)
-                ->where('user_id', Auth::id())
-                ->exists(),
+            $organizer && $guide->activity_organizer_id === $organizer->id,
             403,
             'لا تملك صلاحية تعديل هذا المرشد'
         );

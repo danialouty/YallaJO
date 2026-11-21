@@ -8,6 +8,7 @@ import './components/review-modals';
 import './components/adventure-modals';
 import './components/organizer-profile';
 import './components/navigation';
+import './components/chatbot';
 
 import Alpine from 'alpinejs';
 

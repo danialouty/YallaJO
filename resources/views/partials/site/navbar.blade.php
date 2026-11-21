@@ -3,7 +3,7 @@
     $navigation = [
         [
             'label' => 'استكشف المغامرات',
-            'route' => 'adventures.index',
+            'route' => 'adventuresAll.index',
         ],
         [
             'label' => 'المجتمعات',
@@ -11,7 +11,7 @@
         ],
         [
             'label' => 'نظّم رحلة',
-            'route' => 'organizers.create',
+            'route' => 'organizers.index',
         ],
         [
             'label' => 'عن يلا جو',
@@ -31,16 +31,9 @@
     >
 
         {{-- Brand --}}
-        <div class="flex shrink-0 items-center gap-2">
+        <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-2" aria-label="الانتقال إلى الصفحة الرئيسية">
 
-            <span
-                class="flex size-10 items-center justify-center
-                       rounded-full bg-brand font-display
-                       text-xl font-bold text-white"
-                aria-hidden="true"
-            >
-                ي
-            </span>
+            <x-application-logo class="block size-11 shrink-0" aria-hidden="true" />
 
             <div class="flex flex-col leading-tight">
                 <span class="font-display text-lg font-bold text-ink">
@@ -55,7 +48,7 @@
                     YallaJO
                 </span>
             </div>
-        </div>
+        </a>
 
         {{-- Desktop Navigation --}}
         <nav
@@ -137,22 +130,19 @@
             @endguest
 
             @auth
-                <span class="text-sm font-semibold text-ink">
-                    {{ auth()->user()->name }}
-                </span>
-
-                @if (
-                    auth()->user()->role === 'Adventurer'
-                    && Route::has('adventurer.show')
-                )
-                    <a
-                        href="{{ route('adventurer.show') }}"
-                        class="rounded-control bg-brand px-4 py-2
-                               text-sm font-semibold text-white"
-                    >
-                        ملفي الشخصي
-                    </a>
-                @endif
+                @php
+                    $profileRoute = auth()->user()->role === 'Adventurer' && Route::has('adventurer.show')
+                        ? route('adventurer.show')
+                        : route('profile.edit');
+                @endphp
+                <a href="{{ $profileRoute }}"
+                   class="flex items-center gap-2 rounded-full border border-outline/40 bg-surface py-1 pl-3 pr-1 text-sm font-bold text-ink transition hover:border-brand/40 hover:bg-brand/5"
+                   aria-label="فتح ملف المستخدم">
+                    <span class="size-9 rounded-full bg-brand text-white flex items-center justify-center font-display text-base">
+                        {{ mb_substr(auth()->user()->name, 0, 1) }}
+                    </span>
+                    <span class="max-w-28 truncate">{{ auth()->user()->name }}</span>
+                </a>
             @endauth
 
         </div>
@@ -232,22 +222,18 @@
                 @endguest
 
                 @auth
-                    <span class="px-3 py-2 font-semibold text-ink">
-                        {{ auth()->user()->name }}
-                    </span>
-
-                    @if (
-                        auth()->user()->role === 'Adventurer'
-                        && Route::has('adventurer.show')
-                    )
-                        <a
-                            href="{{ route('adventurer.show') }}"
-                            class="rounded-control bg-brand px-3 py-2
-                                   text-center text-sm text-white"
-                        >
-                            ملفي الشخصي
-                        </a>
-                    @endif
+                    @php
+                        $profileRoute = auth()->user()->role === 'Adventurer' && Route::has('adventurer.show')
+                            ? route('adventurer.show')
+                            : route('profile.edit');
+                    @endphp
+                    <a href="{{ $profileRoute }}"
+                       class="flex items-center gap-3 rounded-control px-3 py-2 text-sm font-bold text-ink hover:bg-brand/10">
+                        <span class="size-9 rounded-full bg-brand text-white flex items-center justify-center font-display">
+                            {{ mb_substr(auth()->user()->name, 0, 1) }}
+                        </span>
+                        <span>{{ auth()->user()->name }}</span>
+                    </a>
                 @endauth
 
             </nav>

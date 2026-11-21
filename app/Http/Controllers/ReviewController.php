@@ -274,4 +274,24 @@ class ReviewController extends Controller
             ->with('success', 'Review deleted successfully.');
     }
 
+    public function report(
+    Request $request,
+    Adventure $adventure,
+    Review $review
+): RedirectResponse {
+    abort_unless($review->adventure_id === $adventure->id, 404);
+
+    $validated = $request->validate([
+        'report_reason' => ['required', 'string', 'max:500'],
+    ]);
+
+    $review->update([
+        'is_reported'   => true,
+        'report_status' => 'pending',
+        'report_reason' => $validated['report_reason'],
+    ]);
+
+    return back()->with('success', 'تم إرسال البلاغ للإدارة بنجاح.');
+}
+
 }

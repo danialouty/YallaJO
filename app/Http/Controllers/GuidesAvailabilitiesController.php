@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityOrganizer;
+use App\Models\Guides;
 use App\Models\Guides_availabilities;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -34,6 +37,9 @@ class GuidesAvailabilitiesController extends Controller
      */
     public function store(Request $request)
     {
+        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        abort_unless($organizer !== null, 403);
+
         $validated = $request->validate([
             'guide_id' => [
                 'required',
@@ -43,7 +49,13 @@ class GuidesAvailabilitiesController extends Controller
             'status' => 'required|in:Available,Busy',
         ]);
 
-        Guides_availabilities::create($validated);
+        $guide = Guides::where('activity_organizer_id', $organizer->id)->firstOrFail();
+        abort_if(Guides_availabilities::where('guide_id', $guide->id)->exists(), 409);
+
+        Guides_availabilities::create([
+            'guide_id' => $guide->id,
+            'status' => $validated['status'],
+        ]);
 
         return redirect()->route('guide-availabilities.index')
             ->with('success', 'Guide availability created successfully');
