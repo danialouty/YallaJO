@@ -6,6 +6,8 @@ use App\Models\Booking;
 use App\Models\Adventure;
 use App\Models\Adventurer;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Payment;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\UpdateBookingValidationRequest;
 
 
@@ -63,8 +65,18 @@ class BookingController extends Controller
             'capacity'=>$adventure->capacity ?? $request->participants_count,
         ];
 
-        Booking::create($dataToInsert);
-        return redirect()->route('bookings.index')->with('success', 'Booking created successfully!');
+        DB::transaction(function () use ($dataToInsert) {
+            $booking = Booking::create($dataToInsert);
+
+            Payment::create([
+                'booking_id' => $booking->id,
+                'total_amount' => $booking->total_amount,
+                'method' => 'Cash',
+                'status' => 'Pending',
+            ]);
+        });
+
+        return redirect()->route('bookings.index')->with('success', 'تم إنشاء الحجز والدفع المعلق بنجاح');
     }
 
     /**

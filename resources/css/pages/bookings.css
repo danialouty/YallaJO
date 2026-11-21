@@ -1,0 +1,60 @@
+.yallajo-bookings-wrapper {
+    font-family: 'Cairo', sans-serif;
+}
+
+.btn-yalla-primary {
+    background-color: #A94B2B;
+    color: #ffffff;
+    transition: background-color 0.2s ease;
+}
+
+.btn-yalla-primary:hover {
+    background-color: #8E3D22;
+}
+
+.btn-yalla-secondary {
+    background-color: #2D5041;
+    color: #ffffff;
+    transition: opacity 0.2s ease;
+}
+
+.btn-yalla-secondary:hover {
+    opacity: 0.92;
+}
+
+.booking-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.booking-modal-backdrop.hidden {
+    display: none;
+}
+
+.booking-modal-card {
+    background: #ffffff;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 28rem;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

@@ -10,7 +10,7 @@ class HomeController extends Controller
     //
     public function home()
 {
-    $adventures = Adventure::where('status', 'active')
+    $adventures = Adventure::where('status', 'Active')
         ->latest()
         ->take(4)
         ->get();
