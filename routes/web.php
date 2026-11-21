@@ -67,7 +67,10 @@ Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'show
 
 Route::middleware('auth')->group(function () {
     Route::resource('adventures', AdventureController::class);
-    Route::resource('adventure-days', AdventureDayController::class);
+    Route::post(
+        '/adventure-schedules/{adventure_schedules}/days/generate',
+        [AdventureSchedulesController::class, 'generateDays']
+    )->name('adventure-schedules.days.generate');
     Route::resource('adventure-schedules', AdventureSchedulesController::class)
         ->parameters(['adventure-schedules' => 'adventure_schedules']);
     Route::put(
