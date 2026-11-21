@@ -85,8 +85,9 @@ class AdventureController extends Controller
     public function edit(Adventure $adventure)
     {
         $adventure->load(['images', 'schedules']);
+        $organizers = ActivityOrganizer::with('user')->orderBy('id')->get();
 
-        return view('adventures.edit', compact('adventure'));
+        return view('adventures.edit', compact('adventure', 'organizers'));
     }
 
     /**
