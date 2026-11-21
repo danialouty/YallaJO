@@ -9,7 +9,10 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="{{ route('home') }}" class="logo">يلا جو</a>
+        <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="الانتقال إلى الصفحة الرئيسية">
+            <x-application-logo class="block size-11 shrink-0" aria-hidden="true" />
+            <span class="logo">يلا جو</span>
+        </a>
         <a href="{{ route('adventuresAll.index') }}" class="back-link">← العودة إلى المغامرات</a>
     </nav>
 

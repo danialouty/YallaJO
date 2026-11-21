@@ -30,22 +30,13 @@
                    px-5 py-5"
         >
 
-            <div>
-                <h2
-                    id="dashboard-mobile-menu-title"
-                    class="font-display text-xl font-bold"
-                >
-                    يلا جو
-                </h2>
-
-                <p
-                    class="mt-1 text-xs text-white/70"
-                    lang="en"
-                    dir="ltr"
-                >
-                    YallaJO Dashboard
-                </p>
-            </div>
+            <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="الانتقال إلى الصفحة الرئيسية">
+                <x-application-logo class="block size-11 shrink-0" aria-hidden="true" />
+                <div>
+                    <h2 id="dashboard-mobile-menu-title" class="font-display text-xl font-bold">يلا جو</h2>
+                    <p class="mt-1 text-xs text-white/70" lang="en" dir="ltr">YallaJO Dashboard</p>
+                </div>
+            </a>
 
             {{-- Close Button --}}
             <button

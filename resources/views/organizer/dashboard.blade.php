@@ -45,8 +45,8 @@
             @else
                 @php
                     $badgeStyles = match ($organizer->approval_status) {
-                        'approved' => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-                        'rejected' => 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+                        'Approved', 'approved' => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                        'Rejected', 'rejected' => 'bg-rose-500/15 text-rose-400 border-rose-500/30',
                         default    => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
                     };
                 @endphp
@@ -88,6 +88,14 @@
                         {{ __('Edit Profile') }}
                     </button>
                 </div>
+                @if (in_array($organizer->approval_status, ['Approved', 'approved'], true))
+                    <div class="mt-6 border-t border-slate-800 pt-5">
+                        <a href="{{ route('guides.index') }}"
+                           class="inline-flex rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-500">
+                            إدارة ملف المرشد والجداول
+                        </a>
+                    </div>
+                @endif
             @endif
         </div>
     </div>

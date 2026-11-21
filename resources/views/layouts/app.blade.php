@@ -61,6 +61,8 @@
         @yield('body')
     @endif
 
+    @include('components.chatbot')
+
     @stack('scripts')
 
 </body>
