@@ -16,7 +16,6 @@ class ImagesController extends Controller
      */
     public function store(Request $request)
     {
-        //
         $validated = $request->validate([
             'adventure_id' => 'required|integer|exists:adventures,id',
             'image_path' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -116,7 +117,7 @@ class SecurityIntegrationTest extends TestCase
             ['POST', 'schedules.store', []],
             ['PUT', 'schedules.update', [1]],
             ['PUT', 'adventure-schedules.days.update', [1, 1]],
-            ['POST', 'adventure-days.store', []],
+            ['POST', 'adventure-schedules.days.generate', [1]],
             ['POST', 'images.store', []],
             ['PUT', 'images.update', [1]],
             ['PUT', 'guides.update', [1]],
@@ -216,8 +217,7 @@ class SecurityIntegrationTest extends TestCase
         $this->putJson(route('adventure-schedules.days.update', [$schedule, $day]), $dayData)->assertForbidden();
         $this->postJson(route('schedules.store'), ['phase' => 'days', 'schedule_id' => $schedule->id, 'days' => [$dayData]])
             ->assertForbidden();
-        $this->patchJson(route('adventure-days.update', $day), [])->assertForbidden();
-        $this->delete(route('adventure-days.destroy', $day))->assertForbidden();
+        $this->postJson(route('adventure-schedules.days.generate', $schedule))->assertForbidden();
         $this->putJson(route('images.update', $image), [])->assertForbidden();
         $this->post(route('images.store'), [
             'adventure_id' => $adventure->id,
@@ -239,8 +239,8 @@ class SecurityIntegrationTest extends TestCase
         $this->putJson(route('schedules.update', $schedule), array_replace($scheduleData, [
             'adventure_id' => $foreignAdventure->id,
         ]))->assertForbidden();
-        $this->patchJson(route('adventure-days.update', $day), $dayData + ['adventure_id' => $foreignAdventure->id])
-            ->assertForbidden();
+        $foreignDay = $foreignAdventure->days()->create($dayData);
+        $this->putJson(route('adventure-schedules.days.update', [$schedule, $foreignDay]), $dayData)->assertNotFound();
         $this->putJson(route('guides.update', $guide), ['activity_organizer_id' => $other->id])
             ->assertUnprocessable();
         $this->patch(route('adventures.update', $adventure), $adventure->only([
@@ -294,7 +294,7 @@ class SecurityIntegrationTest extends TestCase
     {
         $this->actingAs($this->user('Admin'));
         foreach (['dashboard', 'organizers.index', 'users.index', 'adventures.index', 'bookings.index',
-            'payments.index', 'reviews.index'] as $route) {
+            'payments.index', 'reviews.index', 'reports.index'] as $route) {
             $this->get(route('admin.'.$route))->assertOk();
         }
 
@@ -304,6 +304,67 @@ class SecurityIntegrationTest extends TestCase
                 $this->assertContains('admin', $route->gatherMiddleware());
             }
         }
+    }
+
+    public function test_organizer_schedule_forms_and_generated_days_work_together(): void
+    {
+        $organizer = $this->organizer();
+        $adventure = $this->adventure($organizer);
+        $guide = $this->guide($organizer);
+        $data = [
+            'adventure_id' => $adventure->id, 'guide_id' => $guide->id, 'capacity' => 3,
+            'starts_at' => '2027-01-01 10:00:00', 'ends_at' => '2027-01-01 15:00:00',
+        ];
+        $this->actingAs($organizer->user)->get(route('organizer.dashboard'))->assertOk()
+            ->assertSee(route('organizers.index'));
+        $this->get(route('adventure-schedules.create'))->assertOk()->assertSee($adventure->title);
+        $this->post(route('adventure-schedules.store'), $data)->assertRedirect();
+        $schedule = $adventure->schedules()->sole();
+        $this->assertSame('Active', $schedule->status);
+        $this->get(route('adventure-schedules.create', ['phase' => 'days', 'schedule_id' => $schedule->id]))
+            ->assertOk()->assertSee(route('adventure-schedules.days.generate', $schedule));
+
+        Http::preventStrayRequests();
+        Http::fake(['*/api/chat' => Http::response(['message' => ['content' => json_encode([
+            'days' => [['title' => 'Suggested day', 'description' => 'Suggested itinerary']],
+        ])]])]);
+        $this->postJson(route('adventure-schedules.days.generate', $schedule))
+            ->assertOk()->assertJsonPath('days.0.title', 'Suggested day');
+        $this->assertDatabaseCount('adventure_days', 0);
+
+        $this->post(route('adventure-schedules.store'), [
+            'phase' => 'days', 'schedule_id' => $schedule->id, 'days' => [['title' => 'Saved itinerary']],
+        ])->assertRedirectToRoute('adventure-schedules.show', $schedule);
+        $day = $adventure->days()->sole();
+        $this->get(route('adventure-schedules.edit', $schedule))->assertOk()->assertSee('Saved itinerary');
+        $this->put(route('adventure-schedules.update', $schedule), $data + [
+            'status' => 'Active', 'days' => [$day->id => ['title' => 'Edited itinerary']],
+        ])->assertRedirectToRoute('adventure-schedules.index', ['adventure_id' => $adventure->id]);
+        $this->get(route('adventures.profile', $adventure))->assertOk()->assertSee('Edited itinerary');
+    }
+
+    public function test_admin_fraud_report_suspension_blocks_new_bookings(): void
+    {
+        $adventure = $this->adventure($this->organizer());
+        $owner = $this->user('Adventurer');
+        $booking = $this->booking($adventure, $owner, 'Accepted');
+        $review = $booking->review()->create([
+            'adventure_id' => $adventure->id, 'adventurer_id' => $booking->adventurer_id,
+            'rating' => 4, 'comment' => 'Reported review',
+        ]);
+
+        $this->actingAs($owner)->post(route('reviews.report', [$adventure, $review]), [
+            'report_reason' => 'A report for the integrated admin queue',
+        ])->assertRedirect();
+        $this->patch(route('admin.reports.suspend', $review))->assertForbidden();
+        $this->actingAs($this->user('Admin'))->get(route('admin.reports.index'))->assertOk()
+            ->assertSee('A report for the integrated admin queue');
+        $this->patch(route('admin.reports.suspend', $review))->assertRedirect();
+        $this->assertSame('Suspended', $adventure->fresh()->status);
+        $this->assertSame('resolved', $review->fresh()->report_status);
+        $this->actingAs($this->user('Adventurer'))->postJson(route('bookings.store'), [
+            'adventure_id' => $adventure->id, 'participants_count' => 1,
+        ])->assertUnprocessable()->assertJsonValidationErrors('adventure_id');
     }
 
     public function test_review_index_rollback_preserves_foreign_keys_and_existing_rows(): void

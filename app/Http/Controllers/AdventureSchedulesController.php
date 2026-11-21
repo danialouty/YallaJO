@@ -6,6 +6,7 @@ use App\Models\Adventure;
 use App\Models\AdventureDay;
 use App\Models\Adventure_schedules;
 use App\Models\Guides;
+use App\Services\OllamaAdventureDayGenerator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +20,12 @@ class AdventureSchedulesController extends Controller
      */
     public function index(Request $request)
     {
+        $organizerId = (int) $request->user()->activityOrganizer->id;
         $validated = $request->validate([
-            'adventure_id' => ['nullable', 'integer', 'exists:adventures,id'],
+            'adventure_id' => [
+                'nullable', 'integer',
+                Rule::exists('adventures', 'id')->where('activity_organizer_id', $organizerId),
+            ],
         ]);
 
         $schedules = Adventure_schedules::with(['adventure', 'guide'])
@@ -55,9 +60,11 @@ class AdventureSchedulesController extends Controller
                 ->diffInDays($schedule->ends_at->copy()->startOfDay()) + 1;
         }
 
-        $adventures = $schedule ? collect() : $request->user()->activityOrganizer->adventures()->orderBy('title')->get();
+        $organizerId = (int) $request->user()->activityOrganizer->id;
+        $adventures = $schedule ? collect() : Adventure::where('activity_organizer_id', $organizerId)->orderBy('title')->get();
+        $guides = Guides::where('activity_organizer_id', $organizerId)->get();
 
-        return view('adventuresSchedules.create', compact('schedule', 'adventures', 'dayCount'));
+        return view('adventuresSchedules.create', compact('schedule', 'adventures', 'dayCount', 'guides'));
     }
 
     /**
@@ -75,7 +82,7 @@ class AdventureSchedulesController extends Controller
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
             'capacity' => ['required', 'integer', 'min:1'],
-            'status' => ['required', Rule::in(['Active', 'Suspended'])],
+            'status' => ['sometimes', Rule::in(['Active', 'Suspended'])],
         ]);
 
         $this->authorizeAssignment($request, $validated);
@@ -108,6 +115,29 @@ class AdventureSchedulesController extends Controller
         Gate::authorize('manage', $adventure_schedules->adventure);
 
         return view('adventuresSchedules.show', ['schedule' => $adventure_schedules]);
+    }
+
+    /** Generate suggested itinerary text without saving it. */
+    public function generateDays(Adventure_schedules $adventure_schedules, OllamaAdventureDayGenerator $generator)
+    {
+        Gate::authorize('manage', $adventure_schedules->adventure);
+        $dayCount = $adventure_schedules->adventure->days()->count();
+        if ($dayCount === 0) {
+            $dayCount = $adventure_schedules->starts_at->copy()->startOfDay()
+                ->diffInDays($adventure_schedules->ends_at->copy()->startOfDay()) + 1;
+        }
+
+        try {
+            return response()->json([
+                'days' => $generator->generate($adventure_schedules->adventure, $dayCount),
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'message' => 'تعذر توليد البرنامج. تأكد من تشغيل Ollama وتحميل النموذج المحدد في الإعدادات.',
+            ], 503);
+        }
     }
 
     /**
@@ -148,14 +178,13 @@ class AdventureSchedulesController extends Controller
      */
     public function edit(Adventure_schedules $adventure_schedules)
     {
-        $adventure_schedules->load('adventure.days');
+        $adventure_schedules->load(['adventure.days', 'guide.activityOrganizer.user']);
         Gate::authorize('manage', $adventure_schedules->adventure);
-        $adventures = auth()->user()->activityOrganizer->adventures()->orderBy('title')->get();
+        $organizer = auth()->user()->activityOrganizer;
+        $adventures = $organizer->adventures()->orderBy('title')->get();
+        $guides = $organizer->guide()->with('activityOrganizer.user')->get();
 
-        return view('adventuresSchedules.edit', [
-            'schedule' => $adventure_schedules,
-            'adventures' => $adventures,
-        ]);
+        return view('adventuresSchedules.edit', compact('adventure_schedules', 'adventures', 'guides'));
     }
 
     /**
@@ -182,7 +211,7 @@ class AdventureSchedulesController extends Controller
         });
 
         if ($request->routeIs('adventure-schedules.update')) {
-            return redirect()->route('adventure-schedules.show', $adventure_schedules)
+            return redirect()->route('adventure-schedules.index', ['adventure_id' => $adventure_schedules->adventure_id])
                 ->with('success', 'Schedule updated successfully');
         }
 
@@ -194,7 +223,7 @@ class AdventureSchedulesController extends Controller
     {
         $validatedDays = $request->validate([
             'days' => ['sometimes', 'array'],
-            'days.*.day_number' => ['required', 'integer', 'min:1'],
+            'days.*.day_number' => ['sometimes', 'required', 'integer', 'min:1'],
             'days.*.title' => ['required', 'string', 'max:255'],
             'days.*.description' => ['nullable', 'string'],
         ])['days'] ?? [];
@@ -208,10 +237,11 @@ class AdventureSchedulesController extends Controller
         foreach ($validatedDays as $dayId => $dayData) {
             $day = AdventureDay::where('adventure_id', $adventure_schedules->adventure_id)
                 ->findOrFail($dayId);
-            $conflict = AdventureDay::where('adventure_id', $adventure_schedules->adventure_id)
-                ->where('day_number', $dayData['day_number'])
-                ->whereKeyNot($day->id)
-                ->exists();
+            $conflict = isset($dayData['day_number'])
+                && AdventureDay::where('adventure_id', $adventure_schedules->adventure_id)
+                    ->where('day_number', $dayData['day_number'])
+                    ->whereKeyNot($day->id)
+                    ->exists();
             if ($conflict) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
                     "days.$dayId.day_number" => 'This day number is already in use for the adventure.',
@@ -248,22 +278,18 @@ class AdventureSchedulesController extends Controller
         $schedule = Adventure_schedules::findOrFail($validatedSchedule['schedule_id']);
         Gate::authorize('manage', $schedule->adventure);
 
+        $expectedDayCount = (int) $schedule->starts_at->copy()->startOfDay()
+            ->diffInDays($schedule->ends_at->copy()->startOfDay()) + 1;
+
         $validated = $request->validate([
-            'days' => ['required', 'array', 'min:1'],
+            'days' => ['required', 'array', 'list', 'size:'.$expectedDayCount],
             'days.*.title' => ['required', 'string', 'max:255'],
             'days.*.description' => ['nullable', 'string'],
         ]);
 
-        $expectedDayCount = $schedule->starts_at->copy()->startOfDay()
-            ->diffInDays($schedule->ends_at->copy()->startOfDay()) + 1;
-        if (count($validated['days']) !== $expectedDayCount) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'days' => "Enter details for all {$expectedDayCount} days in this schedule.",
-            ]);
-        }
-
-        DB::transaction(function () use ($validated, $schedule) {
-            foreach (array_values($validated['days']) as $index => $day) {
+        DB::transaction(function () use ($validated, $schedule, $expectedDayCount) {
+            for ($index = 0; $index < $expectedDayCount; $index++) {
+                $day = $validated['days'][$index];
                 AdventureDay::updateOrCreate(
                     ['adventure_id' => $schedule->adventure_id, 'day_number' => $index + 1],
                     ['title' => $day['title'], 'description' => $day['description'] ?? null]
@@ -274,4 +300,5 @@ class AdventureSchedulesController extends Controller
         return redirect()->route('adventure-schedules.show', $schedule)
             ->with('success', 'Adventure itinerary added successfully');
     }
+
 }

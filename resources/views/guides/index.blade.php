@@ -6,7 +6,7 @@
                 <p class="text-sm text-gray-500 mt-1">هذه لوحة إدارة رحلاتك وجداولك كمَرشد</p>
             </div>
             @if (! $guide)
-                <span class="inline-flex px-4 py-1.5 rounded-full text-xs font-bold bg-gray-100 text-gray-700">ملف غير مكتمل</span>
+                <a href="{{ route('guides.create') }}" class="inline-flex rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">إضافة مرشد</a>
             @elseif ($guide->status === 'Available')
                 <span class="inline-flex px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">متاح للعمل</span>
             @else
@@ -105,13 +105,70 @@
                             </button>
                         </form>
                     </div>
+
+                    <details class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+                        <summary class="cursor-pointer font-bold text-gray-800">تعديل بيانات المرشد</summary>
+                        <form action="{{ route('guides.update', $guide->id) }}" method="POST" class="mt-5 space-y-4">
+                            @csrf
+                            @method('PATCH')
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">نبذة المرشد</label>
+                                <textarea name="bio" rows="4" required class="w-full rounded-xl border-gray-200 text-sm">{{ $guide->bio }}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">سنوات الخبرة</label>
+                                <input type="number" name="experience_years" min="0" required value="{{ $guide->experience_years }}"
+                                       class="w-full rounded-xl border-gray-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">التخصصات مفصولة بفاصلة</label>
+                                <input type="text" name="specialization" required value="{{ implode(', ', $guide->specialization ?? []) }}"
+                                       class="w-full rounded-xl border-gray-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">الشهادة</label>
+                                <input type="text" name="cetification" value="{{ $guide->cetification }}"
+                                       class="w-full rounded-xl border-gray-200 text-sm">
+                            </div>
+                            <button type="submit" class="w-full rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">
+                                حفظ بيانات المرشد
+                            </button>
+                        </form>
+                    </details>
                 @else
                     <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-4">!</div>
-                        <h2 class="font-bold text-gray-900">ملف المرشد غير مكتمل</h2>
+                        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-4">+</div>
+                        <h2 class="font-bold text-gray-900">إنشاء ملف المرشد</h2>
                         <p class="mt-2 text-sm text-gray-500 leading-6">
-                            حسابك ليس مرتبطًا حاليًا بملف منظم ومرشد، لذلك لا يمكن عرض الجداول.
+                            أضف بياناتك كمرشد حتى تتمكن من إدارة الجداول والحالة.
                         </p>
+                        <form action="{{ route('guides.store') }}" method="POST" class="mt-5 space-y-4">
+                            @csrf
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">نبذة المرشد</label>
+                                <textarea name="bio" rows="4" required class="w-full rounded-xl border-gray-200 text-sm">{{ old('bio') }}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">سنوات الخبرة</label>
+                                <input type="number" name="experience_years" min="0" required value="{{ old('experience_years', 0) }}"
+                                       class="w-full rounded-xl border-gray-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">التخصصات مفصولة بفاصلة</label>
+                                <input type="text" name="specialization" required value="{{ old('specialization') }}"
+                                       placeholder="Hiking, Camping"
+                                       class="w-full rounded-xl border-gray-200 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-600 mb-2">الشهادة</label>
+                                <input type="text" name="cetification" value="{{ old('cetification') }}"
+                                       class="w-full rounded-xl border-gray-200 text-sm">
+                            </div>
+                            <input type="hidden" name="status" value="Available">
+                            <button type="submit" class="w-full rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">
+                                إنشاء ملف المرشد
+                            </button>
+                        </form>
                     </div>
                 @endif
             </div>

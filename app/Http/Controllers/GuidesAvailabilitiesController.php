@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Guides_availabilities;
 use App\Models\Guides;
+use App\Models\Guides_availabilities;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 

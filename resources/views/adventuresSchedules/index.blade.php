@@ -44,7 +44,7 @@
                     @forelse ($schedules as $schedule)
                         <tr class="hover:bg-slate-50">
                             <td class="whitespace-nowrap px-5 py-4 font-semibold text-slate-900">{{ $schedule->adventure->title }}</td>
-                            <td class="whitespace-nowrap px-5 py-4">#{{ $schedule->guide_id }}</td>
+                            <td class="whitespace-nowrap px-5 py-4">{{ $schedule->guide->activityOrganizer->user->name }}</td>
                             <td class="whitespace-nowrap px-5 py-4">{{ $schedule->starts_at?->format('Y-m-d H:i') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-5 py-4">{{ $schedule->ends_at?->format('Y-m-d H:i') ?? '—' }}</td>
                             <td class="whitespace-nowrap px-5 py-4">{{ $schedule->capacity }}</td>

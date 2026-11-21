@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityOrganizer;
+use App\Models\Adventure;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -18,17 +20,25 @@ class ActivityOrganizerController extends Controller
     public function dashboard()
     {
         $organizer = auth()->user()->activityOrganizer;
-        return view('organizer.dashboard', compact('organizer'));
+        abort_unless(auth()->user()->isApprovedOrganizer(), 403);
+
+        $adventureIds = Adventure::where('activity_organizer_id', $organizer->id)->select('id');
+        $adventuresCount = (clone $adventureIds)->count();
+        $bookings = Booking::whereIn('adventure_id', $adventureIds);
+        $bookingsCount = (clone $bookings)->count();
+        $usersCount = (clone $bookings)->distinct()->count('adventurer_id');
+
+        return view('organizer.dashboard', compact('organizer', 'adventuresCount', 'usersCount', 'bookingsCount'));
     }
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request) : View
     {
-        //
+        abort_unless($request->user()->role === 'Activity_Organizer', 403);
         $organizer = $request->user()->activityOrganizer;
 
-        return view('organizer.dashboard', compact('organizer'));
+        return view('organizer.profile', compact('organizer'));
     }
 
     /**
@@ -44,7 +54,7 @@ class ActivityOrganizerController extends Controller
      */
     public function store(Request $request) : RedirectResponse
     {
-        //
+        abort_unless($request->user()->role === 'Activity_Organizer', 403);
         abort_if($request->user()->activityOrganizer, 403, 'Organizer profile already exists.');
 
         $validated = $this->validateProfile($request);
@@ -80,7 +90,7 @@ class ActivityOrganizerController extends Controller
      */
     public function update(Request $request, ActivityOrganizer $organizer)
     {
-        //
+        abort_unless($request->user()->role === 'Activity_Organizer', 403);
         abort_if($organizer->user_id !== $request->user()->id, 403);
 
         $validated = $this->validateProfile($request);
@@ -112,7 +122,7 @@ class ActivityOrganizerController extends Controller
     {
         $validated = $request->validate([
             'organizer_type'    => ['required', Rule::in([ActivityOrganizer::TOURISM_OFFICE, ActivityOrganizer::ADVENTURE_GROUP])],
-            'license_number'    => ['nullable', 'required_if:organizer_type,'.ActivityOrganizer::TOURISM_OFFICE, 'string', 'max:100'],
+            'license_number'    => ['nullable', 'required_if:organizer_type,'.ActivityOrganizer::TOURISM_OFFICE, 'string', 'max:255'],
             'social_handle_url' => ['nullable', 'url', 'max:255'],
         ], [
             'license_number.required_if' => 'A Ministry of Tourism license number is required for registered tourism offices.',

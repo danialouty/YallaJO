@@ -4,7 +4,8 @@
 @section('meta_description', 'احجز رحلات هايكنج وتخييم وغوص وتجارب ريفية في مختلف مناطق الأردن.')
 
 @section('content')
-    <section class="relative isolate min-h-[620px] overflow-hidden bg-ink text-white" aria-labelledby="hero-title">
+    <section class="landing-hero relative isolate min-h-[620px] overflow-hidden bg-ink text-white" aria-labelledby="hero-title">
+        <div class="landing-topography" aria-hidden="true"></div>
         <img
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyNMFQwtfryBGvkUx_KyP8NtN2rqpr7hbzgwob3Q8PXMjKxlX74mrKWxazvPmWr4zg05dDaeCdcKEYjY93G-9-C_hujFUJOY0ij5yBmb_M1QF35TrgMZltoYsYV-2zZoZrgg7ONHVkvUK4OGLyWtNHlVCA8xSqDLu4KKagoJWQ1k6KAzxKRFwfOVYktOeXJnpGfOhWMhlO3CP_ddtg54Exy9U8EVV43ZWTCivGr4s"
             alt=""
@@ -73,8 +74,42 @@
                 <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">تخييم وادي رم</span>
                 <span class="rounded-full border border-white/25 bg-white/10 px-3 py-1.5">غوص العقبة</span>
             </div>
+
+            <div class="mt-8 grid w-full max-w-4xl grid-cols-3 gap-3">
+                <div class="landing-stat">
+                    <strong>+50</strong>
+                    <span>مسار ومغامرة</span>
+                </div>
+                <div class="landing-stat">
+                    <strong>12</strong>
+                    <span>محافظة أردنية</span>
+                </div>
+                <div class="landing-stat">
+                    <strong>24/7</strong>
+                    <span>دعم وحجز</span>
+                </div>
+            </div>
         </div>
     </section>
 
     @include('partials.home.featured-adventures')
+
+    <section class="bg-[#f5f7f4] px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="organizer-join-title">
+        <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 rounded-3xl bg-forest px-6 py-8 text-white sm:px-10 sm:py-10 md:flex-row md:items-center">
+            <div class="max-w-2xl">
+                <p class="text-sm font-bold text-orange-200">لأصحاب التجارب المحلية</p>
+                <h2 id="organizer-join-title" class="mt-2 text-2xl font-extrabold sm:text-3xl">سجّل كمنظّم مغامرات</h2>
+                <p class="mt-3 text-sm leading-7 text-white/80">أنشئ حساب منظّم، أضف مغامراتك ومرشدك، وتابع الحجوزات بعد مراجعة طلبك والموافقة عليه.</p>
+            </div>
+            @guest
+                <a href="{{ route('register', ['role' => 'Activity_Organizer']) }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A94B2B] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#8E3D22]">ابدأ تسجيل المنظّم</a>
+            @else
+                @if (auth()->user()->role === 'Activity_Organizer')
+                    <a href="{{ route('organizers.index') }}" class="inline-flex shrink-0 items-center justify-center rounded-xl bg-[#A94B2B] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#8E3D22]">ملف المنظّم</a>
+                @else
+                    <p class="text-sm text-white/80">لتسجيل حساب منظّم جديد، سجّل الخروج أولًا ثم ابدأ طلبك.</p>
+                @endif
+            @endguest
+        </div>
+    </section>
 @endsection

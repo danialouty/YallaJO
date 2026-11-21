@@ -67,15 +67,7 @@
             {{-- Branding --}}
             <div class="relative z-10 flex items-center gap-3">
 
-                <span
-                    class="flex size-12 items-center
-                           justify-center rounded-card
-                           bg-brand font-display
-                           text-2xl font-bold"
-                    aria-hidden="true"
-                >
-                    ي
-                </span>
+                <x-application-logo class="block size-14 shrink-0" aria-hidden="true" />
 
                 <div>
                     <p class="font-display text-2xl font-bold">

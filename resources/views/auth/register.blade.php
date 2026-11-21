@@ -7,6 +7,16 @@
     <form method="POST" action="{{ route('register') }}" class="space-y-4">
         @csrf
 
+        <div>
+            <label for="role" class="mb-1 block text-sm font-bold text-gray-700">نوع الحساب</label>
+            <select id="role" name="role" required
+                class="w-full rounded-xl border-gray-300 px-3.5 py-2.5 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
+                <option value="Adventurer" @selected(old('role', $role) === 'Adventurer')>مغامر</option>
+                <option value="Activity_Organizer" @selected(old('role', $role) === 'Activity_Organizer')>منظّم مغامرات</option>
+            </select>
+            @error('role')<p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>@enderror
+        </div>
+
         <!-- الاسم الكامل -->
         <div>
             <label for="name" class="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل</label>
@@ -35,6 +45,33 @@
                 placeholder=". . . . . . . . 07"
                 class="w-full rounded-xl border-gray-300 text-sm py-2.5 px-3.5 focus:border-[#2D5041] focus:ring-[#2D5041]">
         </div>
+
+        <fieldset id="organizer-fields" class="hidden space-y-4 rounded-xl border border-gray-200 p-4">
+            <legend class="px-2 text-sm font-bold text-gray-700">بيانات المنظّم المطلوبة للمراجعة</legend>
+            <div>
+                <label for="organizer_type" class="mb-1 block text-sm font-bold text-gray-700">نوع المنظّم</label>
+                <select id="organizer_type" name="organizer_type"
+                    class="w-full rounded-xl border-gray-300 px-3.5 py-2.5 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
+                    <option value="Tourism_office" @selected(old('organizer_type') === 'Tourism_office')>مكتب سياحي</option>
+                    <option value="Adventure_group" @selected(old('organizer_type') === 'Adventure_group')>مجموعة مغامرات</option>
+                </select>
+                @error('organizer_type')<p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div id="organizer-license-field">
+                <label for="license_number" class="mb-1 block text-sm font-bold text-gray-700">رقم الترخيص</label>
+                <input id="license_number" type="text" name="license_number" value="{{ old('license_number') }}"
+                    class="w-full rounded-xl border-gray-300 px-3.5 py-2.5 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
+                @error('license_number')<p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="social_handle_url" class="mb-1 block text-sm font-bold text-gray-700">رابط الموقع أو التواصل (اختياري)</label>
+                <input id="social_handle_url" type="url" name="social_handle_url" value="{{ old('social_handle_url') }}"
+                    placeholder="https://example.com"
+                    class="w-full rounded-xl border-gray-300 px-3.5 py-2.5 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
+                @error('social_handle_url')<p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>@enderror
+            </div>
+            <p class="text-xs leading-5 text-gray-500">سيكون الحساب بحالة «قيد المراجعة» حتى يوافق عليه المسؤول.</p>
+        </fieldset>
 
         <!-- كلمة المرور -->
         <div>
@@ -73,4 +110,24 @@
             </a>
         </p>
     </form>
+    <script>
+        const accountRole = document.getElementById('role');
+        const organizerType = document.getElementById('organizer_type');
+        const organizerFields = document.getElementById('organizer-fields');
+        const licenseField = document.getElementById('organizer-license-field');
+        const licenseInput = document.getElementById('license_number');
+
+        function updateOrganizerFields() {
+            const isOrganizer = accountRole.value === 'Activity_Organizer';
+            organizerFields.classList.toggle('hidden', !isOrganizer);
+            organizerFields.disabled = !isOrganizer;
+            const needsLicense = isOrganizer && organizerType.value === 'Tourism_office';
+            licenseField.classList.toggle('hidden', !needsLicense);
+            licenseInput.required = needsLicense;
+        }
+
+        accountRole.addEventListener('change', updateOrganizerFields);
+        organizerType.addEventListener('change', updateOrganizerFields);
+        updateOrganizerFields();
+    </script>
 </x-guest-layout>

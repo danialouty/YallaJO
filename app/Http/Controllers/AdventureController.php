@@ -43,7 +43,7 @@ class AdventureController extends Controller
     public function store(Request $request)
     {
         $adventure = $request->user()->activityOrganizer->adventures()
-            ->create($request->validate($this->rules()));
+            ->create($request->validate($this->rules(creating: true)));
 
         return redirect()->route('adventures.index', [
             'phase' => 'optional',
@@ -113,7 +113,7 @@ class AdventureController extends Controller
             ->with('success', 'Adventure deleted successfully');
     }
 
-    private function rules(): array
+    private function rules(bool $creating = false): array
     {
         return [
             'title' => ['required', 'string', 'max:255'],
@@ -125,7 +125,7 @@ class AdventureController extends Controller
             'duration_hours' => ['required', 'numeric', 'decimal:0,2', 'gt:0', 'max:999.99'],
             'price' => ['required', 'numeric', 'decimal:0,2', 'min:0', 'max:9999999.99'],
             'requirements' => ['required', 'string', 'max:10000'],
-            'status' => ['required', 'in:Active,Suspended'],
+            'status' => [$creating ? 'sometimes' : 'required', 'in:Active,Suspended'],
         ];
     }
 
@@ -167,8 +167,9 @@ class AdventureController extends Controller
 
     public function showProfile(Adventure $adventure)
     {
-        $adventure->load('images');
+        $adventure->load(['images', 'days']);
 
         return view('adventureProfile', compact('adventure'));
     }
+
 }

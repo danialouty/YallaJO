@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
         $destination = match ($request->user()->role) {
             'Admin' => 'admin.dashboard',
-            'Activity_Organizer' => 'organizers.index',
+            'Activity_Organizer' => $request->user()->isApprovedOrganizer() ? 'organizer.dashboard' : 'organizers.index',
             'Adventurer' => 'bookings.index',
             default => 'dashboard',
         };
