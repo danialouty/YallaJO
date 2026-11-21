@@ -15,20 +15,26 @@ class Review extends Model
         'booking_id',
         'rating',
         'comment',
+        'is_reported',
+        'report_status',
+        'report_reason',
     ];
 
     protected function casts(): array
     {
         return [
             'rating' => 'integer',
+            'is_reported' => 'boolean',
         ];
     }
 
-    public function adventurer(): BelongsTo {
+    public function adventurer(): BelongsTo
+    {
         return $this->belongsTo(Adventurer::class);
     }
 
-    public function adventure(): BelongsTo {
+    public function adventure(): BelongsTo
+    {
         return $this->belongsTo(Adventure::class);
     }
 
