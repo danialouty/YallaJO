@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPrice = document.getElementById('totalPrice');
     const increase = document.getElementById('increase');
     const decrease = document.getElementById('decrease');
-    let people = 2;
+    let people = Number(peopleInput?.value || 1);
 
     function updateBooking() {
         if (!peopleCount || !peopleInput || !totalPrice) return;

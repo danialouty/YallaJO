@@ -53,6 +53,119 @@
     font-size: 11px;
 }
 
+.landing-section-title {
+    position: relative;
+    padding-right: 13px;
+}
+
+.landing-section-title::before {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0.22em;
+    width: 4px;
+    height: 1.05em;
+    border-radius: 999px;
+    background: #a43716;
+}
+
+.landing-destination-card {
+    position: relative;
+    min-height: 230px;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #111c2d;
+}
+
+.landing-destination-card img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 500ms ease;
+}
+
+.landing-destination-card:hover img {
+    transform: scale(1.06);
+}
+
+.landing-destination-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(17, 28, 45, 0.92), rgba(17, 28, 45, 0.05) 70%);
+}
+
+.landing-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #a43716;
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.landing-eyebrow::before {
+    content: "";
+    width: 28px;
+    height: 2px;
+    border-radius: 999px;
+    background: #a43716;
+}
+
+.landing-featured-card {
+    border: 1px solid rgba(223, 192, 183, 0.55);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 7px 24px rgba(35, 48, 64, 0.06);
+}
+
+.landing-featured-card:hover {
+    box-shadow: 0 16px 38px rgba(35, 48, 64, 0.12);
+}
+
+.landing-value-card {
+    position: relative;
+    min-height: 210px;
+    border: 1px solid rgba(223, 192, 183, 0.48);
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.landing-value-card::after {
+    content: "";
+    position: absolute;
+    right: -28px;
+    bottom: -34px;
+    width: 110px;
+    height: 110px;
+    border: 18px solid rgba(164, 55, 22, 0.06);
+    border-radius: 50%;
+}
+
+.landing-category-card {
+    min-height: 96px;
+}
+
+.landing-cta {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.landing-cta::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: -40px;
+    bottom: -90px;
+    width: 220px;
+    height: 220px;
+    border: 38px solid rgba(255, 255, 255, 0.06);
+    border-radius: 50%;
+}
+
 @media (max-width: 640px) {
     .landing-stat {
         min-height: 72px;

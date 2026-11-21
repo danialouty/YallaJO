@@ -6,8 +6,11 @@
             <p class="mt-2 text-sm leading-6 text-slate-600">أكمل بيانات منظمتك لمراجعتها. ستتمكن من إدارة المغامرات والمرشدين بعد الموافقة.</p>
         </header>
 
-        @if (session('status') || session('error'))
-            <div class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900" role="status">{{ session('status') ?? session('error') }}</div>
+        @if (session('status'))
+            <div class="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900" role="status">{{ session('status') }}</div>
+        @endif
+        @if (session('error'))
+            <div class="rounded-xl bg-red-50 p-4 text-sm text-red-800" role="alert">{{ session('error') }}</div>
         @endif
         @if ($errors->any())
             <div class="rounded-xl bg-red-50 p-4 text-sm text-red-800" role="alert">
@@ -24,13 +27,15 @@
                     </div>
                     <span class="rounded-full bg-amber-100 px-3 py-1 text-sm font-bold text-amber-900">{{ __($organizer->approval_status) }}</span>
                 </div>
-                @if ($organizer->approval_status === 'Approved')
+                @if ($organizer->approval_status === \App\Models\ActivityOrganizer::APPROVED)
                     <a href="{{ route('organizer.dashboard') }}" class="mt-5 inline-flex rounded-lg bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white">فتح لوحة المنظّم</a>
-                @elseif ($organizer->approval_status === 'Rejected')
+                    <button type="button" data-modal-open="organizer-profile-modal" class="mt-5 rounded-lg border border-outline px-4 py-2.5 text-sm font-bold text-ink">تعديل البيانات</button>
+                @elseif ($organizer->approval_status === \App\Models\ActivityOrganizer::REJECTED)
                     <p class="mt-4 text-sm text-slate-600">عدّل البيانات ثم أرسلها للمراجعة مرة أخرى.</p>
                     <button type="button" data-modal-open="organizer-profile-modal" class="mt-3 rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-bold text-white">تعديل البيانات</button>
-                @else
+                @elseif ($organizer->approval_status === \App\Models\ActivityOrganizer::PENDING)
                     <p class="mt-4 text-sm text-slate-600">طلبك قيد المراجعة. ستظهر لك صفحات الإدارة بعد الموافقة.</p>
+                    <button type="button" data-modal-open="organizer-profile-modal" class="mt-3 rounded-lg border border-outline px-4 py-2.5 text-sm font-bold text-ink">تعديل البيانات</button>
                 @endif
             </section>
         @else

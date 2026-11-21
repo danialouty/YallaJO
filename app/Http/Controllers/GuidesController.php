@@ -7,6 +7,8 @@ use App\Models\ActivityOrganizer;
 use App\Models\Guides_availabilities;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class GuidesController extends Controller
 {
@@ -55,10 +57,6 @@ class GuidesController extends Controller
      */
     public function store(Request $request)
     {
-        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
-        abort_unless($organizer !== null, 403, 'لا تملك صلاحية إنشاء ملف مرشد');
-        abort_if(Guides::where('activity_organizer_id', $organizer->id)->exists(), 409, 'يوجد ملف مرشد لهذا المنظم بالفعل');
-
         $validated = $request->validate([
             'bio' => 'required|string',
             'experience_years' => 'required|integer|min:0',
@@ -67,15 +65,13 @@ class GuidesController extends Controller
             'status' => 'sometimes|in:Available,Busy',
         ]);
         $validated['specialization'] = array_values(array_filter(array_map('trim', explode(',', $validated['specialization']))));
-        $organizer = ActivityOrganizer::where('user_id', Auth::id())->firstOrFail();
-        abort_if(Guides::where('activity_organizer_id', $organizer->id)->exists(), 403, 'A guide profile already exists for this organizer.');
-        $validated['activity_organizer_id'] = $organizer->id;
-
-        $guide = Guides::create($validated);
-        Guides_availabilities::create([
-            'guide_id' => $guide->id,
-            'status' => $validated['status'],
-        ]);
+        $validated['status'] ??= 'Available';
+        DB::transaction(function () use ($request, $validated) {
+            $organizer = $request->user()->activityOrganizer()->lockForUpdate()->firstOrFail();
+            abort_if($organizer->guide()->exists(), 409, 'يوجد ملف مرشد لهذا المنظم بالفعل');
+            $guide = $organizer->guide()->create($validated);
+            $guide->availability()->create(['status' => $validated['status']]);
+        });
 
         return redirect()->route('guides.index')
     ->with('success', 'تمت إضافة المرشد بنجاح');
@@ -109,14 +105,20 @@ class GuidesController extends Controller
     public function update(Request $request,$id)
     {
         $guide = Guides::findOrFail($id);
-        $organizer = ActivityOrganizer::where('user_id', Auth::id())->first();
+        $organizer = $request->user()->activityOrganizer;
         abort_unless(
-            $organizer && $guide->activity_organizer_id === $organizer->id,
+            $request->user()->isApprovedOrganizer()
+                && (int) $guide->activity_organizer_id === (int) $organizer->id,
             403,
             'لا تملك صلاحية تعديل هذا المرشد'
         );
 
         $validated = $request->validate([
+            'activity_organizer_id' => [
+                'sometimes',
+                'required',
+                Rule::in([$guide->activity_organizer_id]),
+            ],
             'bio' => 'sometimes|required|string',
             'experience_years' => 'sometimes|required|integer|min:0',
             'specialization' => 'sometimes|required|string',
@@ -127,6 +129,7 @@ class GuidesController extends Controller
             $validated['specialization'] = array_values(array_filter(array_map('trim', explode(',', $validated['specialization']))));
         }
 
+        unset($validated['activity_organizer_id']);
         $guide->update($validated);
         if (isset($validated['status'])) {
             Guides_availabilities::updateOrCreate(

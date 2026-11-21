@@ -50,4 +50,30 @@ class Booking extends Model
     public function payment(): HasOne{
         return $this->hasOne(Payment::class);
     }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class);
+    }
+
+    public function isChangeable(): bool
+    {
+        return $this->status === 'Pending'
+            && ! ($this->payment_exists ?? $this->payment()->exists())
+            && ! ($this->review_exists ?? $this->review()->exists());
+    }
+
+    public static function calculateTotal(string $unitPrice, int $participants): string
+    {
+        $unitCents = (int) str_replace('.', '', $unitPrice);
+        if ($unitCents < 0 || ($unitCents > 0 && $participants > intdiv(999999999, $unitCents))) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'participants_count' => 'الإجمالي خارج النطاق المدعوم.',
+            ]);
+        }
+
+        $totalCents = $unitCents * $participants;
+
+        return sprintf('%d.%02d', intdiv($totalCents, 100), $totalCents % 100);
+    }
 }

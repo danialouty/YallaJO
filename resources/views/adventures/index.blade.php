@@ -9,6 +9,9 @@
             @session('success')
                 <div class="w-full rounded-lg bg-emerald-100 px-4 py-3 text-sm font-semibold text-emerald-900" role="status">{{ $value }}</div>
             @endsession
+            @error('adventure')
+                <p class="w-full rounded-lg bg-danger/10 px-4 py-3 text-danger" role="alert">{{ $message }}</p>
+            @enderror
         </header>
 
         <div class="overflow-x-auto rounded-2xl bg-white shadow-sm">

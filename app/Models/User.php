@@ -60,6 +60,13 @@ class User extends Authenticatable
         return $this->hasOne(Adventurer::class);
     }
 
+    public function communities()
+    {
+        return $this->belongsToMany(Community::class, 'community_memberships')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
     /**
      * The activity organizer has 2 foreign keys connected to the
      * user account one for the activity organizer own account and
@@ -77,6 +84,6 @@ class User extends Authenticatable
 
     public function isApprovedOrganizer(): bool {
         return $this->role === 'Activity_Organizer'
-            && $this->activityOrganizer?->approval_status === 'Approved';
+            && $this->activityOrganizer?->approval_status === ActivityOrganizer::APPROVED;
     }
 }
