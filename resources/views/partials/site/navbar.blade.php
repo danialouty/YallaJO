@@ -20,8 +20,17 @@
     class="sticky top-0 z-50 border-b border-outline/30
            bg-surface/95 shadow-sm backdrop-blur-md"
 >
+    <div class="border-b border-brand/10 bg-[#fff8f4]">
+        <div class="mx-auto flex h-8 max-w-[1360px] items-center justify-between px-4 text-[11px] text-muted sm:px-6 lg:px-12">
+            <p class="truncate">
+                <span class="ml-2 font-bold text-brand">خصومات الصيف</span>
+                احجز تجربتك القادمة في كل أنحاء الأردن
+            </p>
+            <a href="{{ route('adventuresAll.index') }}" class="shrink-0 font-bold text-brand hover:underline">اكتشف العروض</a>
+        </div>
+    </div>
     <div
-        class="mx-auto flex h-20 max-w-[1360px]
+        class="mx-auto flex h-16 max-w-[1360px]
                items-center justify-between gap-4
                px-4 sm:px-6 lg:px-12"
     >

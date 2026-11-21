@@ -14,17 +14,12 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\CommunityMembershipController;
 use App\Http\Controllers\CommunityMessageController;
 
 
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
 
 // Organizer Profile & Dashboard (Slice 1)
 Route::middleware(['auth'])->group(function () {
@@ -50,7 +45,21 @@ Route::middleware(['auth', 'admin'])
     });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+
+    if ($user->isAdmin()) {
+        return redirect()->route('admin.organizers.index');
+    }
+
+    if ($user->role === 'Activity_Organizer') {
+        return redirect()->route(
+            $user->isApprovedOrganizer()
+                ? 'organizer.dashboard'
+                : 'organizers.index'
+        );
+    }
+
+    return redirect()->route('bookings.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -161,36 +170,6 @@ Route::controller(ReviewController::class)
 Route::resource('payments', PaymentController::class)
     ->except(['create'])
     ->middleware('auth');
-// Frontend preview - local development only
-if (app()->environment('local')) {
-    Route::view('/ui-preview', 'pages.ui-preview')
-        ->name('ui.preview');
-}
-
-// Home Page Preview - Local Development Only
-if (app()->environment('local')) {
-    Route::view('/home-preview', 'pages.home')
-        ->name('home.preview');
-}
-
-// Dashboard UI preview - local environment only.
-if (app()->environment('local')) {
-    Route::view(
-        '/dashboard-preview',
-        'pages.dashboard-preview'
-    )->name('dashboard.preview');
-}
-
-// Auth UI Preview - Local Environment Only
-
-if (app()->environment('local')) {
-
-    Route::view(
-        '/auth-preview',
-        'pages.auth-preview'
-    )->name('auth.preview');
-
-}
 Route::resource('payments', PaymentController::class)->middleware('auth');
 
     Route::get('/bookings/{bookingId}/payments',
