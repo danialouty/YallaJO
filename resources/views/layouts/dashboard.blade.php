@@ -42,14 +42,8 @@
                 {{-- Dashboard Brand --}}
                 <div class="border-b border-white/15
                                    px-5 py-6">
-                    <div class="flex items-center gap-3">
-                        <span class="flex size-10
-                                           items-center justify-center
-                                           rounded-control bg-brand
-                                           font-display text-xl
-                                           font-bold text-white" aria-hidden="true">
-                            ي
-                        </span>
+                    <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="الانتقال إلى الصفحة الرئيسية">
+                        <x-application-logo class="block size-11 shrink-0" aria-hidden="true" />
 
                         <div>
                             <p class="font-display
@@ -60,8 +54,8 @@
                             <p class="text-xs text-white/70" lang="en" dir="ltr">
                                 YallaJO
                             </p>
-                        </div>
                     </div>
+                    </a>
 
                     <p class="mt-4 text-xs
                                        text-white/70">

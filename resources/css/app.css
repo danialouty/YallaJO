@@ -11,6 +11,7 @@
 @source "../**/*.js";
 
 @import "./pages/adventure-profile.css";
+@import "./pages/chatbot.css";
 @import "./pages/payments.css";
 @import "./pages/bookings.css";
 @import "./pages/bookings-show.css";

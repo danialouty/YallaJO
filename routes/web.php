@@ -13,7 +13,6 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\ChatbotController;
 
 
 
@@ -67,13 +66,20 @@ Route::get('/', [HomeController::class, 'home'])->name('home');
 Route::get('/home/adventures', [AdventureController::class, 'indexAll'])
     ->name('adventuresAll.index');
 
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
 Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'showProfile'])
     ->name('adventures.profile');
 
 
 Route::middleware('auth')->group(function () {
     Route::resource('adventures', AdventureController::class);
-    Route::resource('adventure-days', AdventureDayController::class);
+    Route::post(
+        '/adventure-schedules/{adventure_schedules}/days/generate',
+        [AdventureSchedulesController::class, 'generateDays']
+    )->name('adventure-schedules.days.generate');
     Route::resource('adventure-schedules', AdventureSchedulesController::class)
         ->parameters(['adventure-schedules' => 'adventure_schedules']);
     Route::put(

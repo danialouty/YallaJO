@@ -9,7 +9,10 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="{{ route('home') }}" class="logo">يلا جو</a>
+        <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="الانتقال إلى الصفحة الرئيسية">
+            <x-application-logo class="block size-11 shrink-0" aria-hidden="true" />
+            <span class="logo">يلا جو</span>
+        </a>
         <a href="{{ route('adventuresAll.index') }}" class="back-link">← العودة إلى المغامرات</a>
     </nav>
 
@@ -122,6 +125,23 @@
                     <p class="description">{{ $adventure->description }}</p>
                 </div>
 
+<<<<<<< HEAD
+                <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+                    <h2 class="mb-5 text-lg font-black">♧ برنامج الرحلة خطوة بخطوة</h2>
+                    <div class="space-y-5 border-r-2 border-emerald-100 pr-5">
+                        @forelse ($adventure->days as $day)
+                            <div class="relative">
+                                <span class="absolute -right-[1.65rem] top-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-800 ring-2 ring-emerald-100"></span>
+                                <span class="text-xs font-bold text-orange-700">اليوم {{ $day->day_number }}</span>
+                                <h3 class="mt-1 font-bold">{{ $day->title }}</h3>
+                                @if ($day->description)
+                                    <p class="mt-1 text-sm leading-6 text-slate-500">{{ $day->description }}</p>
+                                @endif
+                            </div>
+                        @empty
+                            <p class="text-sm text-slate-500">لم تتم إضافة برنامج الرحلة بعد.</p>
+                        @endforelse
+=======
                 <div class="card">
                     <h2 class="section-title">♧ برنامج الرحلة خطوة بخطوة</h2>
                     <div class="timeline">
@@ -130,6 +150,7 @@
                         <div class="timeline-item"><span class="timeline-time">10:15 صباحاً</span><h3>بدء النشاط الرئيسي</h3><p>الاستمتاع بالنشاط الأساسي والتجربة المقدمة من المنظم.</p></div>
                         <div class="timeline-item"><span class="timeline-time">12:00 ظهراً</span><h3>وجبة محلية واستراحة</h3><p>الاستمتاع بوجبة محلية وأخذ استراحة مع المجموعة.</p></div>
                         <div class="timeline-item"><span class="timeline-time">02:00 ظهراً</span><h3>نهاية الرحلة والعودة</h3><p>اختتام التجربة والعودة من موقع المغامرة.</p></div>
+>>>>>>> 1a08f9c506b76acdf41213bd291ee4e010e1d85b
                     </div>
                 </div>
             </section>
