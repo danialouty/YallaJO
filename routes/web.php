@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityOrganizerController;
 use App\Http\Controllers\AdminOrganizerController;
+use App\Http\Controllers\AdminFraudReportController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdventureController;
@@ -33,7 +34,12 @@ Route::middleware(['auth', 'admin'])
     ->group(function () {
         Route::resource('organizers', AdminOrganizerController::class)
             ->only(['index', 'update', 'destroy']);
+
+        Route::get('/reports', [AdminFraudReportController::class, 'index'])->name('reports.index');
+        Route::patch('/reports/{review}/suspend', [AdminFraudReportController::class, 'suspendAdventure'])->name('reports.suspend');
+        Route::patch('/reports/{review}/dismiss', [AdminFraudReportController::class, 'dismissReport'])->name('reports.dismiss');
     });
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -46,7 +52,7 @@ Route::middleware('auth')->group(function () {
 
 Route::resource('bookings', BookingController::class)->middleware('auth');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 use App\Http\Controllers\AdventurerController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PaymentController;
@@ -134,11 +140,15 @@ Route::controller(ReviewController::class)
             ->middleware('auth')
             ->name('destroy');
 
+        Route::post('/{review}/report', 'report')
+            ->middleware('auth')
+            ->name('report');
+
     });
 
-    Route::resource('payments', PaymentController::class)
-        ->except(['create'])
-        ->middleware('auth');
+Route::resource('payments', PaymentController::class)
+    ->except(['create'])
+    ->middleware('auth');
 // Frontend preview - local development only
 if (app()->environment('local')) {
     Route::view('/ui-preview', 'pages.ui-preview')
@@ -169,21 +179,21 @@ if (app()->environment('local')) {
     )->name('auth.preview');
 
 }
-    Route::resource('payments', PaymentController::class)->middleware('auth');
+Route::resource('payments', PaymentController::class)->middleware('auth');
 
-    Route::resource('guides', GuidesController::class)
-        ->only(['index', 'store', 'update'])
-        ->middleware(['auth', 'approved.organizer']);
+Route::resource('guides', GuidesController::class)
+    ->only(['index', 'update'])
+    ->middleware('auth');
 
-    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class)
-        ->middleware(['auth', 'approved.organizer']);
+Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
 
 
-    Route::get('/bookings/{bookingId}/payments',
+Route::get(
+    '/bookings/{bookingId}/payments',
     [PaymentController::class, 'showByBooking']
-    )->name('payments.byBooking');
+)->name('payments.byBooking');
 
 
-    Route::post('/chatbot', ['App\\Http\\Controllers\\ChatbotController', 'chat'])
+Route::post('/chatbot', [ChatbotController::class, 'chat'])
     ->middleware('auth')
     ->name('chatbot.chat');
