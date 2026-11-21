@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\ActivityOrganizer;
+use App\Models\Community;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -52,5 +53,36 @@ class DatabaseSeeder extends Seeder
                 'role' => 'Activity_Organizer',
             ]
         );
+
+        $communities = [
+            [
+                'name' => 'Wadi Mujib Trail Seekers',
+                'slug' => 'wadi-mujib-trail-seekers',
+                'description' => 'مجتمع لعشاق مسارات وادي الموجب، من أول الرحلات إلى المغامرين ذوي الخبرة.',
+                'region' => 'وادي الموجب',
+                'activity_style' => 'المشي والمسارات',
+            ],
+            [
+                'name' => 'Jordan Weekend Campers',
+                'slug' => 'jordan-weekend-campers',
+                'description' => 'نخطط لرحلات تخييم ونشاطات نهاية الأسبوع حول مختلف مناطق الأردن.',
+                'region' => 'الأردن',
+                'activity_style' => 'التخييم',
+            ],
+            [
+                'name' => 'Solo Female Hikers JO',
+                'slug' => 'solo-female-hikers-jo',
+                'description' => 'مجتمع آمن ومشجع للنساء لاستكشاف مسارات الأردن والمشاركة في الرحلات الجماعية.',
+                'region' => 'عمان',
+                'activity_style' => 'المشي النسائي',
+            ],
+        ];
+
+        foreach ($communities as $community) {
+            Community::updateOrCreate(
+                ['slug' => $community['slug']],
+                $community
+            );
+        }
     }
 }

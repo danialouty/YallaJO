@@ -12,6 +12,9 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CommunityMembershipController;
+use App\Http\Controllers\CommunityMessageController;
 
 
 
@@ -53,7 +56,21 @@ Route::middleware(['auth', 'admin'])
     });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+
+    if ($user->isAdmin()) {
+        return redirect()->route('admin.organizers.index');
+    }
+
+    if ($user->role === 'Activity_Organizer') {
+        return redirect()->route(
+            $user->isApprovedOrganizer()
+                ? 'organizer.dashboard'
+                : 'organizers.index'
+        );
+    }
+
+    return redirect()->route('bookings.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -203,3 +220,14 @@ if (app()->environment('local')) {
 Route::post('/chatbot', [ChatbotController::class, 'chat'])
     ->middleware('auth')
     ->name('chatbot.chat');
+
+    Route::resource('communities', CommunityController::class)
+        ->only(['index', 'show']);
+
+    Route::middleware('auth')->group(function () {
+        Route::resource('communities.memberships', CommunityMembershipController::class)
+            ->only(['store', 'destroy']);
+
+        Route::resource('communities.messages', CommunityMessageController::class)
+            ->only(['store']);
+    });

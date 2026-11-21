@@ -5,7 +5,7 @@
 
 <x-ui.card
     padding="none"
-    class="group flex h-full flex-col overflow-hidden
+    class="landing-featured-card group flex h-full flex-col overflow-hidden
            transition-all duration-300
            hover:-translate-y-1 hover:shadow-xl"
 >
