@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CommunityMembershipController;
+use App\Http\Controllers\CommunityMessageController;
 
 
 
@@ -180,3 +183,14 @@ if (app()->environment('local')) {
     Route::post('/chatbot', [ChatbotController::class, 'chat'])
     ->middleware('auth')
     ->name('chatbot.chat');
+
+    Route::resource('communities', CommunityController::class)
+        ->only(['index', 'show']);
+
+    Route::middleware('auth')->group(function () {
+        Route::resource('communities.memberships', CommunityMembershipController::class)
+            ->only(['store', 'destroy']);
+
+        Route::resource('communities.messages', CommunityMessageController::class)
+            ->only(['store']);
+    });
