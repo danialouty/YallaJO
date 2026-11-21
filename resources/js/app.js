@@ -5,6 +5,9 @@ import './components/adventure-profile';
 import './components/confirm-forms';
 import './components/booking-modals';
 import './components/review-modals';
+import './components/adventure-modals';
+import './components/organizer-profile';
+import './components/navigation';
 
 import Alpine from 'alpinejs';
 

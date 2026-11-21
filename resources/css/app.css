@@ -11,3 +11,11 @@
 @source "../**/*.js";
 
 @import "./pages/adventure-profile.css";
+@import "./pages/payments.css";
+@import "./pages/bookings.css";
+@import "./pages/bookings-show.css";
+@import "./pages/auth.css";
+
+[x-cloak] {
+    display: none !important;
+}
