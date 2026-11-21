@@ -11,25 +11,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed Admin User
-        User::updateOrCreate(
-            ['email' => 'admin@yallajo.com'],
-            [
-                'name' => 'YallaJO Admin',
-                'password' => 'password123',
-                'phone_number' => '0790000001',
-                'role' => 'Admin',
-            ]
-        );
+        $this->upsertFactoryUser('admin', 'admin@yallajo.com', 'YallaJO Admin', '0790000001');
 
         // 2. Seed Organizer User (with a pending profile to test Admin Approval)
-        $pendingOrganizer = User::updateOrCreate(
-            ['email' => 'organizer@yallajo.com'],
-            [
-                'name' => 'Wadi Rum Adventures',
-                'password' => 'password123',
-                'phone_number' => '0790000002',
-                'role' => 'Activity_Organizer',
-            ]
+        $pendingOrganizer = $this->upsertFactoryUser(
+            'organizer',
+            'organizer@yallajo.com',
+            'Wadi Rum Adventures',
+            '0790000002'
         );
 
         ActivityOrganizer::updateOrCreate(
@@ -43,13 +32,34 @@ class DatabaseSeeder extends Seeder
         );
 
         // 3. Seed Fresh Organizer User (no profile yet, to test your Create Modal)
-        User::updateOrCreate(
-            ['email' => 'neworganizer@yallajo.com'],
+        $this->upsertFactoryUser('organizer', 'neworganizer@yallajo.com', 'Jordan Hike Club', '0790000003');
+
+        // Additional approved organizer and related records for manual testing.
+        $this->call(DemoSeeder::class);
+    }
+
+    private function upsertFactoryUser(string $role, string $email, string $name, string $phone): User
+    {
+        $factory = match ($role) {
+            'organizer' => User::factory()->organizer(),
+            'admin' => User::factory()->admin(),
+            default => User::factory()->adventurer(),
+        };
+
+        $generatedUser = $factory->make([
+            'email' => $email,
+            'name' => $name,
+            'phone_number' => $phone,
+            'password' => 'password123',
+        ]);
+
+        return User::updateOrCreate(
+            ['email' => $email],
             [
-                'name' => 'Jordan Hike Club',
-                'password' => 'password123',
-                'phone_number' => '0790000003',
-                'role' => 'Activity_Organizer',
+                'name' => $generatedUser->name,
+                'phone_number' => $generatedUser->phone_number,
+                'role' => $generatedUser->role,
+                'password' => $generatedUser->password,
             ]
         );
     }
