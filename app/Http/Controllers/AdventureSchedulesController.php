@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Adventure;
 use App\Models\AdventureDay;
 use App\Models\Adventure_schedules;
+use App\Models\Guides;
+use App\Services\OllamaAdventureDayGenerator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,8 +54,9 @@ class AdventureSchedulesController extends Controller
         }
 
         $adventures = $schedule ? collect() : Adventure::orderBy('title')->get();
+        $guides = Guides::all();
 
-        return view('adventuresSchedules.create', compact('schedule', 'adventures', 'dayCount'));
+        return view('adventuresSchedules.create', compact('schedule', 'adventures', 'dayCount', 'guides'));
     }
 
     /**
@@ -71,7 +74,6 @@ class AdventureSchedulesController extends Controller
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
             'capacity' => ['required', 'integer', 'min:1'],
-            'status' => ['required', Rule::in(['Active', 'Suspended'])],
         ]);
 
         $schedule = Adventure_schedules::create($validated);
@@ -102,6 +104,29 @@ class AdventureSchedulesController extends Controller
         $adventure_schedules->load(['adventure.days', 'guide']);
 
         return view('adventuresSchedules.show', ['schedule' => $adventure_schedules]);
+    }
+
+    /** Generate suggested itinerary text without saving it. */
+    public function generateDays(Adventure_schedules $adventure_schedules, OllamaAdventureDayGenerator $generator)
+    {
+        $adventure_schedules->load('adventure');
+        $dayCount = $adventure_schedules->adventure->days()->count();
+        if ($dayCount === 0) {
+            $dayCount = $adventure_schedules->starts_at->copy()->startOfDay()
+                ->diffInDays($adventure_schedules->ends_at->copy()->startOfDay()) + 1;
+        }
+
+        try {
+            return response()->json([
+                'days' => $generator->generate($adventure_schedules->adventure, $dayCount),
+            ]);
+        } catch (\Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'message' => 'تعذر توليد البرنامج. تأكد من تشغيل Ollama وتحميل النموذج المحدد في الإعدادات.',
+            ], 503);
+        }
     }
 
     /**
@@ -141,13 +166,11 @@ class AdventureSchedulesController extends Controller
      */
     public function edit(Adventure_schedules $adventure_schedules)
     {
-        $adventure_schedules->load('adventure.days');
+        $adventure_schedules->load(['adventure.days', 'guide.activityOrganizer.user']);
         $adventures = Adventure::orderBy('title')->get();
+        $guides = Guides::with('activityOrganizer.user')->orderBy('id')->get();
 
-        return view('adventuresSchedules.edit', [
-            'schedule' => $adventure_schedules,
-            'adventures' => $adventures,
-        ]);
+        return view('adventuresSchedules.edit', compact('adventure_schedules', 'adventures', 'guides'));
     }
 
     /**
@@ -167,29 +190,13 @@ class AdventureSchedulesController extends Controller
         if ($adventure_schedules->adventure_id === (int) $validated['adventure_id']) {
             $dayRules = [
                 'days' => ['sometimes', 'array'],
-                'days.*.day_number' => ['required', 'integer', 'min:1'],
                 'days.*.title' => ['required', 'string', 'max:255'],
                 'days.*.description' => ['nullable', 'string'],
             ];
             $validatedDays = $request->validate($dayRules)['days'] ?? [];
-            $numbers = array_column($validatedDays, 'day_number');
-            if (count($numbers) !== count(array_unique($numbers))) {
-                throw \Illuminate\Validation\ValidationException::withMessages([
-                    'days' => 'Each adventure day must have a different day number.',
-                ]);
-            }
             foreach ($validatedDays as $dayId => $dayData) {
                 $day = AdventureDay::where('adventure_id', $adventure_schedules->adventure_id)
                     ->findOrFail($dayId);
-                $conflict = AdventureDay::where('adventure_id', $adventure_schedules->adventure_id)
-                    ->where('day_number', $dayData['day_number'])
-                    ->where('id', '!=', $day->id)
-                    ->exists();
-                if ($conflict) {
-                    throw \Illuminate\Validation\ValidationException::withMessages([
-                        "days.$dayId.day_number" => 'This day number is already in use for the adventure.',
-                    ]);
-                }
                 $day->update($dayData);
             }
         }
@@ -197,7 +204,7 @@ class AdventureSchedulesController extends Controller
         $adventure_schedules->update($validated);
 
         if ($request->routeIs('adventure-schedules.update')) {
-            return redirect()->route('adventure-schedules.show', $adventure_schedules)
+            return redirect()->route('adventure-schedules.index', $adventure_schedules)
                 ->with('success', 'Schedule updated successfully');
         }
 
@@ -223,22 +230,19 @@ class AdventureSchedulesController extends Controller
         ]);
         $schedule = Adventure_schedules::findOrFail($validatedSchedule['schedule_id']);
 
-        $validated = $request->validate([
-            'days' => ['required', 'array', 'min:1'],
-            'days.*.title' => ['required', 'string', 'max:255'],
-            'days.*.description' => ['nullable', 'string'],
-        ]);
-
         $expectedDayCount = $schedule->starts_at->copy()->startOfDay()
             ->diffInDays($schedule->ends_at->copy()->startOfDay()) + 1;
-        if (count($validated['days']) !== $expectedDayCount) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'days' => "Enter details for all {$expectedDayCount} days in this schedule.",
-            ]);
-        }
 
-        DB::transaction(function () use ($validated, $schedule) {
-            foreach (array_values($validated['days']) as $index => $day) {
+        $rules = ['days' => ['required', 'array']];
+        for ($index = 0; $index < $expectedDayCount; $index++) {
+            $rules["days.{$index}.title"] = ['required', 'string', 'max:255'];
+            $rules["days.{$index}.description"] = ['nullable', 'string'];
+        }
+        $validated = $request->validate($rules);
+
+        DB::transaction(function () use ($validated, $schedule, $expectedDayCount) {
+            for ($index = 0; $index < $expectedDayCount; $index++) {
+                $day = $validated['days'][$index];
                 AdventureDay::updateOrCreate(
                     ['adventure_id' => $schedule->adventure_id, 'day_number' => $index + 1],
                     ['title' => $day['title'], 'description' => $day['description'] ?? null]
