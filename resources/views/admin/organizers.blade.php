@@ -58,8 +58,8 @@
                     @forelse ($organizers as $org)
                         @php
                             $badge = match ($org->approval_status) {
-                                'approved' => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-                                'rejected' => 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+                                'Approved' => 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                                'Rejected' => 'bg-rose-500/15 text-rose-400 border-rose-500/30',
                                 default    => 'bg-amber-500/15 text-amber-400 border-amber-500/30',
                             };
                         @endphp
@@ -94,11 +94,11 @@
                             </td>
                             <td class="px-5 py-4">
                                 <div class="flex items-center justify-end gap-2">
-                                    @if ($org->approval_status !== 'approved')
+                                    @if ($org->approval_status !== 'Approved')
                                         <form method="POST" action="{{ route('admin.organizers.update', $org) }}">
                                             @csrf
                                             @method('PUT')
-                                            <input type="hidden" name="approval_status" value="approved">
+                                            <input type="hidden" name="approval_status" value="Approved">
                                             <button type="submit"
                                                 class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-500">
                                                 {{ __('Approve') }}
@@ -106,11 +106,11 @@
                                         </form>
                                     @endif
 
-                                    @if ($org->approval_status !== 'rejected')
+                                    @if ($org->approval_status !== 'Rejected')
                                         <form method="POST" action="{{ route('admin.organizers.update', $org) }}">
                                             @csrf
                                             @method('PUT')
-                                            <input type="hidden" name="approval_status" value="rejected">
+                                            <input type="hidden" name="approval_status" value="Rejected">
                                             <button type="submit"
                                                 class="rounded-lg bg-amber-600/80 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-500">
                                                 {{ __('Reject') }}

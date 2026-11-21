@@ -21,12 +21,12 @@ class EnsureOrganizerIsApproved
             abort(403, 'Only organizers can access this area.');
         }
 
-        if (!$user->activity_organizer) {
+        if (!$user->ActivityOrganizer) {
             return redirect()->route('organizers.index')
                 ->with('error', 'Please complete your organizer profile first.');
         }
 
-        if ($user->activity_organizer->approval_status !== 'approved') {
+        if ($user->ActivityOrganizer->approval_status !== 'Approved') {
             return redirect()->route('organizers.index')
                 ->with('error', 'Your organizer account is pending admin approval.');
         }

@@ -27,6 +27,10 @@ Route::middleware(['auth'])->group(function () {
         ->only(['index', 'store', 'update']);
 });
 
+Route::get('/organizer/dashboard', [ActivityOrganizerController::class, 'dashboard'])
+    ->middleware(['auth', 'approved.organizer'])
+    ->name('organizer.dashboard');
+
 // Admin Verification & Revenue Dashboard (Slices 2 & 3)
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
@@ -65,7 +69,10 @@ Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'show
     ->name('adventures.profile');
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'approved.organizer'])->group(function () {
+    Route::resource('guides', GuidesController::class)
+        ->only(['index', 'create', 'store', 'update']);
+    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
     Route::resource('adventures', AdventureController::class);
     Route::post(
         '/adventure-schedules/{adventure_schedules}/days/generate',
@@ -167,13 +174,6 @@ if (app()->environment('local')) {
 
 }
     Route::resource('payments', PaymentController::class)->middleware('auth');
-
-    Route::resource('guides', GuidesController::class)
-        ->only(['index', 'update'])
-        ->middleware('auth');
-
-    Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
-
 
     Route::get('/bookings/{bookingId}/payments',
     [PaymentController::class, 'showByBooking']
