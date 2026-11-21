@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\ActivityOrganizerController;
+use App\Http\Controllers\AdminOrganizerController;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdventureController;
 use App\Http\Controllers\AdventureDayController;
 use App\Http\Controllers\AdventureSchedulesController;
@@ -15,6 +19,20 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Organizer Profile & Dashboard (Slice 1)
+Route::middleware(['auth'])->group(function () {
+    Route::resource('organizers', ActivityOrganizerController::class)
+        ->only(['index', 'store', 'update']);
+});
+
+// Admin Verification & Revenue Dashboard (Slices 2 & 3)
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::resource('organizers', AdminOrganizerController::class)
+            ->only(['index', 'update', 'destroy']);
+    });
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -110,6 +128,36 @@ Route::controller(ReviewController::class)
 
     });
 
+// Frontend preview - local development only
+if (app()->environment('local')) {
+    Route::view('/ui-preview', 'pages.ui-preview')
+        ->name('ui.preview');
+}
+
+// Home Page Preview - Local Development Only
+if (app()->environment('local')) {
+    Route::view('/home-preview', 'pages.home')
+        ->name('home.preview');
+}
+
+// Dashboard UI preview - local environment only.
+if (app()->environment('local')) {
+    Route::view(
+        '/dashboard-preview',
+        'pages.dashboard-preview'
+    )->name('dashboard.preview');
+}
+
+// Auth UI Preview - Local Environment Only
+
+if (app()->environment('local')) {
+
+    Route::view(
+        '/auth-preview',
+        'pages.auth-preview'
+    )->name('auth.preview');
+
+}
     Route::resource('payments', PaymentController::class)->middleware('auth');
 
     Route::resource('guides', GuidesController::class);

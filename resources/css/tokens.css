@@ -1,0 +1,48 @@
+
+@theme static {
+    /* Brand Colors */
+    --color-brand: #a43716;
+    --color-brand-dark: #862201;
+    --color-forest: #3f6653;
+    --color-accent: #8d4b00;
+
+    /* Backgrounds & Surfaces */
+    --color-canvas: #f9f9ff;
+    --color-surface: #ffffff;
+
+    /* Text & Borders */
+    --color-ink: #111c2d;
+    --color-muted: #58423c;
+    --color-outline: #dfc0b7;
+
+    /* Feedback */
+    --color-danger: #ba1a1a;
+
+    /* Typography */
+    --font-sans: 'IBM Plex Sans Arabic', Tahoma, sans-serif;
+    --font-display: 'Cairo', Tahoma, sans-serif;
+    --font-metrics: 'Inter', Arial, sans-serif;
+
+    /* Border Radius */
+    --radius-control: 0.5rem;
+    --radius-card: 1rem;
+    --radius-hero: 1.5rem;
+
+    /* Layout */
+    --container-site: 85rem;
+
+    /* Shadows */
+    --shadow-card: 0 4px 20px -2px rgb(30 41 59 / 0.05);
+}
+
+@layer base {
+    body {
+        font-family: var(--font-sans);
+        color: var(--color-ink);
+        background-color: var(--color-canvas);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: var(--font-display);
+    }
+}
