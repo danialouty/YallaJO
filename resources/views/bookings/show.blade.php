@@ -90,7 +90,4 @@
         </div>
     </div>
 
-    <style>
-        .yallajo-show-wrapper { font-family: 'Cairo', sans-serif; }
-    </style>
 @endsection

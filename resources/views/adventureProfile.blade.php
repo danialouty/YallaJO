@@ -537,19 +537,12 @@
 
         </section>
 
-        <div class="details-layout">
-
-            <!-- Booking Sidebar -->
-            <aside>
-
-                <div class="card booking-card">
-
-                    <div class="booking-price">
-                        <span>السعر للشخص</span>
-                        <strong>
-                            {{ number_format($adventure->price, 2) }}
-                            <small style="font-size: 12px;">د.أ</small>
-                        </strong>
+        <div class="mt-6 grid items-start gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <aside class="space-y-4 lg:sticky lg:top-5" data-adventure-booking data-price="{{ $adventure->price }}" data-capacity="{{ $adventure->capacity }}">
+                <div class="rounded-2xl bg-white p-5 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between gap-4">
+                        <span class="text-sm text-slate-500">السعر للشخص</span>
+                        <strong class="text-2xl font-black text-orange-700">{{ number_format($adventure->price, 2) }} <small class="text-xs">د.أ</small></strong>
                     </div>
 
                     <form action="#" method="POST" id="bookingForm">
@@ -582,16 +575,8 @@
                                 د.أ
                             </span>
                         </div>
-
-                        <button type="button" class="book-button"
-                            onclick="alert('واجهة الحجز جاهزة، اربطها بمسار الحجز عند تفعيله.')">
-                            🔒 تأكيد الحجز الآن
-                        </button>
-
-                        <p class="booking-note">
-                            السعر النهائي يعتمد على تفاصيل الحجز
-                        </p>
-
+                        <button type="button" id="confirmBooking" class="mt-5 w-full rounded-lg bg-orange-700 px-4 py-3 font-extrabold text-white hover:bg-orange-800">🔒 تأكيد الحجز الآن</button>
+                        <p class="mt-3 text-center text-xs text-slate-500">السعر النهائي يعتمد على تفاصيل الحجز</p>
                     </form>
 
                 </div>
@@ -758,40 +743,6 @@
         </div>
 
     </main>
-
-
-    <script>
-        const price = Number(@json($adventure->price));
-        const capacity = Number(@json($adventure->capacity));
-
-        let people = 2;
-
-        const peopleCount = document.getElementById('peopleCount');
-        const peopleInput = document.getElementById('peopleInput');
-        const totalPrice = document.getElementById('totalPrice');
-
-        function updateBooking() {
-            peopleCount.textContent = people;
-            peopleInput.value = people;
-            totalPrice.textContent = (price * people).toFixed(2);
-        }
-
-        document.getElementById('increase').addEventListener('click', function () {
-            if (people < capacity) {
-                people++;
-                updateBooking();
-            }
-        });
-
-        document.getElementById('decrease').addEventListener('click', function () {
-            if (people > 1) {
-                people--;
-                updateBooking();
-            }
-        });
-
-        updateBooking();
-    </script>
 
 </body>
 

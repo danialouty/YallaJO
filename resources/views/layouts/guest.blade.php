@@ -13,9 +13,6 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <style>
-        body { font-family: 'Cairo', sans-serif; }
-    </style>
 </head>
 <body class="bg-[#F8F9FA] text-gray-800 antialiased">
 
