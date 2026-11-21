@@ -12,6 +12,8 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ChatbotController;
+
 
 
 
@@ -173,3 +175,8 @@ if (app()->environment('local')) {
     Route::get('/bookings/{bookingId}/payments',
     [PaymentController::class, 'showByBooking']
     )->name('payments.byBooking');
+
+
+    Route::post('/chatbot', [ChatbotController::class, 'chat'])
+    ->middleware('auth')
+    ->name('chatbot.chat');
