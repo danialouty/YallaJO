@@ -2,6 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.querySelector('[data-adventure-booking]');
     if (!container) return;
 
+    const bookingSuccess = document.getElementById('adventure-booking-success');
+    const closeBookingSuccess = () => bookingSuccess?.classList.add('is-hidden');
+    bookingSuccess?.querySelector('[data-close-adventure-booking-success]')
+        ?.addEventListener('click', closeBookingSuccess);
+    bookingSuccess?.addEventListener('click', event => {
+        if (event.target === bookingSuccess) closeBookingSuccess();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeBookingSuccess();
+    });
+
     const price = Number(container.dataset.price || 0);
     const capacity = Number(container.dataset.capacity || 0);
     const peopleCount = document.getElementById('peopleCount');

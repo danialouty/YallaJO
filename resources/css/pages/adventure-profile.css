@@ -578,6 +578,82 @@ input {
     text-align: center;
 }
 
+.adventure-booking-success-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(17, 28, 45, 0.62);
+    backdrop-filter: blur(4px);
+}
+
+.adventure-booking-success-backdrop.is-hidden {
+    display: none;
+}
+
+.adventure-booking-success-card {
+    width: min(430px, 100%);
+    border-radius: 18px;
+    background: #fff;
+    padding: 30px 24px 24px;
+    text-align: center;
+    box-shadow: 0 24px 60px -16px rgba(17, 28, 45, 0.35);
+}
+
+.adventure-booking-success-icon {
+    display: grid;
+    width: 64px;
+    height: 64px;
+    place-items: center;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #3f6653;
+    color: #fff;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.adventure-booking-success-kicker {
+    color: #3f6653;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.adventure-booking-success-card h2 {
+    margin-top: 6px;
+    color: #111c2d;
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.adventure-booking-success-card p:not(.adventure-booking-success-kicker) {
+    margin: 10px auto 0;
+    max-width: 330px;
+    color: #58423c;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.adventure-booking-success-card button {
+    min-height: 44px;
+    width: 100%;
+    margin-top: 22px;
+    border: 0;
+    border-radius: 10px;
+    background: #a43716;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.adventure-booking-success-card button:hover {
+    background: #862201;
+}
+
 .benefits p {
     margin: 12px 0;
 }

@@ -23,6 +23,12 @@
             'icon' => 'adventures',
         ],
         [
+            'label' => 'الحجوزات',
+            'route' => 'bookings.index',
+            'active' => 'bookings.*',
+            'icon' => 'bookings',
+        ],
+        [
             'label' => 'مواعيد المغامرات',
             'route' => 'adventure-schedules.index',
             'icon' => 'bookings',
