@@ -12,6 +12,8 @@ use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ChatbotController;
+
 
 
 
@@ -128,6 +130,9 @@ Route::controller(ReviewController::class)
 
     });
 
+    Route::resource('payments', PaymentController::class)
+        ->except(['create'])
+        ->middleware('auth');
 // Frontend preview - local development only
 if (app()->environment('local')) {
     Route::view('/ui-preview', 'pages.ui-preview')
@@ -160,7 +165,9 @@ if (app()->environment('local')) {
 }
     Route::resource('payments', PaymentController::class)->middleware('auth');
 
-    Route::resource('guides', GuidesController::class);
+    Route::resource('guides', GuidesController::class)
+        ->only(['index', 'update'])
+        ->middleware('auth');
 
     Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
 
@@ -168,3 +175,8 @@ if (app()->environment('local')) {
     Route::get('/bookings/{bookingId}/payments',
     [PaymentController::class, 'showByBooking']
     )->name('payments.byBooking');
+
+
+    Route::post('/chatbot', [ChatbotController::class, 'chat'])
+    ->middleware('auth')
+    ->name('chatbot.chat');
