@@ -22,7 +22,7 @@
 
             <h1 id="hero-title" class="max-w-4xl font-display text-3xl font-extrabold leading-[1.16] tracking-tight drop-shadow-lg md:text-5xl">
                 اكتشف مسارات الأردن<br>
-                <span class="mt-1 inline-block text-[#f1b84b]">ومجتمرات المغامرة</span>
+                <span class="mt-1 inline-block text-[#f1b84b]">مجتمعات المغامرة</span>
             </h1>
 
             <p class="mt-4 max-w-2xl text-sm leading-7 text-white/90 md:text-base">
