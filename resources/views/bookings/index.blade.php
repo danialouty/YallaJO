@@ -116,6 +116,9 @@
                             <th class="py-3.5 px-4 font-semibold">سعر الفرد</th>
                             <th class="py-3.5 px-4 font-semibold">الإجمالي</th>
                             <th class="py-3.5 px-4 font-semibold">حالة الحجز</th>
+                            @if ($isOrganizer)
+                                <th class="py-3.5 px-4 font-semibold">حالة الدفع</th>
+                            @endif
                             <th class="py-3.5 px-6 font-semibold text-center">الإجراءات</th>
                         </tr>
                     </thead>
@@ -149,6 +152,20 @@
                                         </span>
                                     @endif
                                 </td>
+
+                                @if ($isOrganizer)
+                                    <td class="py-4 px-4">
+                                        @if ($booking->payment?->status === 'Confirmed')
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                                                مدفوع
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                                                غير مدفوع
+                                            </span>
+                                        @endif
+                                    </td>
+                                @endif
 
                                 <td class="py-4 px-6">
                                     <div class="flex items-center justify-center gap-2">
@@ -187,7 +204,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center">
+                                <td colspan="{{ $isOrganizer ? 7 : 6 }}" class="py-12 text-center">
                                     <p class="text-gray-500 font-medium mb-3">لا يوجد لديك أي حجوزات حالياً</p>
                                     @unless ($isOrganizer)
                                         <button type="button" data-open-create-modal class="text-sm font-bold text-[#A94B2B] underline cursor-pointer">

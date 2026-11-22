@@ -69,15 +69,15 @@ class BookingController extends Controller
 
             $booking->payment()->create([
                 'total_amount' => $booking->total_amount,
-                'method' => 'Cash',
+                'method' => $validated['payment_method'] ?? 'Cash',
                 'status' => 'Pending',
             ]);
 
             return $booking;
         });
 
-        return redirect()->route('bookings.index')
-            ->with('success', 'تم إرسال طلب الحجز بنجاح. يمكنك متابعة حالته من سجل حجوزاتك.');
+        return redirect()->route('adventures.profile', $booking->adventure_id)
+            ->with('booking_success', 'تم الحجز بنجاح.');
     }
 
     public function show(string $booking)

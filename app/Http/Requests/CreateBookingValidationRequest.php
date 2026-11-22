@@ -25,6 +25,7 @@ class CreateBookingValidationRequest extends FormRequest
         return [
             'adventure_id' => ['required', 'integer', 'exists:adventures,id'],
             'participants_count' => ['required', 'integer', 'min:1'],
+            'payment_method' => ['sometimes', 'in:Visa,Cash'],
         ];
     }
     public function messages(): array{

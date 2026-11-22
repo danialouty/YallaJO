@@ -654,6 +654,39 @@ input {
     background: #862201;
 }
 
+.payment-modal-card {
+    max-height: min(90vh, 720px);
+    overflow-y: auto;
+    text-align: right;
+}
+
+.payment-modal-card h2 {
+    text-align: center;
+}
+
+.payment-modal-card > p:not(.adventure-booking-success-kicker) {
+    text-align: center;
+}
+
+.payment-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.payment-cancel-button {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 10px;
+    border: 1px solid #dfc0b7;
+    border-radius: 10px;
+    background: #fff;
+    color: #58423c;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .benefits p {
     margin: 12px 0;
 }
