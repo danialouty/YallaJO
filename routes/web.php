@@ -221,7 +221,6 @@ if (app()->environment('local')) {
 }
 
 Route::post('/chatbot', ['App\\Http\\Controllers\\ChatbotController', 'chat'])
-    ->middleware('auth')
     ->name('chatbot.chat');
 
 Route::resource('communities', CommunityController::class)

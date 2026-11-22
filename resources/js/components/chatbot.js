@@ -36,7 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         const message = input.value.trim();
-        if (!message) return;
+        if (!message) {
+            input.setAttribute('aria-invalid', 'true');
+            input.focus();
+            const notice = document.createElement('div');
+            notice.className = 'chatbot-message chatbot-message-ai';
+            notice.textContent = 'اكتب رسالتك أولاً حتى أقدر أساعدك.';
+            messages.appendChild(notice);
+            messages.scrollTop = messages.scrollHeight;
+            return;
+        }
+        input.removeAttribute('aria-invalid');
 
         const userMessage = document.createElement('div');
         userMessage.className = 'chatbot-message chatbot-message-user';
