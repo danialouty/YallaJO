@@ -76,9 +76,18 @@
         <!-- كلمة المرور -->
         <div>
             <label for="password" class="block text-sm font-bold text-gray-700 mb-1">كلمة المرور</label>
-            <input id="password" type="password" name="password" required autocomplete="new-password"
-                placeholder="8 أحرف على الأقل"
-                class="w-full rounded-xl border-gray-300 text-sm py-2.5 px-3.5 focus:border-[#2D5041] focus:ring-[#2D5041]">
+            <div class="relative">
+                <input id="password" type="password" name="password" required autocomplete="new-password"
+                    placeholder="8 أحرف على الأقل"
+                    class="w-full rounded-xl border-gray-300 text-sm py-2.5 ps-3.5 pe-12 focus:border-[#2D5041] focus:ring-[#2D5041]">
+                <button type="button" data-password-toggle="password" aria-label="إظهار كلمة المرور" aria-pressed="false"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-[#2D5041]">
+                    <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+                        <circle cx="12" cy="12" r="2.5"/>
+                    </svg>
+                </button>
+            </div>
             @error('password')
                 <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p>
             @enderror
@@ -88,9 +97,18 @@
         <div>
             <label for="password_confirmation" class="block text-sm font-bold text-gray-700 mb-1">تأكيد كلمة
                 المرور</label>
-            <input id="password_confirmation" type="password" name="password_confirmation" required
-                autocomplete="new-password" placeholder="أعد كتابة كلمة المرور"
-                class="w-full rounded-xl border-gray-300 text-sm py-2.5 px-3.5 focus:border-[#2D5041] focus:ring-[#2D5041]">
+            <div class="relative">
+                <input id="password_confirmation" type="password" name="password_confirmation" required
+                    autocomplete="new-password" placeholder="أعد كتابة كلمة المرور"
+                    class="w-full rounded-xl border-gray-300 text-sm py-2.5 ps-3.5 pe-12 focus:border-[#2D5041] focus:ring-[#2D5041]">
+                <button type="button" data-password-toggle="password_confirmation" aria-label="إظهار تأكيد كلمة المرور" aria-pressed="false"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-[#2D5041]">
+                    <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+                        <circle cx="12" cy="12" r="2.5"/>
+                    </svg>
+                </button>
+            </div>
             @error('password_confirmation')
                 <p class="mt-1 text-xs text-red-600 font-medium">{{ $message }}</p>
             @enderror

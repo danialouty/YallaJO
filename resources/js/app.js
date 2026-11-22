@@ -10,6 +10,7 @@ import './components/organizer-profile';
 import './components/navigation';
 import './components/chatbot';
 import './components/adventures-reveal';
+import './components/password-toggle';
 
 import Alpine from 'alpinejs';
 
