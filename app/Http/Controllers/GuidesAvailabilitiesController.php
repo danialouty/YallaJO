@@ -97,7 +97,7 @@ class GuidesAvailabilitiesController extends Controller
 
     private function ownedAvailabilities(): Builder
     {
-        return Guides_availabilities::whereHas('guide', fn (Builder $query) => $query
+        return Guides_availabilities::query()->whereHas('guide', fn (Builder $query) => $query
             ->where('activity_organizer_id', auth()->user()->activityOrganizer->id));
     }
 }

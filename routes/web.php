@@ -4,7 +4,6 @@ use App\Http\Controllers\ActivityOrganizerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AdminOrganizerController;
 use App\Http\Controllers\AdminFraudReportController;
-use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\AdventureController;
 use App\Http\Controllers\AdventureSchedulesController;
 use App\Http\Controllers\ImagesController;
@@ -221,7 +220,7 @@ if (app()->environment('local')) {
 
 }
 
-Route::post('/chatbot', [ChatbotController::class, 'chat'])
+Route::post('/chatbot', ['App\\Http\\Controllers\\ChatbotController', 'chat'])
     ->middleware('auth')
     ->name('chatbot.chat');
 
