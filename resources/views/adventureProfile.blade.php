@@ -75,7 +75,7 @@
                 <section class="adventure-booking-success-card" dir="rtl">
                     <div class="adventure-booking-success-icon" aria-hidden="true">✓</div>
                     <p class="adventure-booking-success-kicker">اكتمل الحجز</p>
-                    <h2 id="adventure-booking-success-title">تم إرسال طلبك بنجاح</h2>
+                    <h2 id="adventure-booking-success-title">تم الحجز</h2>
                     <p>{{ session('booking_success') }}</p>
                     <button type="button" data-close-adventure-booking-success autofocus>متابعة التصفح</button>
                 </section>
@@ -113,6 +113,7 @@
                     <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                         @csrf
                         <input type="hidden" name="adventure_id" value="{{ $adventure->id }}">
+                        <input type="hidden" name="payment_method" value="Cash">
 
                         <label class="booking-label">عدد الأشخاص</label>
                         <div class="people-control">
@@ -129,10 +130,10 @@
                             </span>
                         </div>
 
-                        <button type="submit" class="book-button">
-                            تأكيد الحجز الآن
+                        <button type="button" class="book-button" data-open-payment>
+                            حجز
                         </button>
-                        <p class="booking-note">سيتم إنشاء الحجز والدفع المعلق تلقائيًا بعد التأكيد.</p>
+                        <p class="booking-note">أدخل بيانات الدفع لإكمال الحجز.</p>
                     </form>
                     @endif
                 </div>
@@ -205,5 +206,28 @@
             </section>
         </div>
     </main>
+
+    @if (auth()->check() && auth()->user()->role === 'Adventurer' && ! $alreadyBooked && $adventure->status === 'Active' && $adventure->capacity > 0)
+        <div id="adventure-payment-modal" class="adventure-booking-success-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="payment-modal-title">
+            <section class="adventure-booking-success-card payment-modal-card" dir="rtl">
+                <p class="adventure-booking-success-kicker">الدفع الآمن</p>
+                <h2 id="payment-modal-title">بيانات الدفع</h2>
+                <p>الإجمالي: <strong><span data-payment-total>{{ number_format($adventure->price, 2) }}</span> د.أ</strong></p>
+                <form id="payment-details-form" novalidate>
+                    <label class="booking-label" for="payment-cardholder">اسم حامل البطاقة</label>
+                    <input class="booking-input" id="payment-cardholder" autocomplete="cc-name" required>
+                    <label class="booking-label" for="payment-card-number">رقم البطاقة</label>
+                    <input class="booking-input" id="payment-card-number" inputmode="numeric" autocomplete="cc-number" maxlength="19" required>
+                    <div class="payment-fields-row">
+                        <div><label class="booking-label" for="payment-expiry">تاريخ الانتهاء</label><input class="booking-input" id="payment-expiry" placeholder="MM/YY" autocomplete="cc-exp" maxlength="5" required></div>
+                        <div><label class="booking-label" for="payment-cvv">رمز الأمان</label><input class="booking-input" id="payment-cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4" required></div>
+                    </div>
+                    <p class="booking-note" data-payment-error role="alert"></p>
+                    <button type="submit" class="book-button">تأكيد الحجز</button>
+                    <button type="button" class="payment-cancel-button" data-close-payment>رجوع</button>
+                </form>
+            </section>
+        </div>
+    @endif
 </body>
 </html>
