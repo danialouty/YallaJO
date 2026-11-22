@@ -11,12 +11,41 @@
 @source "../**/*.js";
 
 @import "./pages/adventure-profile.css";
+@import "./pages/adventures-explore.css";
+@import "./pages/landing.css";
 @import "./pages/chatbot.css";
 @import "./pages/payments.css";
 @import "./pages/bookings.css";
 @import "./pages/bookings-show.css";
 @import "./pages/auth.css";
+@import "./pages/communities.css";
+@import "./pages/about.css";
 
 [x-cloak] {
     display: none !important;
+}
+
+/* Keep all primary public actions on one brand-red color. */
+.bg-brand,
+button.bg-brand,
+a.bg-brand {
+    background-color: #a94b2b !important;
+}
+
+.hover\:bg-brand-dark:hover,
+button.bg-brand:hover,
+a.bg-brand:hover {
+    background-color: #8e3d22 !important;
+}
+
+/* Public white action buttons should not visually blend into cards. */
+button.bg-white,
+a.bg-white {
+    background-color: #a94b2b !important;
+    color: #fff !important;
+}
+
+button.bg-white:hover,
+a.bg-white:hover {
+    background-color: #8e3d22 !important;
 }

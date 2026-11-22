@@ -23,11 +23,17 @@
             'icon' => 'adventures',
         ],
         [
+            'label' => 'الحجوزات',
+            'route' => 'bookings.index',
+            'active' => 'bookings.*',
+            'icon' => 'bookings',
+        ],
+        [
             'label' => 'مواعيد المغامرات',
             'route' => 'adventure-schedules.index',
             'icon' => 'bookings',
         ],
-    
+
     ];
 
     $adminMenu = [
@@ -37,24 +43,40 @@
             'icon' => 'dashboard',
         ],
         [
-            'label' => 'طلبات الموافقة المعلقة',
-            'route' => 'admin.approvals.index',
+            'label' => 'إدارة المنظّمين',
+            'route' => 'admin.organizers.index',
+            'active' => 'admin.organizers.*',
             'icon' => 'approval',
         ],
         [
             'label' => 'إدارة المستخدمين والأدوار',
             'route' => 'admin.users.index',
+            'active' => 'admin.users.*',
             'icon' => 'community',
         ],
         [
             'label' => 'المغامرات والتصنيفات',
             'route' => 'admin.adventures.index',
+            'active' => 'admin.adventures.*',
             'icon' => 'adventures',
         ],
         [
             'label' => 'الحجوزات والعمولات',
             'route' => 'admin.bookings.index',
+            'active' => 'admin.bookings.*',
             'icon' => 'payments',
+        ],
+        [
+            'label' => 'المدفوعات',
+            'route' => 'admin.payments.index',
+            'active' => 'admin.payments.*',
+            'icon' => 'payments',
+        ],
+        [
+            'label' => 'التقييمات',
+            'route' => 'admin.reviews.index',
+            'active' => 'admin.reviews.*',
+            'icon' => 'reports',
         ],
         [
             'label' => 'التقارير والشكاوى',
@@ -117,7 +139,7 @@
             $routeExists = Route::has($item['route']);
 
             $isActive = $routeExists
-                && request()->routeIs($item['route']);
+                && request()->routeIs($item['active'] ?? $item['route']);
 
             $itemClasses = '
                 flex min-h-11 items-center gap-3

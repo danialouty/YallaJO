@@ -2,12 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\AdventureFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Adventure extends Model
 {
+    /** @use HasFactory<AdventureFactory> */
+    use HasFactory;
+
     protected $table = 'adventures';
 
     protected $fillable = [
@@ -51,6 +56,11 @@ class Adventure extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function reservedBookings(): HasMany
+    {
+        return $this->bookings()->whereIn('status', ['Pending', 'Accepted']);
     }
 
     public function images(): HasMany

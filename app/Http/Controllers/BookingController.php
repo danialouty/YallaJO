@@ -1,128 +1,144 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\CreateBookingValidationRequest;
-use App\Models\Booking;
 use App\Models\Adventure;
 use App\Models\Adventurer;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Payment;
+use App\Models\Booking;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\UpdateBookingValidationRequest;
-
+use Illuminate\Validation\ValidationException;
 
 class BookingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $userId = Auth::id();
-        $adventurer = Adventurer::firstOrCreate(['user_id' => $userId]);
-        $bookings = Booking::with('adventure')->where('adventurer_id', $adventurer->id)->latest()->get();
-        $adventures = Adventure::all();
-        return view('bookings.index', [
-            'data' => $bookings,
-            'adventures' => $adventures,
-        ]);
+        $user = auth()->user();
+        $isOrganizer = $user->role === 'Activity_Organizer';
+        $bookings = $isOrganizer
+            ? Booking::whereHas('adventure', fn (Builder $query) => $query->where('activity_organizer_id', $user->activityOrganizer->id))
+                ->with(['adventure', 'adventurer.user', 'payment'])->latest()->get()
+            : $this->ownedBookings()->with('adventure')->withExists(['payment', 'review'])->latest()->get();
+        $adventures = $isOrganizer ? collect() : Adventure::where('status', 'Active')->get();
+
+        return view('bookings.index', compact('bookings', 'adventures', 'isOrganizer') + ['data' => $bookings]);
     }
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
-        $adventures = Adventure::all();
-        return view('bookings.create', ['adventures' => $adventures]);
+        return view('bookings.create', ['adventures' => Adventure::where('status', 'Active')->get()]);
     }
 
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(CreateBookingValidationRequest $request)
     {
-        $adventure = Adventure::find($request->adventure_id);
-        $userId = Auth::user()->id;
-        $adventurer = Adventurer::where('user_id', '=', $userId)->first();
+        if ($request->user()->role !== 'Adventurer') {
+            $destination = $request->user()->role === 'Activity_Organizer'
+                ? 'organizer.dashboard'
+                : 'dashboard';
 
-        $counter = Booking::where('adventure_id', '=', $adventure->id)->where('adventurer_id', '=', $adventurer->id)->count();
-        if ($counter > 0) {
-            return redirect()->back()->with('error', 'Sorry, you have already booked this adventure.');
+            return redirect()->route($destination)
+                ->with('error', 'الحجز متاح لحسابات المغامرين فقط.');
         }
-        $unitPrice = $adventure->price;
-        $commissionRate = 0.10;
-        $totalAmount = $unitPrice * $request->participants_count;
 
-        $dataToInsert = [
-            'adventure_id' => $adventure->id,
-            'adventurer_id' => $adventurer->id,
-            'participants_count' => $request->participants_count,
-            'unit_price' => $unitPrice,
-            'commission_rate' => $commissionRate,
-            'total_amount' => $totalAmount,
-            'status' => 'Pending',
-            'capacity'=>$adventure->capacity ?? $request->participants_count,
-        ];
+        $validated = $request->validated();
 
-        DB::transaction(function () use ($dataToInsert) {
-            $booking = Booking::create($dataToInsert);
+        $booking = DB::transaction(function () use ($request, $validated) {
+            $adventure = Adventure::query()->lockForUpdate()->findOrFail($validated['adventure_id']);
+            if ($adventure->status !== 'Active') {
+                throw ValidationException::withMessages(['adventure_id' => 'الحجز غير متاح لهذه المغامرة.']);
+            }
 
-            Payment::create([
-                'booking_id' => $booking->id,
+            $adventurer = Adventurer::firstOrCreate(['user_id' => $request->user()->id]);
+            if ($adventure->bookings()->where('adventurer_id', $adventurer->id)->exists()) {
+                throw ValidationException::withMessages(['adventure_id' => 'سبق لك حجز هذه المغامرة.']);
+            }
+
+            $participants = (int) $validated['participants_count'];
+            $this->validateCapacity($adventure, $participants);
+            $booking = $adventurer->bookings()->create([
+                'adventure_id' => $adventure->id,
+                'participants_count' => $participants,
+                'unit_price' => $adventure->price,
+                'commission_rate' => '0.10',
+                'total_amount' => Booking::calculateTotal($adventure->price, $participants),
+                'status' => 'Pending',
+                'capacity' => $adventure->capacity,
+            ]);
+
+            $booking->payment()->create([
                 'total_amount' => $booking->total_amount,
                 'method' => 'Cash',
                 'status' => 'Pending',
             ]);
+
+            return $booking;
         });
 
-        return redirect()->route('bookings.index')->with('success', 'تم إنشاء الحجز والدفع المعلق بنجاح');
+        return redirect()->route('bookings.index')
+            ->with('success', 'تم إرسال طلب الحجز بنجاح. يمكنك متابعة حالته من سجل حجوزاتك.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(string $booking)
     {
-        $userId = Auth::id();
-        $adventurer = Adventurer::firstOrCreate(['user_id' => $userId]);
+        $record = $this->ownedBookings()->with('adventure')->withExists(['payment', 'review'])->findOrFail($booking);
 
-        $booking = Booking::with('adventure')
-            ->where('adventurer_id', $adventurer->id)
-            ->findOrFail($id);
-
-        return view('bookings.show', ['data' => $booking]);
+        return view('bookings.show', ['data' => $record]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function edit(string $booking)
     {
-        $data = Booking::findOrFail($id);
-        return view('bookings.edit', ['data' => $data]);
+        $record = $this->ownedBookings()->with('adventure')->findOrFail($booking);
+        abort_unless($record->isChangeable() && $record->adventure->status === 'Active', 403);
+
+        return view('bookings.edit', ['booking' => $record]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateBookingValidationRequest $request, $id)
+    public function update(Request $request, string $booking)
     {
-        $booking = Booking::findOrFail($id);
-        $booking->update([
-            'participants_count' => $request->participants_count,
-            'total_amount' => $request->participants_count * $booking->unit_price
-        ]);
-        return redirect()->route('bookings.index')->with('success', 'booking updated successfully');
+        $record = $this->ownedBookings()->findOrFail($booking);
+        $validated = $request->validate(['participants_count' => ['required', 'integer', 'between:1,2147483647']]);
+        $participants = (int) $validated['participants_count'];
+
+        DB::transaction(function () use ($record, $participants) {
+            $adventure = Adventure::query()->lockForUpdate()->findOrFail($record->adventure_id);
+            $current = $this->ownedBookings()->lockForUpdate()->findOrFail($record->id);
+            abort_unless($current->isChangeable() && $adventure->status === 'Active', 403);
+            $this->validateCapacity($adventure, $participants, $current);
+            $current->update([
+                'participants_count' => $participants,
+                'total_amount' => Booking::calculateTotal($current->unit_price, $participants),
+            ]);
+        });
+
+        return redirect()->route('bookings.index')->with('success', 'تم تحديث الحجز.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function destroy(string $booking)
     {
-        $data = Booking::findOrFail($id);
-        $data->delete();
-        return redirect()->route('bookings.index')->with('success', 'Booking deleted successfully!');
+        DB::transaction(function () use ($booking) {
+            $current = $this->ownedBookings()->lockForUpdate()->findOrFail($booking);
+            abort_unless($current->isChangeable(), 403);
+            $current->update(['status' => 'Cancelled', 'cancelled_at' => now()]);
+        });
+
+        return redirect()->route('bookings.index')->with('success', 'أُلغي الحجز وبقي سجله محفوظًا.');
+    }
+
+    private function ownedBookings(): Builder
+    {
+        return Booking::whereHas('adventurer', fn (Builder $query) => $query->where('user_id', auth()->id()));
+    }
+
+    private function validateCapacity(Adventure $adventure, int $participants, ?Booking $current = null): void
+    {
+        $reserved = $adventure->reservedBookings()
+            ->when($current, fn (Builder $query) => $query->whereKeyNot($current->id))
+            ->sum('participants_count');
+
+        if ($participants > $adventure->capacity - $reserved) {
+            throw ValidationException::withMessages(['participants_count' => 'عدد المشاركين يتجاوز المقاعد المتاحة.']);
+        }
     }
 }

@@ -1,15 +1,22 @@
 @extends('layouts.dashboard')
 
-@section('dashboard-theme', 'adventurer')
-@section('dashboard-name', 'بوابة المغامر')
-@section('dashboard-title', 'إدارة حجوزاتي')
+@section('dashboard-theme', $isOrganizer ? 'organizer' : 'adventurer')
+@section('dashboard-name', $isOrganizer ? 'مساحة المنظّم' : 'بوابة المغامر')
+@section('dashboard-title', $isOrganizer ? 'حجوزات مغامراتي' : 'إدارة حجوزاتي')
 
 @section('dashboard-header-actions')
+    @unless ($isOrganizer)
+    <a href="{{ route('home') }}" class="inline-flex items-center justify-center rounded-xl border border-outline px-4 py-2.5 text-sm font-bold text-ink hover:bg-canvas">
+        العودة للرئيسية
+    </a>
+    @endunless
+    @unless ($isOrganizer)
     <button type="button" data-open-create-modal
             class="btn-yalla-primary inline-flex items-center justify-center gap-2 px-5 py-2.5 font-bold text-sm rounded-xl shadow-sm cursor-pointer">
         <span>+</span>
         <span>حجز مغامرة جديدة</span>
     </button>
+    @endunless
 @endsection
 
 @section('content')
@@ -17,14 +24,48 @@
 
         <!-- رسائل النجاح والخطأ -->
         @if (session('success'))
-            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium">
-                {{ session('success') }}
+            <div id="booking-success-modal"
+                 class="booking-success-backdrop"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="booking-success-title"
+                 data-booking-success="{{ session('success') }}">
+                <div class="booking-success-card">
+                    <div class="booking-success-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="m5 12.5 4.2 4.2L19 7" />
+                        </svg>
+                    </div>
+                    <p class="booking-success-kicker">تم إنشاء الحجز</p>
+                    <h2 id="booking-success-title" class="booking-success-title">حجزك جاهز للمتابعة</h2>
+                    <p class="booking-success-message">
+                        تم إرسال طلب الحجز بنجاح، ويمكنك متابعة حالته من سجل حجوزاتك.
+                    </p>
+                    <div class="booking-success-actions">
+                        <button type="button" data-close-success-modal class="booking-success-primary">
+                            عرض حجوزاتي
+                        </button>
+                        <button type="button" data-close-success-modal class="booking-success-secondary">
+                            إغلاق
+                        </button>
+                    </div>
+                </div>
             </div>
         @endif
 
         @if (session('error'))
             <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-sm font-medium">
                 {{ session('error') }}
+            </div>
+        @endif
+
+        @if ($errors->any() && old('_method'))
+            <div class="mb-6 rounded-xl border border-danger/30 bg-danger/10 p-4 text-sm text-danger" role="alert">
+                <ul class="list-inside list-disc">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 
@@ -62,8 +103,8 @@
         <!-- جدول الحجوزات -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h2 class="font-bold text-gray-800">سجل حجوزاتك</h2>
-                <span class="text-xs text-gray-400">يمكنك تعديل عدد المشاركين طالما الحجز "قيد الانتظار"</span>
+                <h2 class="font-bold text-gray-800">{{ $isOrganizer ? 'حجوزات مغامرات منظمتك' : 'سجل حجوزاتك' }}</h2>
+                <span class="text-xs text-gray-400">{{ $isOrganizer ? 'تظهر الحجوزات المرتبطة بمغامراتك فقط' : 'يمكنك تعديل عدد المشاركين طالما الحجز "قيد الانتظار"' }}</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -83,6 +124,9 @@
                             <tr class="hover:bg-gray-50/60 transition">
                                 <td class="py-4 px-6">
                                     <p class="font-bold text-gray-900">{{ $booking->adventure->title ?? 'مغامرة #' . $booking->adventure_id }}</p>
+                                    @if ($isOrganizer)
+                                        <p class="text-xs text-gray-400 mt-0.5">{{ $booking->adventurer->user->name }}</p>
+                                    @endif
                                     <p class="text-xs text-gray-400 mt-0.5">تاريخ الطلب: {{ $booking->created_at->format('Y/m/d') }}</p>
                                 </td>
 
@@ -91,7 +135,7 @@
                                 <td class="py-4 px-4 font-extrabold text-gray-900">{{ number_format($booking->total_amount, 2) }} د.أ</td>
 
                                 <td class="py-4 px-4">
-                                    @if ($booking->status === 'Confirmed')
+                                    @if ($booking->status === 'Accepted')
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
                                             مؤكد من المنظم
                                         </span>
@@ -115,7 +159,7 @@
                                         </a>
 
                                         <!-- زر Edit Pop-up (يظهر فقط إذا كانت الحالة Pending) -->
-                                        @if ($booking->status === 'Pending')
+                                        @if (!$isOrganizer && $booking->isChangeable() && $booking->adventure?->status === 'Active')
                                             <button type="button"
                                                     data-open-edit-modal
                                                     data-id="{{ $booking->id }}"
@@ -128,7 +172,8 @@
                                         @endif
 
                                         <!-- إلغاء الحجز -->
-                                        <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" data-confirm="هل أنت متأكد من إلغاء وحذف هذا الحجز؟">
+                                        @if (!$isOrganizer && $booking->isChangeable())
+                                        <form action="{{ route('bookings.destroy', $booking->id) }}" method="POST" data-confirm="هل أنت متأكد من إلغاء هذا الحجز؟">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -136,6 +181,7 @@
                                                 إلغاء
                                             </button>
                                         </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -143,9 +189,11 @@
                             <tr>
                                 <td colspan="6" class="py-12 text-center">
                                     <p class="text-gray-500 font-medium mb-3">لا يوجد لديك أي حجوزات حالياً</p>
-                                    <button type="button" data-open-create-modal class="text-sm font-bold text-[#A94B2B] underline cursor-pointer">
-                                        احجز مغامرتك الأولى الآن
-                                    </button>
+                                    @unless ($isOrganizer)
+                                        <button type="button" data-open-create-modal class="text-sm font-bold text-[#A94B2B] underline cursor-pointer">
+                                            احجز مغامرتك الأولى الآن
+                                        </button>
+                                    @endunless
                                 </td>
                             </tr>
                         @endforelse

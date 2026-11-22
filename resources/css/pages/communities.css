@@ -1,0 +1,75 @@
+.communities-hero {
+    background:
+        radial-gradient(circle at 78% 20%, rgba(241, 184, 75, 0.16), transparent 18rem),
+        linear-gradient(135deg, rgba(33, 61, 50, 0.96), rgba(63, 102, 83, 0.82)),
+        url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=85') center 58% / cover no-repeat;
+}
+
+.community-detail-cover {
+    position: relative;
+    min-height: 240px;
+    overflow: hidden;
+    background: #3f6653;
+}
+
+.community-detail-cover img {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.community-detail-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(17, 28, 45, 0.92), rgba(17, 28, 45, 0.18));
+}
+
+.community-card {
+    border: 1px solid rgba(223, 192, 183, 0.55);
+    border-radius: 16px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(35, 48, 64, 0.06);
+    transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.community-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(164, 55, 22, 0.28);
+    box-shadow: 0 16px 38px rgba(35, 48, 64, 0.12);
+}
+
+.community-cover {
+    position: relative;
+    height: 180px;
+    background:
+        linear-gradient(135deg, rgba(63, 102, 83, 0.88), rgba(164, 55, 22, 0.72)),
+        #3f6653;
+}
+
+.community-cover img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.community-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(17, 28, 45, 0.42), transparent 65%);
+}
+
+.community-message {
+    border: 1px solid rgba(223, 192, 183, 0.45);
+    border-radius: 14px;
+    background: #fff;
+}
+
+.community-message-own {
+    border-color: rgba(164, 55, 22, 0.18);
+    background: #fffaf7;
+}

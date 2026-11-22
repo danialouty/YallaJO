@@ -16,6 +16,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
+        if (request()->filled('redirect')) {
+            session()->put('url.intended', request()->query('redirect'));
+        }
+
         return view('auth.login');
     }
 
@@ -28,11 +32,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $destination = $request->user()->role === 'Activity_Organizer'
-            ? ($request->user()->isApprovedOrganizer() ? route('organizer.dashboard') : route('organizers.index'))
-            : route('bookings.index', absolute: false);
+        $destination = match ($request->user()->role) {
+            'Admin' => 'admin.dashboard',
+            'Activity_Organizer' => $request->user()->isApprovedOrganizer() ? 'organizer.dashboard' : 'organizers.index',
+            'Adventurer' => 'adventuresAll.index',
+            default => 'dashboard',
+        };
 
-        return redirect()->intended($destination);
+        return redirect()->intended(route($destination, absolute: false));
     }
 
     /**

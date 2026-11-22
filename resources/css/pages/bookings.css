@@ -53,6 +53,107 @@
         opacity: 0;
         transform: translateY(10px) scale(0.98);
     }
+
+    .booking-success-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(17, 28, 45, 0.58);
+        backdrop-filter: blur(4px);
+        padding: 16px;
+    }
+
+    .booking-success-backdrop.is-hidden {
+        display: none;
+    }
+
+    .booking-success-card {
+        width: min(430px, 100%);
+        border: 1px solid rgba(30, 41, 59, 0.08);
+        border-radius: 18px;
+        background: #fff;
+        padding: 30px 24px 24px;
+        text-align: center;
+        box-shadow: 0 24px 60px -16px rgba(17, 28, 45, 0.35);
+        animation: modalFadeIn 220ms ease-out;
+    }
+
+    .booking-success-icon {
+        display: grid;
+        width: 72px;
+        height: 72px;
+        place-items: center;
+        margin: 0 auto 16px;
+        border: 7px solid #eef7f2;
+        border-radius: 50%;
+        background: #3f6653;
+        color: #fff;
+    }
+
+    .booking-success-icon svg {
+        width: 36px;
+        height: 36px;
+        stroke: currentColor;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .booking-success-kicker {
+        color: #3f6653;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .booking-success-title {
+        margin-top: 6px;
+        color: #111c2d;
+        font-size: 22px;
+        font-weight: 900;
+    }
+
+    .booking-success-message {
+        margin: 10px auto 0;
+        max-width: 330px;
+        color: #58423c;
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+    .booking-success-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+    }
+
+    .booking-success-primary,
+    .booking-success-secondary {
+        min-height: 44px;
+        flex: 1;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .booking-success-primary {
+        border: 0;
+        background: #a43716;
+        color: #fff;
+    }
+
+    .booking-success-primary:hover {
+        background: #862201;
+    }
+
+    .booking-success-secondary {
+        border: 1px solid rgba(30, 41, 59, 0.16);
+        background: #fff;
+        color: #111c2d;
+    }
     to {
         opacity: 1;
         transform: translateY(0) scale(1);

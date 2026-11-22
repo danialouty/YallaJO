@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const successModal = document.getElementById('booking-success-modal');
+    document.querySelectorAll('[data-close-success-modal]').forEach(button => {
+        button.addEventListener('click', () => {
+            successModal?.classList.add('is-hidden');
+        });
+    });
+    successModal?.addEventListener('click', event => {
+        if (event.target === successModal) {
+            successModal.classList.add('is-hidden');
+        }
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            successModal?.classList.add('is-hidden');
+        }
+    });
     const createModal = document.getElementById('createBookingModal');
     const editModal = document.getElementById('editBookingModal');
     const createCount = document.getElementById('create_participants_count');

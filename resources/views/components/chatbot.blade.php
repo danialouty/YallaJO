@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <form id="chatbot-form" class="chatbot-form">
+        <form id="chatbot-form" class="chatbot-form" novalidate>
             @csrf
             <label for="chatbot-input" class="sr-only">اكتب رسالتك للمساعد</label>
             <input id="chatbot-input"
@@ -29,7 +29,6 @@
                    maxlength="1000"
                    autocomplete="off"
                    placeholder="اسأل عن مغامرة..."
-                   required
                    class="chatbot-input">
             <button id="chatbot-send" type="submit" class="chatbot-send" aria-label="إرسال الرسالة">
                 <span aria-hidden="true">➤</span>

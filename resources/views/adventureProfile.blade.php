@@ -19,20 +19,68 @@
     <main class="container" data-adventure-booking
           data-price="{{ $adventure->price }}"
           data-capacity="{{ $adventure->capacity }}">
-        <section class="gallery" aria-label="صور المغامرة">
-            <div class="gallery-left">
-                @foreach($adventure->images->skip(1)->take(2) as $image)
-                    <img src="{{ asset('images/' . $image->image_path) }}" alt="{{ $adventure->title }}">
+        @php
+            $galleryImages = $adventure->images
+                ->map(fn ($image) => asset('images/' . $image->image_path))
+                ->values()
+                ->all();
+
+            $fallbackImages = [
+                'https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1600&q=85',
+                'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=85',
+                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1200&q=85',
+                'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=85',
+            ];
+
+            foreach ($fallbackImages as $fallbackImage) {
+                if (count($galleryImages) >= 4) {
+                    break;
+                }
+                if (!in_array($fallbackImage, $galleryImages, true)) {
+                    $galleryImages[] = $fallbackImage;
+                }
+            }
+
+            $mainGalleryImage = $galleryImages[0] ?? $fallbackImages[0];
+        @endphp
+
+        <section class="gallery" data-adventure-gallery aria-label="صور المغامرة">
+            <figure class="gallery-main">
+                <img id="gallery-main-image"
+                     src="{{ $mainGalleryImage }}"
+                     alt="{{ $adventure->title }}"
+                     loading="eager"
+                     fetchpriority="high">
+                <button type="button" class="gallery-expand" data-gallery-expand aria-label="عرض الصورة بالحجم الكامل">
+                    عرض الصورة
+                </button>
+                <span class="gallery-count">{{ count($galleryImages) }} صور</span>
+            </figure>
+
+            <div class="gallery-thumbnails" aria-label="صور مصغرة للمغامرة">
+                @foreach(array_slice($galleryImages, 0, 4) as $index => $galleryImage)
+                    <button type="button"
+                            class="gallery-thumbnail {{ $index === 0 ? 'is-active' : '' }}"
+                            data-gallery-src="{{ $galleryImage }}"
+                            aria-label="عرض الصورة رقم {{ $index + 1 }}">
+                        <img src="{{ $galleryImage }}" alt="{{ $adventure->title }} - صورة {{ $index + 1 }}" loading="lazy">
+                    </button>
                 @endforeach
             </div>
-            <div class="gallery-main">
-                @if($adventure->images->isNotEmpty())
-                    <img src="{{ asset('images/' . $adventure->images->first()->image_path) }}" alt="{{ $adventure->title }}">
-                @else
-                    <img src="https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200" alt="{{ $adventure->title }}">
-                @endif
-            </div>
         </section>
+
+        @if (session('booking_success'))
+            <div id="adventure-booking-success" class="adventure-booking-success-backdrop"
+                 role="dialog" aria-modal="true" aria-labelledby="adventure-booking-success-title">
+                <section class="adventure-booking-success-card" dir="rtl">
+                    <div class="adventure-booking-success-icon" aria-hidden="true">✓</div>
+                    <p class="adventure-booking-success-kicker">اكتمل الحجز</p>
+                    <h2 id="adventure-booking-success-title">تم إرسال طلبك بنجاح</h2>
+                    <p>{{ session('booking_success') }}</p>
+                    <button type="button" data-close-adventure-booking-success autofocus>متابعة التصفح</button>
+                </section>
+            </div>
+        @endif
 
         <div class="details-layout">
             <aside>
@@ -45,27 +93,39 @@
                     @if(session('error'))
                         <p class="booking-note text-red-600">{{ session('error') }}</p>
                     @endif
+                    @foreach ($errors->all() as $error)
+                        <p class="booking-note text-red-600" role="alert">{{ $error }}</p>
+                    @endforeach
 
+                    @if ($adventure->status !== 'Active' || $adventure->capacity < 1)
+                        <p class="booking-note">الحجز غير متاح لهذه المغامرة حاليًا.</p>
+                    @elseif (auth()->check() && auth()->user()->role !== 'Adventurer')
+                        <p class="booking-note">الحجز متاح لحسابات المغامرين فقط.</p>
+                    @elseif (!auth()->check())
+                        <a href="{{ route('login', ['redirect' => request()->fullUrl()]) }}"
+                           class="book-button block text-center">
+                            سجل دخولك لتأكيد الحجز
+                        </a>
+                    @elseif ($alreadyBooked)
+                        <div class="booking-note" role="status">سبق وقدّمت طلب حجز لهذه المغامرة. يمكنك متابعة حالته من صفحة حجوزاتي.</div>
+                        <a href="{{ route('bookings.index') }}" class="book-button block text-center">متابعة حالة الحجز</a>
+                    @else
                     <form action="{{ route('bookings.store') }}" method="POST" id="bookingForm">
                         @csrf
                         <input type="hidden" name="adventure_id" value="{{ $adventure->id }}">
 
-                        <label for="bookingDate" class="booking-label">تاريخ الرحلة</label>
-                        <input id="bookingDate" type="date" name="booking_date" class="booking-input"
-                               min="{{ date('Y-m-d') }}" required>
-
                         <label class="booking-label">عدد الأشخاص</label>
                         <div class="people-control">
                             <button type="button" id="increase" aria-label="زيادة عدد الأشخاص">+</button>
-                            <strong id="peopleCount">2</strong>
+                            <strong id="peopleCount">1</strong>
                             <button type="button" id="decrease" aria-label="تقليل عدد الأشخاص">−</button>
                         </div>
-                        <input type="hidden" name="participants_count" id="peopleInput" value="2">
+                        <input type="hidden" name="participants_count" id="peopleInput" value="1">
 
                         <div class="total">
                             <span>الإجمالي التقريبي</span>
                             <span class="total-price">
-                                <span id="totalPrice">{{ number_format($adventure->price * 2, 2) }}</span> د.أ
+                                <span id="totalPrice">{{ number_format($adventure->price, 2) }}</span> د.أ
                             </span>
                         </div>
 
@@ -74,6 +134,7 @@
                         </button>
                         <p class="booking-note">سيتم إنشاء الحجز والدفع المعلق تلقائيًا بعد التأكيد.</p>
                     </form>
+                    @endif
                 </div>
 
                 <div class="card benefits">
@@ -125,32 +186,20 @@
                     <p class="description">{{ $adventure->description }}</p>
                 </div>
 
-<<<<<<< HEAD
-                <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-                    <h2 class="mb-5 text-lg font-black">♧ برنامج الرحلة خطوة بخطوة</h2>
-                    <div class="space-y-5 border-r-2 border-emerald-100 pr-5">
+                <div class="card">
+                    <h2 class="section-title">♧ برنامج الرحلة خطوة بخطوة</h2>
+                    <div class="timeline">
                         @forelse ($adventure->days as $day)
-                            <div class="relative">
-                                <span class="absolute -right-[1.65rem] top-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-800 ring-2 ring-emerald-100"></span>
-                                <span class="text-xs font-bold text-orange-700">اليوم {{ $day->day_number }}</span>
-                                <h3 class="mt-1 font-bold">{{ $day->title }}</h3>
+                            <div class="timeline-item">
+                                <span class="timeline-time">اليوم {{ $day->day_number }}</span>
+                                <h3>{{ $day->title }}</h3>
                                 @if ($day->description)
-                                    <p class="mt-1 text-sm leading-6 text-slate-500">{{ $day->description }}</p>
+                                    <p>{{ $day->description }}</p>
                                 @endif
                             </div>
                         @empty
                             <p class="text-sm text-slate-500">لم تتم إضافة برنامج الرحلة بعد.</p>
                         @endforelse
-=======
-                <div class="card">
-                    <h2 class="section-title">♧ برنامج الرحلة خطوة بخطوة</h2>
-                    <div class="timeline">
-                        <div class="timeline-item"><span class="timeline-time">08:00 صباحاً</span><h3>التجمع والانطلاق</h3><p>الالتقاء بالمجموعة والانطلاق إلى موقع المغامرة.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">09:30 صباحاً</span><h3>الوصول والتعرف على المنطقة</h3><p>استكشاف المكان والتعرف على طبيعته وثقافته المحلية.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">10:15 صباحاً</span><h3>بدء النشاط الرئيسي</h3><p>الاستمتاع بالنشاط الأساسي والتجربة المقدمة من المنظم.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">12:00 ظهراً</span><h3>وجبة محلية واستراحة</h3><p>الاستمتاع بوجبة محلية وأخذ استراحة مع المجموعة.</p></div>
-                        <div class="timeline-item"><span class="timeline-time">02:00 ظهراً</span><h3>نهاية الرحلة والعودة</h3><p>اختتام التجربة والعودة من موقع المغامرة.</p></div>
->>>>>>> 1a08f9c506b76acdf41213bd291ee4e010e1d85b
                     </div>
                 </div>
             </section>

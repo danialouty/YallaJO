@@ -10,10 +10,6 @@
             'route' => 'communities.index',
         ],
         [
-            'label' => 'نظّم رحلة',
-            'route' => 'organizers.index',
-        ],
-        [
             'label' => 'عن يلا جو',
             'route' => 'about',
         ],
@@ -25,7 +21,7 @@
            bg-surface/95 shadow-sm backdrop-blur-md"
 >
     <div
-        class="mx-auto flex h-20 max-w-[1360px]
+        class="mx-auto flex h-14 max-w-[1360px]
                items-center justify-between gap-4
                px-4 sm:px-6 lg:px-12"
     >
@@ -135,14 +131,24 @@
                         ? route('adventurer.show')
                         : route('profile.edit');
                 @endphp
-                <a href="{{ $profileRoute }}"
-                   class="flex items-center gap-2 rounded-full border border-outline/40 bg-surface py-1 pl-3 pr-1 text-sm font-bold text-ink transition hover:border-brand/40 hover:bg-brand/5"
-                   aria-label="فتح ملف المستخدم">
-                    <span class="size-9 rounded-full bg-brand text-white flex items-center justify-center font-display text-base">
-                        {{ mb_substr(auth()->user()->name, 0, 1) }}
-                    </span>
-                    <span class="max-w-28 truncate">{{ auth()->user()->name }}</span>
-                </a>
+                <div class="flex items-center gap-2">
+                    <a href="{{ $profileRoute }}"
+                       class="flex items-center gap-2 rounded-full border border-outline/40 bg-surface py-1 pl-3 pr-1 text-sm font-bold text-ink transition hover:border-brand/40 hover:bg-brand/5"
+                       aria-label="فتح ملف المستخدم">
+                        <span class="size-9 rounded-full bg-brand text-white flex items-center justify-center font-display text-base">
+                            {{ mb_substr(auth()->user()->name, 0, 1) }}
+                        </span>
+                        <span class="max-w-28 truncate">{{ auth()->user()->name }}</span>
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit"
+                                class="min-h-11 rounded-control border border-outline/40 px-3 text-sm font-bold text-muted transition hover:border-danger/40 hover:bg-danger/5 hover:text-danger"
+                                aria-label="تسجيل الخروج">
+                            خروج
+                        </button>
+                    </form>
+                </div>
             @endauth
 
         </div>
@@ -234,6 +240,13 @@
                         </span>
                         <span>{{ auth()->user()->name }}</span>
                     </a>
+                    <form method="POST" action="{{ route('logout') }}" class="mt-1">
+                        @csrf
+                        <button type="submit"
+                                class="w-full rounded-control border border-outline/40 px-3 py-2 text-center text-sm font-bold text-danger hover:bg-danger/5">
+                            تسجيل الخروج
+                        </button>
+                    </form>
                 @endauth
 
             </nav>

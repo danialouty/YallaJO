@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\ActivityOrganizerFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +11,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class ActivityOrganizer extends Model
 {
+    /** @use HasFactory<ActivityOrganizerFactory> */
+    use HasFactory;
+    public const PENDING = 'Pending';
+    public const APPROVED = 'Approved';
+    public const REJECTED = 'Rejected';
+    public const BANNED = 'Banned';
+
+    public const ADVENTURE_GROUP = 'Adventure_group';
+    public const TOURISM_OFFICE = 'Tourism_office';
+
     protected $table = 'activity_organizers';
 
     protected $fillable = [

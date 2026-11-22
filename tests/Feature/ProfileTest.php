@@ -9,7 +9,10 @@ test('profile page is displayed', function () {
         ->actingAs($user)
         ->get('/profile');
 
-    $response->assertOk();
+    $response->assertOk()
+        ->assertSee('حذف الحساب من هذه الصفحة غير متاح')
+        ->assertDontSee('confirm-user-deletion', false)
+        ->assertDontSee('name="_method" value="delete"', false);
 });
 
 test('profile information can be updated', function () {
@@ -50,7 +53,7 @@ test('email verification status is unchanged when the email address is unchanged
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 
-test('user can delete their account', function () {
+test('self service account deletion is forbidden even with a valid password', function () {
     $user = User::factory()->create();
 
     $response = $this
@@ -59,27 +62,20 @@ test('user can delete their account', function () {
             'password' => 'password',
         ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
+    $response->assertForbidden();
 
-    $this->assertGuest();
-    $this->assertNull($user->fresh());
+    $this->assertAuthenticatedAs($user);
+    $this->assertModelExists($user);
 });
 
-test('correct password must be provided to delete account', function () {
+test('self service account deletion without a password is also forbidden', function () {
     $user = User::factory()->create();
 
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->delete('/profile', [
-            'password' => 'wrong-password',
-        ]);
+    $this->actingAs($user)
+        ->deleteJson(route('profile.destroy'))
+        ->assertForbidden()
+        ->assertJsonPath('message', 'حذف الحساب من هذه الصفحة غير متاح حفاظًا على سجلات الحجوزات والمدفوعات.');
 
-    $response
-        ->assertSessionHasErrorsIn('userDeletion', 'password')
-        ->assertRedirect('/profile');
-
-    $this->assertNotNull($user->fresh());
+    $this->assertAuthenticatedAs($user);
+    $this->assertModelExists($user);
 });

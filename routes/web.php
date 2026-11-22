@@ -1,26 +1,22 @@
 <?php
 
 use App\Http\Controllers\ActivityOrganizerController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AdminOrganizerController;
 use App\Http\Controllers\AdminFraudReportController;
-use App\Http\Controllers\ChatbotController;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdventureController;
-use App\Http\Controllers\AdventureDayController;
 use App\Http\Controllers\AdventureSchedulesController;
 use App\Http\Controllers\ImagesController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\CommunityMembershipController;
+use App\Http\Controllers\CommunityMessageController;
 
 
 
-
-Route::get('/', function () {
-    return view('welcome');
-});
 
 // Organizer Profile & Dashboard (Slice 1)
 Route::middleware(['auth'])->group(function () {
@@ -37,16 +33,43 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::resource('organizers', AdminOrganizerController::class)
-            ->only(['index', 'update', 'destroy']);
-
+        Route::get('/', DashboardController::class)->name('dashboard');
         Route::get('/reports', [AdminFraudReportController::class, 'index'])->name('reports.index');
         Route::patch('/reports/{review}/suspend', [AdminFraudReportController::class, 'suspendAdventure'])->name('reports.suspend');
         Route::patch('/reports/{review}/dismiss', [AdminFraudReportController::class, 'dismissReport'])->name('reports.dismiss');
+        Route::resource('organizers', AdminOrganizerController::class)
+            ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
+        Route::patch('organizers/{organizer}/profile', [AdminOrganizerController::class, 'updateProfile'])
+            ->whereNumber('organizer')->name('organizers.profile.update');
+        Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class)
+            ->only(['index', 'show']);
+        Route::where(['user' => '[0-9]+', 'adventure' => '[0-9]+', 'booking' => '[0-9]+', 'review' => '[0-9]+'])
+            ->group(function () {
+                Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except('destroy');
+                Route::resource('adventures', \App\Http\Controllers\Admin\AdventureController::class)->except('destroy');
+                Route::patch('adventures/{adventure}/suspend', [\App\Http\Controllers\Admin\AdventureController::class, 'suspend'])->name('adventures.suspend');
+                Route::resource('bookings', \App\Http\Controllers\Admin\BookingController::class)->only(['index', 'show', 'edit', 'update']);
+                Route::patch('bookings/{booking}/cancel', [\App\Http\Controllers\Admin\BookingController::class, 'cancel'])->name('bookings.cancel');
+                Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
+            });
     });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $user = auth()->user();
+
+    if ($user->isAdmin()) {
+        return redirect()->route('admin.organizers.index');
+    }
+
+    if ($user->role === 'Activity_Organizer') {
+        return redirect()->route(
+            $user->isApprovedOrganizer()
+            ? 'organizer.dashboard'
+            : 'organizers.index'
+        );
+    }
+
+    return redirect()->route('bookings.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -54,8 +77,6 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-Route::resource('bookings', BookingController::class)->middleware('auth');
 
 require __DIR__ . '/auth.php';
 use App\Http\Controllers\AdventurerController;
@@ -80,10 +101,11 @@ Route::get('/adventures/{adventure}/profile', [AdventureController::class, 'show
 
 
 Route::middleware(['auth', 'approved.organizer'])->group(function () {
+    Route::get('/adventures', [AdventureController::class, 'index'])->name('adventures.index');
     Route::resource('guides', GuidesController::class)
         ->only(['index', 'create', 'store', 'update']);
     Route::resource('guide-availabilities', GuidesAvailabilitiesController::class);
-    Route::resource('adventures', AdventureController::class);
+    Route::resource('adventures', AdventureController::class)->except('index');
     Route::post(
         '/adventure-schedules/{adventure_schedules}/days/generate',
         [AdventureSchedulesController::class, 'generateDays']
@@ -104,6 +126,13 @@ Route::middleware(['auth', 'approved.organizer'])->group(function () {
         ->name('schedules.update');
 
 });
+
+Route::get('/bookings', [BookingController::class, 'index'])
+    ->middleware(['auth', 'booking.viewer'])
+    ->name('bookings.index');
+Route::resource('bookings', BookingController::class)
+    ->except('index')
+    ->middleware(['auth', 'adventurer']);
 
 Route::middleware('auth')->controller(AdventurerController::class)->prefix('adventurer/profile')
     ->name('adventurer.')->group(function () {
@@ -154,9 +183,12 @@ Route::controller(ReviewController::class)
 
     });
 
-Route::resource('payments', PaymentController::class)
-    ->except(['create'])
-    ->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::resource('payments', PaymentController::class);
+    Route::get('/bookings/{bookingId}/payments', [PaymentController::class, 'showByBooking'])
+        ->whereNumber('bookingId')
+        ->name('payments.byBooking');
+});
 // Frontend preview - local development only
 if (app()->environment('local')) {
     Route::view('/ui-preview', 'pages.ui-preview')
@@ -187,13 +219,17 @@ if (app()->environment('local')) {
     )->name('auth.preview');
 
 }
-Route::resource('payments', PaymentController::class)->middleware('auth');
 
-    Route::get('/bookings/{bookingId}/payments',
-    [PaymentController::class, 'showByBooking']
-)->name('payments.byBooking');
-
-
-Route::post('/chatbot', [ChatbotController::class, 'chat'])
-    ->middleware('auth')
+Route::post('/chatbot', ['App\\Http\\Controllers\\ChatbotController', 'chat'])
     ->name('chatbot.chat');
+
+Route::resource('communities', CommunityController::class)
+    ->only(['index', 'show']);
+
+Route::middleware('auth')->group(function () {
+    Route::resource('communities.memberships', CommunityMembershipController::class)
+        ->only(['store', 'destroy']);
+
+    Route::resource('communities.messages', CommunityMessageController::class)
+        ->only(['store']);
+});

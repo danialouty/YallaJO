@@ -2,11 +2,21 @@
 
 namespace App\Models;
 
+use Database\Factories\AdventureSchedulesFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Adventure_schedules extends Model
 {
+    /** @use HasFactory<AdventureSchedulesFactory> */
+    use HasFactory;
+
+    protected static function newFactory(): AdventureSchedulesFactory
+    {
+        return AdventureSchedulesFactory::new();
+    }
+
     protected $table = 'adventure_schedules';
 
     protected $fillable = [

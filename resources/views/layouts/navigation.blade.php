@@ -15,9 +15,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+                    @can('viewAny', \App\Models\Payment::class)
+                    <x-nav-link :href="route(auth()->user()->isAdmin() ? 'admin.payments.index' : 'payments.index')" :active="request()->routeIs('payments.*', 'admin.payments.*')">
                         المدفوعات
                     </x-nav-link>
+                    @endcan
                     @if(auth()->check() && auth()->user()->isApprovedOrganizer())
                         <x-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
                             لوحة المرشد
@@ -88,9 +90,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.*')">
+            @can('viewAny', \App\Models\Payment::class)
+            <x-responsive-nav-link :href="route(auth()->user()->isAdmin() ? 'admin.payments.index' : 'payments.index')" :active="request()->routeIs('payments.*', 'admin.payments.*')">
                 المدفوعات
             </x-responsive-nav-link>
+            @endcan
             @if(auth()->check() && auth()->user()->isApprovedOrganizer())
                 <x-responsive-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
                     المرشدون
