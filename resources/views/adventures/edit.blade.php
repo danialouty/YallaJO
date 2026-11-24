@@ -35,7 +35,7 @@
                             @endforeach
                         </select>
                     </label>
-                    <label class="text-sm font-bold text-slate-700">الموقع<input class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="location" name="location" value="{{ old('location', $adventure->location) }}" required></label>
+                    <label class="text-sm font-bold text-slate-700">الموقع ونقطة التجمع<input class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="location" name="location" value="{{ old('location', $adventure->location) }}" required></label>
                     <label class="text-sm font-bold text-slate-700">المدة بالساعات<input class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="duration_hours" type="number" step="0.01" name="duration_hours" value="{{ old('duration_hours', $adventure->duration_hours) }}" required></label>
                     <label class="text-sm font-bold text-slate-700">السعر<input class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="price" type="number" step="0.01" name="price" value="{{ old('price', $adventure->price) }}" required></label>
                     <label class="text-sm font-bold text-slate-700">الحالة

@@ -29,7 +29,7 @@
             {{-- Adventure Category --}}
             <span
                 class="absolute right-3 top-3
-                       rounded-full bg-forest
+                       adventure-tag rounded-full
                        px-3 py-1.5 text-xs
                        font-semibold text-white"
             >

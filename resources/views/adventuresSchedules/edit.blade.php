@@ -22,6 +22,14 @@
                 class="grid gap-4 sm:grid-cols-2">
                 @csrf
                 @method('PUT')
+                @if ($adventure_schedules->adventure->days->isNotEmpty())
+                    <div class="sm:col-span-2">
+                        <button type="button" id="generate-itinerary"
+                            data-endpoint="{{ route('adventure-schedules.days.generate', $adventure_schedules) }}"
+                            class="rounded-lg bg-emerald-100 px-5 py-2.5 text-sm font-bold text-emerald-900 hover:bg-emerald-200">✦ أعد ملء الأيام بالذكاء الاصطناعي</button>
+                        <p id="ai-status" class="mt-2 text-sm text-slate-600" role="status" aria-live="polite"></p>
+                    </div>
+                @endif
                 <label class="text-sm font-bold text-slate-700 sm:col-span-2">المغامرة
                     <select name="adventure_id" required
                         class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
@@ -87,14 +95,6 @@
                             الآن.</p>
                     @endforelse
                 </div>
-                @if ($adventure_schedules->adventure->days->isNotEmpty())
-                    <div class="sm:col-span-2">
-                        <button type="button" id="generate-itinerary"
-                            data-endpoint="{{ route('adventure-schedules.days.generate', $adventure_schedules) }}"
-                            class="rounded-lg bg-emerald-100 px-5 py-2.5 text-sm font-bold text-emerald-900 hover:bg-emerald-200">✦ أعد ملء الأيام بالذكاء الاصطناعي</button>
-                        <p id="ai-status" class="mt-2 text-sm text-slate-600" role="status" aria-live="polite"></p>
-                    </div>
-                @endif
                 <div class="flex flex-wrap gap-3 sm:col-span-2">
                     <button type="submit"
                         class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">حفظ
