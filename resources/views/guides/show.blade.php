@@ -2,7 +2,7 @@
     <div dir="rtl" class="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
         <div class="flex items-center justify-between gap-4 mb-6">
             <div>
-                <a href="{{ route('guides.index') }}" class="text-sm font-semibold text-[#A94B2B]">← العودة إلى المرشدين</a>
+                <a href="{{ route('guides.index') }}" class="text-sm font-semibold text-[#9B7448]">← العودة إلى المرشدين</a>
                 <h1 class="mt-3 text-2xl font-extrabold text-gray-900">تفاصيل المرشد #{{ $guide->id }}</h1>
             </div>
             @if ($guide->status === 'Available')
@@ -13,7 +13,7 @@
         </div>
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="bg-[#2D5041] text-white p-6">
+            <div class="bg-[#3F6653] text-white p-6">
                 <p class="text-sm text-emerald-100">المنظم المسؤول</p>
                 <p class="text-2xl font-extrabold mt-1">{{ $guide->activityOrganizer?->user?->name ?? 'غير مرتبط بمنظم' }}</p>
             </div>
@@ -30,7 +30,7 @@
                     <p class="text-xs text-gray-500 mb-2">التخصصات</p>
                     <div class="flex flex-wrap gap-2">
                         @foreach ($guide->specialization ?? [] as $specialty)
-                            <span class="px-3 py-1 rounded-lg bg-[#E8F1ED] text-[#2D5041] text-xs font-bold">{{ $specialty }}</span>
+                            <span class="px-3 py-1 rounded-lg bg-[#EEF4F0] text-[#3F6653] text-xs font-bold">{{ $specialty }}</span>
                         @endforeach
                     </div>
                 </div>
@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                <a href="{{ route('guides.edit', $guide->id) }}" class="px-5 py-2.5 bg-[#E8F1ED] hover:bg-[#d5e6de] text-[#2D5041] font-bold text-sm rounded-xl">تعديل المرشد</a>
+                <a href="{{ route('guides.edit', $guide->id) }}" class="px-5 py-2.5 bg-[#EEF4F0] hover:bg-[#DCE9E1] text-[#3F6653] font-bold text-sm rounded-xl">تعديل المرشد</a>
             </div>
         </div>
     </div>

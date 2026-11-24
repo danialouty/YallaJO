@@ -17,7 +17,7 @@
 @endphp
 
 <header
-    class="sticky top-0 z-50 border-b border-outline/30
+    class="site-navbar sticky top-0 z-50 border-b border-outline/30
            bg-surface/95 shadow-sm backdrop-blur-md"
 >
     <div
@@ -109,7 +109,7 @@
                 @if (Route::has('register'))
                     <a
                         href="{{ route('register') }}"
-                        class="rounded-control bg-brand px-4 py-2
+                        class="landing-action rounded-control bg-brand px-4 py-2
                                text-sm font-semibold text-white
                                transition-colors hover:bg-brand-dark"
                     >
@@ -215,7 +215,7 @@
                     @if (Route::has('register'))
                         <a
                             href="{{ route('register') }}"
-                            class="rounded-control bg-brand px-3 py-2
+                            class="landing-action rounded-control bg-brand px-3 py-2
                                    text-center text-sm text-white"
                         >
                             حساب جديد

@@ -13,10 +13,10 @@
                 </div>
             @endif
             <nav class="mb-6 flex flex-wrap gap-4 text-sm font-bold">
-                <a href="{{ route('adventure-schedules.index') }}" class="text-orange-700 hover:text-orange-900">العودة
+                <a href="{{ route('adventure-schedules.index') }}" class="text-brand hover:text-brand-dark">العودة
                     إلى المواعيد</a>
                 <a href="{{ route('adventure-schedules.edit', $schedule) }}"
-                    class="text-orange-700 hover:text-orange-900">تعديل الموعد</a>
+                    class="text-brand hover:text-brand-dark">تعديل الموعد</a>
             </nav>
 
             <h1 class="text-2xl font-black text-slate-900">{{ $schedule->adventure->title }}</h1>

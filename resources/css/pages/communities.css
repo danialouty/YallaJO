@@ -1,8 +1,17 @@
 .communities-hero {
+    display: flex;
+    min-height: 360px;
+    align-items: center;
     background:
-        radial-gradient(circle at 78% 20%, rgba(241, 184, 75, 0.16), transparent 18rem),
-        linear-gradient(135deg, rgba(33, 61, 50, 0.96), rgba(63, 102, 83, 0.82)),
-        url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=85') center 58% / cover no-repeat;
+        radial-gradient(circle at 78% 20%, rgba(241, 184, 75, 0.12), transparent 18rem),
+        linear-gradient(135deg, rgba(17, 28, 45, 0.68), rgba(17, 28, 45, 0.38)),
+        url('https://photos.altai-travel.com/1280x0/jordanie-wadi-rum-11445.jpg') center 58% / cover no-repeat;
+}
+
+@media (min-width: 640px) {
+    .communities-hero {
+        min-height: 392px;
+    }
 }
 
 .community-detail-cover {
@@ -38,7 +47,7 @@
 
 .community-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(164, 55, 22, 0.28);
+    border-color: rgba(27, 67, 50, 0.28);
     box-shadow: 0 16px 38px rgba(35, 48, 64, 0.12);
 }
 
@@ -46,7 +55,7 @@
     position: relative;
     height: 180px;
     background:
-        linear-gradient(135deg, rgba(63, 102, 83, 0.88), rgba(164, 55, 22, 0.72)),
+        linear-gradient(135deg, rgba(63, 102, 83, 0.88), rgba(27, 67, 50, 0.72)),
         #3f6653;
 }
 
@@ -70,6 +79,6 @@
 }
 
 .community-message-own {
-    border-color: rgba(164, 55, 22, 0.18);
+    border-color: rgba(27, 67, 50, 0.18);
     background: #fffaf7;
 }

@@ -63,6 +63,8 @@
                         <div class="community-cover">
                             @if ($community->cover_image)
                                 <img src="{{ $community->cover_image }}" alt="{{ $community->name }}" class="h-full w-full object-cover">
+                            @else
+                                <img src="https://photos.altai-travel.com/1280x0/jordanie-wadi-rum-11445.jpg" alt="مجموعة مغامرين في وادي رم" class="h-full w-full object-cover">
                             @endif
                         </div>
                         <div class="p-5">

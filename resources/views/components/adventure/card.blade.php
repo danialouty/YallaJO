@@ -36,17 +36,6 @@
                 {{ $adventure['category'] }}
             </span>
 
-            {{-- Decorative Favorite Icon --}}
-            <span
-                class="absolute left-3 top-3
-                       flex size-9 items-center justify-center
-                       rounded-full bg-white/95
-                       text-xl text-ink shadow-sm"
-                aria-hidden="true"
-            >
-                ♡
-            </span>
-
             {{-- Availability Preview --}}
             <span
                 class="absolute bottom-3 left-3
@@ -143,7 +132,7 @@
 
                 @if (!empty($adventure['id']))
                     <a href="{{ route('adventures.profile', $adventure['id']) }}"
-                       class="inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-dark">
+                       class="landing-action inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-4 py-2 text-sm font-bold text-white transition hover:bg-brand-dark">
                         احجز الآن
                     </a>
                 @else

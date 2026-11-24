@@ -21,6 +21,7 @@
           data-capacity="{{ $adventure->capacity }}">
         @php
             $galleryImages = $adventure->images
+                ->take(4)
                 ->map(fn ($image) => asset('images/' . $image->image_path))
                 ->values()
                 ->all();
@@ -168,7 +169,7 @@
                              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160"
                              alt="منظم المغامرة">
                         <div>
-                            <h3>{{ $adventure->organizer_name ?? 'منظم الرحلة' }}</h3>
+                            <h3>{{ $adventure->activityOrganizer?->user?->name ?? 'منظم الرحلة' }}</h3>
                             <p>منظم المغامرة · الأردن</p>
                         </div>
                     </div>

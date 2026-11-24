@@ -21,31 +21,35 @@
 @import "./pages/communities.css";
 @import "./pages/about.css";
 
-[x-cloak] {
-    display: none !important;
-}
-
-/* Keep all primary public actions on one brand-red color. */
-.bg-brand,
+/* Filled brand and dark actions must keep a readable white label. */
+a.bg-brand,
 button.bg-brand,
-a.bg-brand {
-    background-color: #a94b2b !important;
-}
-
-.hover\:bg-brand-dark:hover,
-button.bg-brand:hover,
-a.bg-brand:hover {
-    background-color: #8e3d22 !important;
-}
-
-/* Public white action buttons should not visually blend into cards. */
-button.bg-white,
-a.bg-white {
-    background-color: #a94b2b !important;
+a.bg-ink,
+button.bg-ink,
+a.bg-forest,
+button.bg-forest {
     color: #fff !important;
 }
 
-button.bg-white:hover,
-a.bg-white:hover {
-    background-color: #8e3d22 !important;
+.footer-social-link {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    border: 1px solid rgb(255 255 255 / 35%);
+    border-radius: 999px;
+    padding: 0.5rem 0.9rem;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.footer-social-link:hover,
+.footer-social-link:focus-visible {
+    border-color: #fff;
+    background: rgb(255 255 255 / 14%);
+}
+
+[x-cloak] {
+    display: none !important;
 }

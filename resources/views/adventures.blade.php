@@ -123,7 +123,7 @@
                 @endforelse
             </div>
 
-            <div class="mt-8">{{ $adventures->links() }}</div>
+            <div class="adventures-pagination mt-8">{{ $adventures->links() }}</div>
         </div>
     </main>
 @endsection

@@ -87,14 +87,14 @@
 
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-xs text-gray-500 font-medium">الحجوزات المؤكدة</p>
-                <p class="text-2xl font-extrabold text-[#2D5041] mt-2">
+                <p class="text-2xl font-extrabold text-[#3F6653] mt-2">
                     {{ $data->where('status', 'Confirmed')->count() }}
                 </p>
             </div>
 
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-xs text-gray-500 font-medium">إجمالي قيمة الحجوزات</p>
-                <p class="text-2xl font-extrabold text-[#A94B2B] mt-2">
+                <p class="text-2xl font-extrabold text-[#9B7448] mt-2">
                     {{ number_format($data->sum('total_amount'), 2) }} <span class="text-xs font-normal">د.أ</span>
                 </p>
             </div>
@@ -183,7 +183,7 @@
                                                     data-title="{{ $booking->adventure->title ?? 'مغامرة #' . $booking->adventure_id }}"
                                                     data-unit-price="{{ $booking->unit_price }}"
                                                     data-count="{{ $booking->participants_count }}"
-                                                    class="px-3 py-1.5 text-xs font-semibold bg-[#E8F1ED] hover:bg-[#d5e6de] text-[#2D5041] rounded-lg transition cursor-pointer">
+                                                    class="px-3 py-1.5 text-xs font-semibold bg-[#EEF4F0] hover:bg-[#DCE9E1] text-[#3F6653] rounded-lg transition cursor-pointer">
                                                 تعديل
                                             </button>
                                         @endif
@@ -207,7 +207,7 @@
                                 <td colspan="{{ $isOrganizer ? 7 : 6 }}" class="py-12 text-center">
                                     <p class="text-gray-500 font-medium mb-3">لا يوجد لديك أي حجوزات حالياً</p>
                                     @unless ($isOrganizer)
-                                        <button type="button" data-open-create-modal class="text-sm font-bold text-[#A94B2B] underline cursor-pointer">
+                                        <button type="button" data-open-create-modal class="text-sm font-bold text-[#9B7448] underline cursor-pointer">
                                             احجز مغامرتك الأولى الآن
                                         </button>
                                     @endunless
@@ -222,7 +222,7 @@
         <!-- ==================== POP-UP 1: إنشاء حجز جديد ==================== -->
         <div id="createBookingModal" class="booking-modal-backdrop {{ $errors->any() && !old('_method') ? '' : 'hidden' }}">
             <div class="booking-modal-card">
-                <div class="bg-[#2D5041] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#3F6653] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="font-bold text-lg">حجز مغامرة جديدة</h3>
                     <button type="button" data-close-create-modal class="text-white/70 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
                 </div>
@@ -243,7 +243,7 @@
                     <div>
                         <label for="create_adventure_id" class="block text-sm font-bold text-gray-700 mb-1.5">اختر المغامرة</label>
                         <select name="adventure_id" id="create_adventure_id" required
-                                class="w-full rounded-xl border-gray-300 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
+                                class="w-full rounded-xl border-gray-300 text-sm focus:border-[#3F6653] focus:ring-[#3F6653]">
                             <option value="" data-price="0">-- اختر من المغامرات المتاحة --</option>
                             @foreach ($adventures as $adventure)
                                 <option value="{{ $adventure->id }}"
@@ -267,7 +267,7 @@
 
                     <div class="bg-[#F8F9FA] p-4 rounded-xl border border-gray-200 flex items-center justify-between">
                         <span class="text-sm text-gray-600 font-medium">الإجمالي المطلوب:</span>
-                        <span class="text-xl font-extrabold text-[#A94B2B]">
+                        <span class="text-xl font-extrabold text-[#9B7448]">
                             <span id="create_total_amount">0.00</span> دينار أردني
                         </span>
                     </div>
@@ -287,7 +287,7 @@
         <!-- ==================== POP-UP 2: تعديل الحجز ==================== -->
         <div id="editBookingModal" class="booking-modal-backdrop hidden">
             <div class="booking-modal-card">
-                <div class="bg-[#2D5041] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#3F6653] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="font-bold text-lg">تعديل الحجز <span id="edit_booking_id_label"></span></h3>
                     <button type="button" data-close-edit-modal class="text-white/70 hover:text-white text-2xl leading-none cursor-pointer">&times;</button>
                 </div>
@@ -320,7 +320,7 @@
 
                     <div class="bg-[#F8F9FA] p-4 rounded-xl border border-gray-200 flex items-center justify-between">
                         <span class="text-sm text-gray-600 font-medium">الإجمالي بعد التعديل:</span>
-                        <span class="text-xl font-extrabold text-[#2D5041]">
+                        <span class="text-xl font-extrabold text-[#3F6653]">
                             <span id="edit_total_amount">0.00</span> دينار أردني
                         </span>
                     </div>

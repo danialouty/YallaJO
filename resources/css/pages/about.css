@@ -49,7 +49,7 @@
     bottom: -42px;
     width: 112px;
     height: 112px;
-    border: 16px solid rgba(164, 55, 22, 0.055);
+    border: 16px solid rgba(27, 67, 50, 0.055);
     border-radius: 50%;
 }
 
@@ -67,7 +67,7 @@
     top: 50%;
     z-index: 2;
     width: 38px;
-    border-top: 1px dashed rgba(164, 55, 22, 0.35);
+    border-top: 1px dashed rgba(27, 67, 50, 0.35);
 }
 
 .about-cta {

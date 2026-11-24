@@ -1,6 +1,6 @@
 
 <footer
-    class="w-full bg-forest text-white"
+    class="w-full bg-ink text-white {{ request()->routeIs('home') ? 'landing-reveal' : '' }}"
     aria-label="تذييل الموقع"
 >
     <div
@@ -112,62 +112,27 @@
             </section>
 
 
-            {{-- 4. Newsletter --}}
+            {{-- 4. Social links --}}
             <section
                 class="space-y-4"
-                aria-labelledby="footer-newsletter"
+                aria-labelledby="footer-contact"
             >
                 <h2
-                    id="footer-newsletter"
+                    id="footer-contact"
                     class="font-display text-lg font-bold"
                 >
-                    النشرة البريدية للمغامرين
+                    تواصل معنا عبر
                 </h2>
 
                 <p class="text-sm leading-7 text-white/80">
-                    تابع آخر المغامرات والأنشطة
-                    والعروض الجديدة في الأردن.
+                    تابع يلا جو واكتشف آخر المغامرات والأنشطة في الأردن.
                 </p>
 
-                <div class="flex flex-col gap-2">
-
-                    <label
-                        for="newsletter-email"
-                        class="text-sm text-white/80"
-                    >
-                        البريد الإلكتروني
-                    </label>
-
-                    <input
-                        type="email"
-                        id="newsletter-email"
-                        name="newsletter_email"
-                        placeholder="example@email.com"
-                        disabled
-                        class="w-full rounded-control
-                               border border-white/30
-                               bg-white px-4 py-3
-                               text-sm text-ink
-                               opacity-70
-                               cursor-not-allowed"
-                    >
-
-                    <button
-                        type="button"
-                        disabled
-                        class="rounded-control bg-brand
-                               px-5 py-3 text-sm
-                               font-semibold text-white
-                               opacity-60 cursor-not-allowed"
-                    >
-                        اشترك
-                    </button>
-
-                    <p class="text-xs text-white/60">
-                        الاشتراك بالبريد الإلكتروني قيد التطوير.
-                    </p>
-
-                </div>
+                <nav class="flex flex-wrap gap-3" aria-label="حسابات يلا جو على مواقع التواصل">
+                    <a href="https://www.instagram.com/yallajo/" target="_blank" rel="noopener noreferrer" class="footer-social-link">Instagram</a>
+                    <a href="https://www.facebook.com/yallajo/" target="_blank" rel="noopener noreferrer" class="footer-social-link">Facebook</a>
+                    <a href="https://www.tiktok.com/@yallajo" target="_blank" rel="noopener noreferrer" class="footer-social-link">TikTok</a>
+                </nav>
             </section>
 
         </div>

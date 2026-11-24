@@ -5,7 +5,7 @@
                 <h1 class="text-2xl font-black text-slate-900">مواعيد المغامرات</h1>
                 <p class="mt-1 text-sm text-slate-500">استعرض المواعيد أو صفّها حسب المغامرة.</p>
             </div>
-            <a href="{{ route('adventure-schedules.create') }}" class="rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-800">＋ إضافة موعد</a>
+            <a href="{{ route('adventure-schedules.create') }}" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark">＋ إضافة موعد</a>
             @if (session('success'))
                 <div class="w-full rounded-lg bg-emerald-100 px-4 py-3 text-sm font-semibold text-emerald-900" role="status">{{ session('success') }}</div>
             @endif
@@ -14,7 +14,7 @@
         <form action="{{ route('adventure-schedules.index') }}" method="GET" class="flex flex-col gap-3 rounded-2xl bg-white p-5 shadow-sm sm:flex-row sm:items-end">
             <label for="adventure_id" class="flex-1 text-sm font-bold text-slate-700">
                 تصفية حسب المغامرة
-                <select id="adventure_id" name="adventure_id" class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
+                <select id="adventure_id" name="adventure_id" class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand">
                     <option value="">كل المغامرات</option>
                     @foreach ($adventures as $adventure)
                         <option value="{{ $adventure->id }}" @selected((string) request('adventure_id') === (string) $adventure->id)>{{ $adventure->title }}</option>
@@ -22,7 +22,7 @@
                 </select>
             </label>
             <div class="flex gap-2">
-                <button type="submit" class="rounded-lg bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-900">تصفية</button>
+                <button type="submit" class="rounded-lg bg-forest px-5 py-2.5 text-sm font-bold text-white hover:bg-forest/90">تصفية</button>
                 <a href="{{ route('adventure-schedules.index') }}" class="rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200">مسح</a>
             </div>
         </form>
@@ -54,7 +54,7 @@
                             <td class="whitespace-nowrap px-5 py-4">
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('adventure-schedules.show', $schedule) }}" class="rounded-md bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200">عرض</a>
-                                    <a href="{{ route('adventure-schedules.edit', $schedule) }}" class="rounded-md bg-orange-100 px-3 py-2 text-xs font-bold text-orange-800 hover:bg-orange-200">تعديل</a>
+                                    <a href="{{ route('adventure-schedules.edit', $schedule) }}" class="rounded-md bg-brand/10 px-3 py-2 text-xs font-bold text-brand-dark hover:bg-brand/15">تعديل</a>
                                     <form action="{{ route('adventure-schedules.destroy', $schedule) }}" method="POST" data-confirm="هل تريد حذف هذا الموعد؟">
                                         @csrf
                                         @method('DELETE')

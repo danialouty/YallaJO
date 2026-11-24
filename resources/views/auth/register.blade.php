@@ -9,11 +9,17 @@
 
         <div>
             <label for="role" class="mb-1 block text-sm font-bold text-gray-700">نوع الحساب</label>
-            <select id="role" name="role" required
-                class="w-full rounded-xl border-gray-300 px-3.5 py-2.5 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
-                <option value="Adventurer" @selected(old('role', $role) === 'Adventurer')>مغامر</option>
-                <option value="Activity_Organizer" @selected(old('role', $role) === 'Activity_Organizer')>منظّم مغامرات</option>
-            </select>
+            <div class="relative">
+                <select id="role" name="role" required
+                    class="w-full rounded-xl border-gray-300 py-2.5 pe-3.5 ps-11 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]"
+                    style="appearance: none; background-image: none; padding-left: 2.75rem; padding-right: 0.875rem;">
+                    <option value="Adventurer" @selected(old('role', $role) === 'Adventurer')>مغامر</option>
+                    <option value="Activity_Organizer" @selected(old('role', $role) === 'Activity_Organizer')>منظّم مغامرات</option>
+                </select>
+                <svg class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                </svg>
+            </div>
             @error('role')<p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>@enderror
         </div>
 
@@ -50,11 +56,17 @@
             <legend class="px-2 text-sm font-bold text-gray-700">بيانات المنظّم المطلوبة للمراجعة</legend>
             <div>
                 <label for="organizer_type" class="mb-1 block text-sm font-bold text-gray-700">نوع المنظّم</label>
-                <select id="organizer_type" name="organizer_type"
-                    class="w-full rounded-xl border-gray-300 px-3.5 py-2.5 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]">
-                    <option value="Tourism_office" @selected(old('organizer_type') === 'Tourism_office')>مكتب سياحي</option>
-                    <option value="Adventure_group" @selected(old('organizer_type') === 'Adventure_group')>مجموعة مغامرات</option>
-                </select>
+                <div class="relative">
+                    <select id="organizer_type" name="organizer_type"
+                        class="w-full rounded-xl border-gray-300 py-2.5 pe-3.5 ps-11 text-sm focus:border-[#2D5041] focus:ring-[#2D5041]"
+                        style="appearance: none; background-image: none; padding-left: 2.75rem; padding-right: 0.875rem;">
+                        <option value="Tourism_office" @selected(old('organizer_type') === 'Tourism_office')>مكتب سياحي</option>
+                        <option value="Adventure_group" @selected(old('organizer_type') === 'Adventure_group')>مجموعة مغامرات</option>
+                    </select>
+                    <svg class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                    </svg>
+                </div>
                 @error('organizer_type')<p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>@enderror
             </div>
             <div id="organizer-license-field">
