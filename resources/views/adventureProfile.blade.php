@@ -150,7 +150,7 @@
                         <div>
                             <div class="badges">
                                 <span class="badge badge-green">✦ تجربة محلية</span>
-                                <span class="badge badge-orange">{{ $adventure->category }}</span>
+                                <span class="badge badge-green">{{ $adventure->category }}</span>
                             </div>
                             <h1>{{ $adventure->title }}</h1>
                             <p class="location">📍 {{ $adventure->location }}، الأردن</p>
@@ -172,14 +172,54 @@
                             <p>منظم المغامرة · الأردن</p>
                         </div>
                     </div>
-                    <a href="#" class="contact-button">تواصل مع المنظم</a>
+                    @php($organizerUser = $adventure->activityOrganizer?->user)
+                    @if ($organizerUser?->phone_number)
+                        <a href="https://wa.me/{{ preg_replace('/\\D+/', '', $organizerUser->phone_number) }}" class="contact-button" target="_blank" rel="noopener">تواصل مع المنظم</a>
+                    @elseif ($organizerUser?->email)
+                        <a href="mailto:{{ $organizerUser->email }}" class="contact-button">تواصل مع المنظم</a>
+                    @else
+                        <span class="contact-button" aria-disabled="true">لا تتوفر بيانات تواصل</span>
+                    @endif
                 </div>
 
                 <div class="features">
                     <div class="feature"><div class="feature-icon">⏱</div><small>مدة المغامرة</small><strong>{{ $adventure->duration_hours }} ساعات</strong></div>
                     <div class="feature"><div class="feature-icon">🥾</div><small>مستوى الصعوبة</small><strong>{{ $adventure->difficulty_level ?? 'متوسط' }}</strong></div>
                     <div class="feature"><div class="feature-icon">👥</div><small>السعة القصوى</small><strong>{{ $adventure->capacity }} شخص</strong></div>
-                    <div class="feature"><div class="feature-icon">📍</div><small>الموقع</small><strong>{{ $adventure->location }}</strong></div>
+                    <div class="feature"><div class="feature-icon">📍</div><small>نقطة تجمع المغامرين</small><strong>{{ $adventure->location }}</strong></div>
+                </div>
+
+                @php($meetingPointQuery = $adventure->location . ', الأردن')
+                <section class="card meeting-point-card" aria-labelledby="meeting-point-title">
+                    <div class="meeting-point-heading">
+                        <div>
+                            <h2 id="meeting-point-title" class="section-title">🗺️ خريطة نقطة التجمع</h2>
+                            <p class="description">{{ $adventure->location }}، الأردن</p>
+                        </div>
+                        <a class="contact-button" href="https://www.google.com/maps/search/?api=1&amp;query={{ urlencode($meetingPointQuery) }}" target="_blank" rel="noopener">الاتجاهات</a>
+                    </div>
+                    <iframe class="meeting-point-map"
+                            src="https://www.google.com/maps?q={{ urlencode($meetingPointQuery) }}&amp;output=embed"
+                            title="خريطة نقطة التجمع: {{ $adventure->location }}"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen></iframe>
+                </section>
+
+                <div class="card">
+                    <h2 class="section-title">📅 مواعيد المغامرة وجداول المرشدين</h2>
+                    <div class="adventure-schedules">
+                        @forelse ($adventure->schedules as $schedule)
+                            <article class="adventure-schedule">
+                                <div><small>تاريخ المغامرة</small><strong>{{ $schedule->starts_at?->translatedFormat('l، j F Y') ?? 'غير محدد' }}</strong></div>
+                                <div><small>الوقت</small><strong>{{ $schedule->starts_at?->format('H:i') ?? '—' }} – {{ $schedule->ends_at?->format('H:i') ?? '—' }}</strong></div>
+                                <div><small>المرشد</small><strong>{{ $schedule->guide?->activityOrganizer?->user?->name ?? 'سيتم تحديده' }}</strong></div>
+                                <div><small>نقطة التجمع</small><strong>{{ $adventure->location }}</strong></div>
+                            </article>
+                        @empty
+                            <p class="description">لم تُحدد مواعيد لهذه المغامرة بعد.</p>
+                        @endforelse
+                    </div>
                 </div>
 
                 <div class="card">

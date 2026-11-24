@@ -105,24 +105,8 @@
 }
 
 .adventure-category {
-    background: #3f6653;
+    background: #1b4332;
     box-shadow: 0 8px 18px rgba(17, 28, 45, 0.16);
-}
-
-.adventure-category {
-    background: linear-gradient(135deg, #3f6653, #1b4332);
-}
-
-.adventure-card:nth-child(3n + 1) .adventure-category {
-    background: linear-gradient(135deg, #a43716, #d97706);
-}
-
-.adventure-card:nth-child(3n + 2) .adventure-category {
-    background: linear-gradient(135deg, #3f6653, #1b4332);
-}
-
-.adventure-card:nth-child(3n) .adventure-category {
-    background: linear-gradient(135deg, #2f5f82, #4e8aa8);
 }
 
 .adventure-card:hover img {

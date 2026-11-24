@@ -167,7 +167,10 @@ class AdventureController extends Controller
 
     public function showProfile(Adventure $adventure)
     {
-        $adventure->load(['images', 'days']);
+        $adventure->load(['images', 'days', 'activityOrganizer.user', 'schedules' => fn ($query) => $query
+            ->where('status', 'Active')
+            ->with('guide.activityOrganizer.user')
+            ->orderBy('starts_at')]);
         $alreadyBooked = auth()->check()
             && auth()->user()->role === 'Adventurer'
             && $adventure->bookings()->whereHas('adventurer', fn ($query) => $query->where('user_id', auth()->id()))->exists();

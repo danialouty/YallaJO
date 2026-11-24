@@ -24,7 +24,7 @@
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">الوصف<textarea
                             class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
                             name="description" rows="4" required>{{ old('description') }}</textarea></label>
-                    <label class="text-sm font-bold text-slate-700">الصعوبة
+                    <label class="text-sm foبnt-bold text-slate-700">الصعوبة
                         <select
                             class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
                             name="difficulty_level" required>
@@ -47,7 +47,7 @@
                             @endforeach
                         </select>
                     </label>
-                    <label class="text-sm font-bold text-slate-700">الموقع<input
+                    <label class="text-sm font-bold text-slate-700">الموقع ونقطة التجمع<input
                             class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
                             name="location" value="{{ old('location') }}" required></label>
                     <label class="text-sm font-bold text-slate-700">المدة بالساعات<input

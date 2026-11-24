@@ -16,6 +16,11 @@
     flex-direction: column;
 }
 
+.chatbot-at-top .chatbot-panel {
+    top: 74px;
+    bottom: auto;
+}
+
 .chatbot-header {
     display: flex;
     align-items: center;
