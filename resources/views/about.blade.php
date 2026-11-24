@@ -53,20 +53,17 @@
         </div>
     </section>
 
-    <section id="about-values" class="bg-canvas py-16 md:py-20">
-        <div class="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
-            <div class="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+    <section id="about-values" class="bg-canvas py-0">
+        <div class="mx-auto w-full max-w-[1360px]">
+            <div class="about-story-grid grid overflow-hidden lg:grid-cols-2">
                 <div class="about-story-image relative">
-                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1100&q=86"
-                         alt="مسارات طبيعية في جبال الأردن"
+                    <img src="https://panorama.solutions/sites/default/files/mjmwt_syhy_.jpg"
+                         alt="مجموعة من المغامرين في محمية غابات عجلون"
                          loading="lazy">
-                    <div class="absolute bottom-5 right-5 max-w-xs rounded-card border border-white/25 bg-ink/85 p-4 text-white backdrop-blur-sm">
-                        <p class="text-xs font-bold text-[#f1b84b]">من نحن</p>
-                        <p class="mt-2 text-sm leading-7 text-white/90">منصة أردنية تربطك بأهل المكان وتجاربهم الأصيلة.</p>
-                    </div>
+                    <div class="about-story-image-fade" aria-hidden="true"></div>
                 </div>
 
-                <div>
+                <div class="about-story-copy flex flex-col justify-center p-6 sm:p-10 lg:p-12">
                     <p class="text-sm font-bold text-brand">قصتنا</p>
                     <h2 class="mt-3 max-w-xl font-display text-3xl font-bold leading-snug text-ink sm:text-4xl">
                         مغامرة تبدأ من المكان وأهلها
