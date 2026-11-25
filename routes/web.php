@@ -37,20 +37,20 @@ Route::middleware(['auth', 'admin'])
         Route::get('/reports', [AdminFraudReportController::class, 'index'])->name('reports.index');
         Route::patch('/reports/{review}/suspend', [AdminFraudReportController::class, 'suspendAdventure'])->name('reports.suspend');
         Route::patch('/reports/{review}/dismiss', [AdminFraudReportController::class, 'dismissReport'])->name('reports.dismiss');
-        Route::resource('organizers', AdminOrganizerController::class)
-            ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
-        Route::patch('organizers/{organizer}/profile', [AdminOrganizerController::class, 'updateProfile'])
-            ->whereNumber('organizer')->name('organizers.profile.update');
+        Route::resource('communities', \App\Http\Controllers\Admin\CommunityController::class)
+            ->parameters(['communities' => 'community']);
+        Route::resource('organizers', AdminOrganizerController::class)->only(['index', 'show']);
         Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class)
             ->only(['index', 'show']);
         Route::where(['user' => '[0-9]+', 'adventure' => '[0-9]+', 'booking' => '[0-9]+', 'review' => '[0-9]+'])
             ->group(function () {
-                Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except('destroy');
+                Route::resource('users', \App\Http\Controllers\Admin\UserController::class)
+                    ->only(['index', 'create', 'store', 'show']);
                 Route::resource('adventures', \App\Http\Controllers\Admin\AdventureController::class)->except('destroy');
                 Route::patch('adventures/{adventure}/suspend', [\App\Http\Controllers\Admin\AdventureController::class, 'suspend'])->name('adventures.suspend');
                 Route::resource('bookings', \App\Http\Controllers\Admin\BookingController::class)->only(['index', 'show', 'edit', 'update']);
                 Route::patch('bookings/{booking}/cancel', [\App\Http\Controllers\Admin\BookingController::class, 'cancel'])->name('bookings.cancel');
-                Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
+                Route::resource('reviews', \App\Http\Controllers\Admin\ReviewController::class)->only(['index', 'show', 'destroy']);
             });
     });
 

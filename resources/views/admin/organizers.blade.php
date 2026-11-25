@@ -1,6 +1,4 @@
 @extends('layouts.dashboard')
-@use('App\Models\ActivityOrganizer')
-
 @section('title', 'إدارة المنظّمين | يلا جو')
 @section('dashboard-theme', 'admin')
 @section('dashboard-name', 'لوحة الإدارة')
@@ -8,19 +6,6 @@
 
 @section('content')
     <div class="space-y-6 pb-8">
-        <x-admin.action-link :href="route('admin.organizers.create')">إضافة ملف منظّم</x-admin.action-link>
-        @if (session('status'))
-            <p role="status" class="rounded-control border border-forest/30 bg-forest/10 p-4 text-sm text-forest">{{ session('status') }}</p>
-        @endif
-
-        @if (session('error'))
-            <p role="alert" class="rounded-control border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{{ session('error') }}</p>
-        @endif
-
-        @error('approval_status')
-            <p role="alert" class="rounded-control border border-danger/30 bg-danger/5 p-4 text-sm text-danger">{{ $message }}</p>
-        @enderror
-
         <x-ui.card padding="lg">
             <form action="{{ route('admin.organizers.index') }}" method="GET" class="grid gap-4 sm:grid-cols-2">
                 <x-ui.input name="search" id="organizer-search" label="البحث عن منظّم"
@@ -56,21 +41,13 @@
                         <caption class="sr-only">سجلات المنظّمين وحالات الاعتماد</caption>
                         <thead class="bg-canvas text-ink">
                             <tr>
-                                @foreach (['حساب المنظّم', 'النوع والترخيص', 'الحالة', 'آخر اعتماد', 'الإجراءات'] as $heading)
+                                @foreach (['حساب المنظّم', 'النوع والترخيص', 'الحالة', 'آخر اعتماد', 'التفاصيل'] as $heading)
                                     <th scope="col" class="whitespace-nowrap px-4 py-3 text-start">{{ $heading }}</th>
                                 @endforeach
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-outline/40">
                             @foreach ($organizers as $organizer)
-                                @php
-                                    $status = $organizer->approval_status;
-                                    $statusStyle = match ($status) {
-                                        ActivityOrganizer::APPROVED => 'bg-forest/10 text-forest',
-                                        ActivityOrganizer::REJECTED, ActivityOrganizer::BANNED => 'bg-danger/10 text-danger',
-                                        default => 'bg-brand/10 text-brand',
-                                    };
-                                @endphp
                                 <tr>
                                     <th scope="row" class="px-4 py-3 text-start font-normal">
                                         <p class="font-semibold"><bdi>{{ $organizer->user?->name ?? 'حساب غير متاح' }}</bdi></p>
@@ -87,7 +64,7 @@
                                         @endif
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-3">
-                                        <span class="rounded-full px-2 py-1 font-semibold {{ $statusStyle }}">{{ $statuses[$status] ?? $status }}</span>
+                                        <span class="rounded-full px-2 py-1 font-semibold {{ $organizer->approval_status === 'Approved' ? 'bg-forest/10 text-forest' : ($organizer->approval_status === 'Rejected' || $organizer->approval_status === 'Banned' ? 'bg-danger/10 text-danger' : 'bg-brand/10 text-brand') }}">{{ $statuses[$organizer->approval_status] ?? $organizer->approval_status }}</span>
                                     </td>
                                     <td class="whitespace-nowrap px-4 py-3">
                                         @if ($organizer->approved_at)
@@ -97,25 +74,6 @@
                                     </td>
                                     <td class="px-4 py-3">
                                         <x-admin.action-link :href="route('admin.organizers.show', $organizer)">التفاصيل</x-admin.action-link>
-                                        <x-admin.action-link :href="route('admin.organizers.edit', $organizer)">تعديل الملف</x-admin.action-link>
-                                        @if ($status === ActivityOrganizer::BANNED)
-                                            <span class="text-muted">الإجراءات موقوفة</span>
-                                        @else
-                                            <div class="flex flex-wrap gap-2">
-                                                @foreach ([ActivityOrganizer::APPROVED => 'اعتماد', ActivityOrganizer::REJECTED => 'رفض'] as $decision => $label)
-                                                    @if ($status !== $decision)
-                                                        <form method="POST" action="{{ route('admin.organizers.update', $organizer) }}">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <input type="hidden" name="approval_status" value="{{ $decision }}">
-                                                            <x-ui.button type="submit" size="sm" variant="outline">
-                                                                {{ $label }}<span class="sr-only"> {{ $organizer->user?->name }}</span>
-                                                            </x-ui.button>
-                                                        </form>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

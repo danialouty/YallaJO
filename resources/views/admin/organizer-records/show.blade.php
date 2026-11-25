@@ -18,7 +18,5 @@
             'آخر اعتماد' => $organizer->approved_at?->format('Y-m-d H:i'),
             'المعتمِد' => $organizer->approver?->name,
         ]">
-        <x-admin.action-link :href="route('admin.organizers.edit', $organizer)">تعديل الملف</x-admin.action-link>
-        <p class="text-sm text-muted">يمكن إدارة قرارات الاعتماد والرفض من قائمة المنظّمين.</p>
     </x-admin.record-details>
 @endsection

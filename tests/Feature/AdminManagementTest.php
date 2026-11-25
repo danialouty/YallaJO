@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Adventure;
 use App\Models\Booking;
+use App\Models\Community;
 use App\Models\Payment;
 use App\Models\Review;
 use App\Models\User;
@@ -12,7 +13,7 @@ use Tests\TestCase;
 
 class AdminManagementTest extends TestCase
 {
-    private const MODULES = ['users', 'adventures', 'bookings', 'reviews'];
+    private const MODULES = ['users', 'adventures', 'bookings', 'reviews', 'communities'];
 
     protected function setUp(): void
     {
@@ -40,6 +41,8 @@ class AdminManagementTest extends TestCase
             '2026_11_18_120850_create_bookings_table',
             '2026_11_18_120850_create_payments_table',
             '2026_11_18_120851_create_reviews_table',
+            '2026_11_21_150000_create_communities_table',
+            '2026_11_21_153000_simplify_communities',
         ] as $migration) {
             (require database_path("migrations/{$migration}.php"))->up();
         }
@@ -47,18 +50,28 @@ class AdminManagementTest extends TestCase
         $this->withoutVite();
     }
 
-    public function test_all_eight_routes_require_an_admin(): void
+    public function test_admin_routes_require_an_admin(): void
     {
+        $community = Community::create([
+            'name' => 'Admin test community',
+            'slug' => 'admin-test-community',
+            'description' => 'Test community description.',
+            'region' => 'Amman',
+            'activity_style' => 'Hiking',
+        ]);
+
         foreach (self::MODULES as $module) {
             $this->get(route("admin.$module.index"))->assertRedirect(route('login'));
-            $this->get(route("admin.$module.show", 1))->assertRedirect(route('login'));
+            $record = $module === 'communities' ? $community : 1;
+            $this->get(route("admin.$module.show", $record))->assertRedirect(route('login'));
         }
 
         foreach (['Adventurer', 'Activity_Organizer'] as $role) {
             $this->actingAs($this->user($role));
             foreach (self::MODULES as $module) {
                 $this->get(route("admin.$module.index"))->assertForbidden();
-                $this->get(route("admin.$module.show", 1))->assertForbidden();
+                $record = $module === 'communities' ? $community : 1;
+                $this->get(route("admin.$module.show", $record))->assertForbidden();
             }
         }
     }

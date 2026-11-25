@@ -61,15 +61,21 @@ class AdminOrganizerManagementTest extends TestCase
     {
         $organizer = $this->organizer('Pending');
         $index = route('admin.organizers.index');
-        $update = route('admin.organizers.update', $organizer);
-        $delete = route('admin.organizers.destroy', $organizer);
+        $show = route('admin.organizers.show', $organizer);
 
         $this->get($index)->assertRedirect(route('login'));
+        $this->get($show)->assertRedirect(route('login'));
         foreach ([$this->user('Adventurer'), $organizer->user] as $user) {
             $this->actingAs($user)->get($index)->assertForbidden();
-            $this->patch($update, ['approval_status' => 'Approved'])->assertForbidden();
-            $this->delete($delete)->assertForbidden();
+            $this->get($show)->assertForbidden();
         }
+        $this->actingAs($this->user('Admin'));
+        $this->get('/admin/organizers/create')->assertNotFound();
+        $this->get('/admin/organizers/'.$organizer->id.'/edit')->assertNotFound();
+        $this->post('/admin/organizers', ['user_id' => $organizer->user_id])->assertMethodNotAllowed();
+        $this->patch('/admin/organizers/'.$organizer->id, ['approval_status' => 'Approved'])->assertMethodNotAllowed();
+        $this->patch('/admin/organizers/'.$organizer->id.'/profile')->assertNotFound();
+        $this->delete('/admin/organizers/'.$organizer->id)->assertMethodNotAllowed();
         $this->assertSame('Pending', $organizer->fresh()->approval_status);
     }
 
@@ -97,62 +103,17 @@ class AdminOrganizerManagementTest extends TestCase
             ->assertRedirect(route('admin.organizers.index'))->assertSessionHasErrors('status');
     }
 
-    public function test_approval_and_rejection_update_only_the_selected_record_and_preserve_history(): void
+    public function test_admin_organizer_pages_only_display_records_and_never_mutate_them(): void
     {
         $admin = $this->user('Admin');
         $organizer = $this->organizer('Pending');
-        $other = $this->organizer('Pending');
-        $this->freezeTime();
-        $update = route('admin.organizers.update', $organizer);
-
-        $this->actingAs($admin)->patch($update, [
-            'approval_status' => 'Approved', 'approved_by' => $other->user_id,
-            'user_id' => $other->user_id, 'license_number' => 'Tampered value',
-        ])->assertRedirect(route('admin.organizers.index'))->assertSessionHas('status');
-
-        $approved = $organizer->fresh();
-        $this->assertSame('Approved', $approved->approval_status);
-        $this->assertSame($admin->id, $approved->approved_by);
-        $this->assertSame(now()->format('Y-m-d H:i:s'), $approved->approved_at->format('Y-m-d H:i:s'));
-        $this->assertSame($organizer->user_id, $approved->user_id);
-        $this->assertSame($organizer->license_number, $approved->license_number);
-        $this->assertSame('Pending', $other->fresh()->approval_status);
-
-        $this->actingAs($organizer->user)->get('/test-approved-organizer')->assertNoContent();
-
-        $this->travel(1)->hours();
-        $this->actingAs($this->user('Admin'))->patch($update, ['approval_status' => 'Approved'])->assertRedirect();
-        $this->assertSame($approved->approved_by, $organizer->fresh()->approved_by);
-        $this->assertEquals($approved->approved_at, $organizer->fresh()->approved_at);
-
-        $this->patch($update, ['approval_status' => 'Rejected'])->assertRedirect()->assertSessionHas('status');
-        $rejected = $organizer->fresh();
-        $this->assertSame('Rejected', $rejected->approval_status);
-        $this->assertSame($approved->approved_by, $rejected->approved_by);
-        $this->assertEquals($approved->approved_at, $rejected->approved_at);
-        $this->assertSame('Pending', $other->fresh()->approval_status);
-        $this->actingAs($organizer->user()->firstOrFail())->get('/test-approved-organizer')
-            ->assertRedirect(route('organizers.index'))->assertSessionHas('error');
-    }
-
-    public function test_invalid_and_banned_transitions_and_hard_deletion_are_denied(): void
-    {
-        $pending = $this->organizer('Pending');
-        $banned = $this->organizer('Banned');
-        $this->actingAs($this->user('Admin'));
-
-        foreach (['approved', 'Pending', 'Banned', 'Unknown'] as $status) {
-            $this->from(route('admin.organizers.index'))
-                ->patch(route('admin.organizers.update', $pending), ['approval_status' => $status])
-                ->assertRedirect(route('admin.organizers.index'))->assertSessionHasErrors('approval_status');
-        }
-        $this->patch(route('admin.organizers.update', $banned), ['approval_status' => 'Approved'])
-            ->assertRedirect(route('admin.organizers.index'))->assertSessionHas('error');
-        $this->delete(route('admin.organizers.destroy', $pending))->assertForbidden();
-        $this->get(route('admin.organizers.index'))->assertOk()->assertDontSee('name="_method" value="DELETE"', false);
-        $this->assertSame('Banned', $banned->fresh()->approval_status);
-        $this->assertSame('Pending', $pending->fresh()->approval_status);
-        $this->assertDatabaseCount('activity_organizers', 2);
+        $this->actingAs($admin)->get(route('admin.organizers.index'))
+            ->assertOk()->assertSee('TEST-123')
+            ->assertDontSee('name="current_password"', false)
+            ->assertDontSee('تعديل الملف')->assertDontSee('name="approval_status"', false);
+        $this->get(route('admin.organizers.show', $organizer))
+            ->assertOk()->assertSee('بانتظار الموافقة')->assertDontSee('تعديل الملف');
+        $this->assertSame('Pending', $organizer->fresh()->approval_status);
     }
 
     public function test_profile_submission_uses_canonical_values_and_resubmits_rejected_profiles(): void

@@ -101,8 +101,14 @@ class BookingController extends Controller
         return redirect()->route('admin.bookings.show', $record)->with('success', 'حُفظ الحجز وأُعيد حساب إجماليه.');
     }
 
-    public function cancel(string $booking): RedirectResponse
+    public function cancel(Request $request, string $booking): RedirectResponse
     {
+        $request->validate(
+            ['current_password' => ['required', 'current_password']],
+            ['current_password.required' => 'يجب تأكيد كلمة مرورك لإلغاء الحجز.',
+             'current_password.current_password' => 'كلمة المرور غير صحيحة.'],
+        );
+
         $cancelled = DB::transaction(function () use ($booking) {
             $record = Booking::query()->lockForUpdate()->findOrFail($booking);
             if (! $this->canChange($record)) {

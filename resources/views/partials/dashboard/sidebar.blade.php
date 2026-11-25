@@ -55,6 +55,12 @@
             'icon' => 'community',
         ],
         [
+            'label' => 'إدارة المجتمعات',
+            'route' => 'admin.communities.index',
+            'active' => 'admin.communities.*',
+            'icon' => 'community',
+        ],
+        [
             'label' => 'المغامرات والتصنيفات',
             'route' => 'admin.adventures.index',
             'active' => 'admin.adventures.*',

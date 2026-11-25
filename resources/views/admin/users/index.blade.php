@@ -16,7 +16,6 @@
                 <td class="[overflow-wrap:anywhere]">{{ ['Admin' => 'مسؤول النظام', 'Adventurer' => 'مغامر', 'Activity_Organizer' => 'منظّم'][$record->role] ?? $record->role }}</td>
                 <td class="[overflow-wrap:anywhere]">{{ $record->created_at?->toDateString() ?? 'غير مسجّل' }}</td>
                 <td>
-                    <x-admin.action-link :href="route('admin.users.edit', $record)">تعديل</x-admin.action-link>
                     <a href="{{ route('admin.users.show', $record) }}" class="inline-flex min-h-11 items-center rounded-control text-brand underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand">
                         عرض<span class="sr-only"> السجل رقم {{ $record->id }}</span>
                     </a>
