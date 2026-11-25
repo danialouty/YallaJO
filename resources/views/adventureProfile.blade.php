@@ -22,7 +22,7 @@
         @php
             $galleryImages = $adventure->images
                 ->take(4)
-                ->map(fn ($image) => asset('images/' . $image->image_path))
+                ->map(fn ($image) => $image->url)
                 ->values()
                 ->all();
 

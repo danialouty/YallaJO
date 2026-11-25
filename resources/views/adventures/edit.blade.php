@@ -62,7 +62,7 @@
                         @csrf @method('PUT')
                         <input type="hidden" name="_form_type" value="edit">
                         <input type="hidden" name="_adventure_id" value="{{ $adventure->id }}">
-                        <img src="{{ asset('images/' . $image->image_path) }}" alt="{{ $adventure->title }}" class="h-16 w-16 rounded-lg object-cover">
+                        <img src="{{ $image->url }}" alt="{{ $adventure->title }}" class="h-16 w-16 rounded-lg object-cover">
                         <label class="min-w-0 flex-1 text-xs font-bold">استبدال الصورة<input class="mt-1 block w-full text-xs" type="file" name="image_path" accept="image/jpeg,image/png,image/webp" required></label>
                         <button class="rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white hover:bg-brand-dark" type="submit">تحديث</button>
                     </form>

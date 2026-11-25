@@ -25,7 +25,7 @@
                     <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                         @foreach ($adventure->images as $image)
                             @if ($image->image_path)
-                                <img class="h-48 w-full rounded-xl object-cover" src="{{ asset('images/' . $image->image_path) }}" alt="{{ $adventure->title }}">
+                                <img class="h-48 w-full rounded-xl object-cover" src="{{ $image->url }}" alt="{{ $adventure->title }}">
                             @endif
                         @endforeach
                     </div>
