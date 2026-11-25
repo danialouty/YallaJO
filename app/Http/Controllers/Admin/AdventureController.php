@@ -102,8 +102,14 @@ class AdventureController extends Controller
         return redirect()->route('admin.adventures.show', $adventure)->with('success', 'حُفظت بيانات المغامرة.');
     }
 
-    public function suspend(string $adventure): RedirectResponse
+    public function suspend(Request $request, string $adventure): RedirectResponse
     {
+        $request->validate(
+            ['current_password' => ['required', 'current_password']],
+            ['current_password.required' => 'يجب تأكيد كلمة مرورك لإيقاف المغامرة.',
+             'current_password.current_password' => 'كلمة المرور غير صحيحة.'],
+        );
+
         $record = Adventure::findOrFail($adventure);
         $record->update(['status' => 'Suspended']);
 

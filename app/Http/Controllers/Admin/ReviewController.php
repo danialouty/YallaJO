@@ -16,9 +16,11 @@ class ReviewController extends Controller
         $validator = Validator::make($request->query(), [
             'search' => ['nullable', 'string', 'max:100'],
             'rating' => ['nullable', 'integer', 'between:1,5'],
+            'is_reported' => ['nullable', 'boolean'],
         ], [
             'search.*' => 'أدخل قيمة بحث صالحة.',
             'rating.*' => 'اختر تقييمًا من ١ إلى ٥.',
+            'is_reported.*' => 'اختر قيمة صالحة لحقل البلاغ.',
         ]);
 
         if ($validator->fails()) {
@@ -38,6 +40,10 @@ class ReviewController extends Controller
             $query->where('rating', (int) $filters['rating']);
         }
 
+        if (isset($filters['is_reported'])) {
+            $query->where('is_reported', (bool) $filters['is_reported']);
+        }
+
         return view('admin.reviews.index', [
             'records' => $query->paginate(15)->appends($filters),
             'filters' => $filters,
@@ -51,29 +57,19 @@ class ReviewController extends Controller
         return view('admin.reviews.show', compact('review'));
     }
 
-    public function edit(string $review): View
-    {
-        return view('admin.reviews.form', ['review' => Review::findOrFail($review)]);
-    }
-
-    public function update(Request $request, string $review): RedirectResponse
-    {
-        $record = Review::findOrFail($review);
-        $data = $request->validate([
-            'rating' => ['required', 'integer', 'between:1,5'],
-            'comment' => ['required', 'string', 'max:1000'],
-            'booking_id' => ['missing'],
-            'adventure_id' => ['missing'],
-            'adventurer_id' => ['missing'],
-        ]);
-        $record->update($data);
-
-        return redirect()->route('admin.reviews.show', $record)->with('success', 'حُفظ التقييم.');
-    }
-
     public function destroy(Request $request, string $review): RedirectResponse
     {
-        $request->validate(['confirm_delete' => ['accepted']]);
+        $request->validate(
+            [
+                'confirm_delete' => ['accepted'],
+                'current_password' => ['required', 'current_password'],
+            ],
+            [
+                'confirm_delete.accepted' => 'يجب تأكيد رغبتك في الحذف.',
+                'current_password.required' => 'يجب تأكيد كلمة مرورك لإتمام الحذف.',
+                'current_password.current_password' => 'كلمة المرور غير صحيحة.',
+            ],
+        );
         Review::findOrFail($review)->delete();
 
         return redirect()->route('admin.reviews.index')->with('success', 'حُذف التقييم.');

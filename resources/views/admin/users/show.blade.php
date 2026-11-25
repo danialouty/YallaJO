@@ -18,7 +18,6 @@
         'نوع المنظّم' => $user->activityOrganizer?->organizer_type,
         'حالة اعتماد المنظّم' => $user->activityOrganizer?->approval_status,
     ]">
-        <x-admin.action-link :href="route('admin.users.edit', $user)">تعديل الحساب</x-admin.action-link>
-        <p class="text-sm text-muted">حذف الحساب وتعطيله غير متاحين للحفاظ على السجلات المرتبطة.</p>
+        <p class="text-sm text-muted">تعديل بيانات الحساب وكلمة المرور متاحان لصاحب الحساب من صفحة الملف الشخصي. حذف الحساب وتعطيله غير متاحين للحفاظ على السجلات المرتبطة.</p>
     </x-admin.record-details>
 @endsection

@@ -1,4 +1,4 @@
-@props(['action', 'method', 'label', 'warning', 'confirmation' => false])
+@props(['action', 'method', 'label', 'warning', 'confirmation' => false, 'requirePassword' => false])
 
 <details class="rounded-control border border-danger/30 p-3">
     <summary class="cursor-pointer rounded-control font-semibold text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger">{{ $label }}</summary>

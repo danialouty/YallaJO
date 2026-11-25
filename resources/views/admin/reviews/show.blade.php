@@ -13,7 +13,6 @@
         'تاريخ التقييم' => $review->created_at?->toDateString(),
         'التعليق' => $review->comment,
     ]">
-        <x-admin.action-link :href="route('admin.reviews.edit', $review)">تعديل التقييم</x-admin.action-link>
         <x-admin.confirm-action :action="route('admin.reviews.destroy', $review)" method="DELETE" label="حذف التقييم"
             warning="سيُحذف هذا التقييم، ويبقى الحجز والمغامرة وسجلات الدفع محفوظة." confirmation />
     </x-admin.record-details>

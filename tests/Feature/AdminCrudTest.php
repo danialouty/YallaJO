@@ -43,7 +43,7 @@ class AdminCrudTest extends TestCase
 
     public function test_create_and_write_routes_enforce_admin_middleware(): void
     {
-        $create = ['admin.users.create', 'admin.adventures.create', 'admin.organizers.create'];
+        $create = ['admin.users.create', 'admin.adventures.create'];
         foreach ($create as $route) {
             $this->get(route($route))->assertRedirect(route('login'));
         }
@@ -52,7 +52,7 @@ class AdminCrudTest extends TestCase
             foreach ($create as $route) {
                 $this->get(route($route))->assertForbidden();
             }
-            foreach (['users', 'adventures', 'organizers'] as $module) {
+            foreach (['users', 'adventures'] as $module) {
                 $this->post(route("admin.$module.store"))->assertForbidden();
             }
             $this->patch(route('admin.bookings.cancel', 1))->assertForbidden();
@@ -82,12 +82,15 @@ class AdminCrudTest extends TestCase
         $organizer = User::where('email', 'organizer@example.test')->sole();
         $this->assertSame('Pending', $organizer->activityOrganizer->approval_status);
         $this->assertNull($organizer->adventurer);
-        $this->get(route('admin.users.edit', $user))->assertOk()->assertSee('value="PATCH"', false)->assertDontSee($user->password);
+        $this->get('/admin/users/'.$user->id.'/edit')->assertNotFound();
+        $this->get(route('admin.users.index'))->assertOk()
+            ->assertDontSee('/admin/users/'.$user->id.'/edit');
+        $this->get(route('admin.users.show', $user))->assertOk()
+            ->assertDontSee('/admin/users/'.$user->id.'/edit');
         unset($data['role'], $data['password'], $data['password_confirmation']);
         $data['name'] = 'Updated account';
-        $this->patch(route('admin.users.update', $user), $data)->assertRedirect(route('admin.users.show', $user));
-        $this->assertSame('Updated account', $user->fresh()->name);
-        $this->patch(route('admin.users.update', $admin), $data + ['role' => 'Adventurer'])->assertSessionHasErrors('role');
+        $this->patch('/admin/users/'.$user->id, $data)->assertMethodNotAllowed();
+        $this->assertSame('Created account', $user->fresh()->name);
         $this->delete(route('admin.users.show', $admin))->assertMethodNotAllowed();
         $this->assertSame('Admin', $admin->fresh()->role);
     }
@@ -119,7 +122,7 @@ class AdminCrudTest extends TestCase
         $this->patch(route('admin.adventures.update', $adventure), array_replace($data, ['title' => 'Updated trail']))
             ->assertRedirect(route('admin.adventures.show', $adventure));
         $this->get(route('admin.adventures.show', $adventure))->assertSee(route('admin.adventures.suspend', $adventure));
-        $this->patch(route('admin.adventures.suspend', $adventure))->assertRedirect();
+        $this->patch(route('admin.adventures.suspend', $adventure), ['current_password' => 'password'])->assertRedirect();
         $this->assertSame('Suspended', $adventure->fresh()->status);
         $this->assertSame('Updated trail', $adventure->fresh()->title);
         $this->assertModelExists($booking);
@@ -142,8 +145,8 @@ class AdminCrudTest extends TestCase
         $this->patch(route('admin.bookings.update', $booking), ['participants_count' => 3, 'total_amount' => '1.00'])->assertRedirect();
         $this->assertSame('69.75', $booking->fresh()->total_amount);
         $this->patch(route('admin.bookings.update', $paid), ['participants_count' => 3])->assertSessionHasErrors('participants_count');
-        $this->patch(route('admin.bookings.cancel', $paid))->assertSessionHas('error');
-        $this->patch(route('admin.bookings.cancel', $booking))->assertSessionHas('success');
+        $this->patch(route('admin.bookings.cancel', $paid), ['current_password' => 'password'])->assertSessionHas('error');
+        $this->patch(route('admin.bookings.cancel', $booking), ['current_password' => 'password'])->assertSessionHas('success');
         $this->assertSame('Cancelled', $booking->fresh()->status);
         $this->assertNotNull($booking->fresh()->cancelled_at);
         $this->assertSame('Pending', $paid->fresh()->status);
@@ -151,7 +154,7 @@ class AdminCrudTest extends TestCase
         $this->assertDatabaseCount('payments', 1);
     }
 
-    public function test_review_edits_and_confirmed_deletion_keep_the_booking_intact(): void
+    public function test_reviews_are_read_only_and_confirmed_deletion_keeps_the_booking_intact(): void
     {
         $this->actingAs($this->user('Admin'));
         $booking = $this->booking($this->adventure(), 'Accepted');
@@ -159,44 +162,59 @@ class AdminCrudTest extends TestCase
             'adventurer_id' => $booking->adventurer_id, 'rating' => 4, 'comment' => 'Original']);
         $payment = Payment::create(['booking_id' => $booking->id, 'total_amount' => '46.50']);
         $this->post(route('admin.reviews.index'), ['booking_id' => $booking->id])->assertMethodNotAllowed();
-        $this->get(route('admin.reviews.edit', $review))->assertOk()->assertSee('value="PATCH"', false);
-        $this->patch(route('admin.reviews.update', $review), ['rating' => 6, 'comment' => 'Invalid'])->assertSessionHasErrors('rating');
-        $this->patch(route('admin.reviews.update', $review), ['rating' => 5, 'comment' => 'Changed', 'booking_id' => null])
-            ->assertSessionHasErrors('booking_id');
-        $this->patch(route('admin.reviews.update', $review), ['rating' => 5, 'comment' => 'Changed'])->assertRedirect();
-        $this->assertSame(5, $review->fresh()->rating);
-        $this->assertSame($booking->id, $review->fresh()->booking_id);
-        $this->get(route('admin.reviews.show', $review))->assertSee('value="DELETE"', false);
+        $this->get(route('admin.reviews.index'))->assertOk()
+            ->assertSee(route('admin.reviews.show', $review))
+            ->assertDontSee('تعديل');
+        $this->get(route('admin.reviews.show', $review))->assertOk()
+            ->assertSee('value="DELETE"', false)->assertDontSee('تعديل التقييم');
+        $this->get('/admin/reviews/'.$review->id.'/edit')->assertNotFound();
+        $this->patch('/admin/reviews/'.$review->id, ['rating' => 5, 'comment' => 'Changed'])->assertMethodNotAllowed();
+        $this->assertSame(4, $review->fresh()->rating);
         $this->delete(route('admin.reviews.destroy', $review))->assertSessionHasErrors('confirm_delete');
         $this->assertModelExists($review);
-        $this->delete(route('admin.reviews.destroy', $review), ['confirm_delete' => '1'])->assertRedirect(route('admin.reviews.index'));
+        $this->delete(route('admin.reviews.destroy', $review), [
+            'confirm_delete' => '1', 'current_password' => 'password',
+        ])->assertRedirect(route('admin.reviews.index'));
         $this->assertModelMissing($review);
         $this->assertModelExists($booking);
         $this->assertModelExists($payment);
     }
 
-    public function test_organizer_profile_crud_preserves_approval_and_denies_deletion(): void
+    public function test_admin_organizer_pages_are_read_only(): void
     {
         $admin = $this->user('Admin');
         $owner = $this->user('Activity_Organizer');
-        $this->actingAs($admin)->get(route('admin.organizers.create'))->assertOk()->assertSee(route('admin.organizers.store'));
-        $data = ['user_id' => $owner->id, 'organizer_type' => 'Tourism_office', 'license_number' => 'TEST'];
-        $this->post(route('admin.organizers.store'), array_replace($data, ['user_id' => $admin->id]))->assertSessionHasErrors('user_id');
-        $this->post(route('admin.organizers.store'), $data)->assertRedirect();
-        $organizer = $owner->activityOrganizer()->sole();
-        $this->post(route('admin.organizers.store'), $data)->assertSessionHasErrors('user_id');
-        $this->patch(route('admin.organizers.update', $organizer), ['approval_status' => 'Approved'])->assertRedirect();
-        $this->get(route('admin.organizers.show', $organizer))->assertOk()->assertSee($owner->name);
-        $this->get(route('admin.organizers.edit', $organizer))->assertOk()->assertSee(route('admin.organizers.profile.update', $organizer));
-        $update = ['organizer_type' => 'Adventure_group', 'license_number' => 'NEW-TEST'];
-        $this->patch(route('admin.organizers.profile.update', $organizer), $update + ['approved_at' => null])
-            ->assertSessionHasErrors('approved_at');
-        $this->patch(route('admin.organizers.profile.update', $organizer), $update)->assertRedirect();
+        $organizer = $owner->activityOrganizer()->create(['license_number' => 'TEST']);
+        $this->actingAs($admin)->get(route('admin.organizers.index'))
+            ->assertOk()->assertSee('TEST')->assertSee(route('admin.organizers.show', $organizer))
+            ->assertDontSee('name="current_password"', false)->assertDontSee('تعديل الملف');
+        $this->get(route('admin.organizers.show', $organizer))
+            ->assertOk()->assertSee($owner->name)->assertDontSee('تعديل الملف');
+        $this->get('/admin/organizers/create')->assertNotFound();
+        $this->get('/admin/organizers/'.$organizer->id.'/edit')->assertNotFound();
+        $this->post('/admin/organizers', ['user_id' => $owner->id])->assertMethodNotAllowed();
+        $this->patch('/admin/organizers/'.$organizer->id, ['approval_status' => 'Approved'])->assertMethodNotAllowed();
+        $this->patch('/admin/organizers/'.$organizer->id.'/profile')->assertNotFound();
+        $this->delete('/admin/organizers/'.$organizer->id)->assertMethodNotAllowed();
         $this->assertDatabaseHas('activity_organizers', [
-            'id' => $organizer->id, 'license_number' => 'NEW-TEST', 'approval_status' => 'Approved', 'approved_by' => $admin->id,
+            'id' => $organizer->id, 'approval_status' => 'Pending', 'license_number' => 'TEST',
         ]);
-        $this->delete(route('admin.organizers.destroy', $organizer))->assertForbidden();
-        $this->assertModelExists($organizer);
+    }
+
+    public function test_report_filters_render_between_summary_cards_and_table(): void
+    {
+        $this->actingAs($this->user('Admin'));
+        $content = $this->get(route('admin.reports.index'))->assertOk()->getContent();
+
+        $summaryPosition = strpos($content, 'إجمالي البلاغات في الصفحة');
+        $filterPosition = strpos($content, 'name="report_status"');
+        $tablePosition = strpos($content, '<table');
+
+        $this->assertNotFalse($summaryPosition);
+        $this->assertNotFalse($filterPosition);
+        $this->assertNotFalse($tablePosition);
+        $this->assertLessThan($filterPosition, $summaryPosition);
+        $this->assertLessThan($tablePosition, $filterPosition);
     }
 
     private function user(string $role): User
