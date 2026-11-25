@@ -3,13 +3,13 @@
 }
 
 .btn-yalla-primary {
-    background-color: #A94B2B;
+    background-color: #9b7448;
     color: #ffffff;
     transition: background-color 0.2s ease;
 }
 
 .btn-yalla-primary:hover {
-    background-color: #8E3D22;
+    background-color: #785a34;
 }
 
 .btn-yalla-secondary {
@@ -141,12 +141,12 @@
 
     .booking-success-primary {
         border: 0;
-        background: #a43716;
+        background: #9b7448;
         color: #fff;
     }
 
     .booking-success-primary:hover {
-        background: #862201;
+        background: #785a34;
     }
 
     .booking-success-secondary {

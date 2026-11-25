@@ -37,7 +37,7 @@
     @stack('styles')
 </head>
 
-<body class="min-h-screen antialiased">
+<body class="min-h-screen antialiased {{ request()->routeIs('home') ? 'landing-scroll-mode' : '' }}">
 
     @if (isset($slot))
         @php

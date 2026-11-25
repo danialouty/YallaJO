@@ -3,7 +3,7 @@
         <div class="rounded-2xl bg-white p-5 shadow-sm sm:p-8">
             <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <h1 class="text-2xl font-black text-slate-900">إضافة مغامرة</h1>
-                <a class="text-sm font-bold text-orange-700 hover:text-orange-900"
+                <a class="text-sm font-bold text-brand hover:text-brand-dark"
                     href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
             </header>
 
@@ -19,14 +19,14 @@
                 @csrf
                 <div class="grid gap-4 sm:grid-cols-2">
                     <label class="text-sm font-bold text-slate-700">اسم المغامرة<input
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             name="title" value="{{ old('title') }}" required></label>
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">الوصف<textarea
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             name="description" rows="4" required>{{ old('description') }}</textarea></label>
                     <label class="text-sm foبnt-bold text-slate-700">الصعوبة
                         <select
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             name="difficulty_level" required>
                             @foreach (['Easy' => 'سهل', 'Medium' => 'متوسط', 'Hard' => 'صعب'] as $value => $label)
                                 <option value="{{ $value }}" @selected(old('difficulty_level') === $value)>{{ $label }}
@@ -35,11 +35,11 @@
                         </select>
                     </label>
                     <label class="text-sm font-bold text-slate-700">السعة<input
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             type="number" name="capacity" value="{{ old('capacity') }}" required></label>
                     <label class="text-sm font-bold text-slate-700">التصنيف
                         <select
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             name="category" required>
                             @foreach (['Hiking', 'Diving', 'Camping', 'Cyciling', 'Zaitoon day out', 'kayaking', 'climbing', 'Sky Diving', 'Blimping', 'Toursim'] as $category)
                                 <option value="{{ $category }}" @selected(old('category') === $category)>{{ $category }}
@@ -48,23 +48,23 @@
                         </select>
                     </label>
                     <label class="text-sm font-bold text-slate-700">الموقع ونقطة التجمع<input
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             name="location" value="{{ old('location') }}" required></label>
                     <label class="text-sm font-bold text-slate-700">المدة بالساعات<input
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             type="number" step="0.01" name="duration_hours" value="{{ old('duration_hours') }}"
                             required></label>
                     <label class="text-sm font-bold text-slate-700">السعر<input
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             type="number" step="0.01" name="price" value="{{ old('price') }}" required></label>
 
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">المتطلبات<textarea
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             name="requirements" rows="3" required>{{ old('requirements') }}</textarea></label>
                 </div>
                 <div class="mt-6 flex flex-wrap gap-3">
                     <button
-                        class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800"
+                        class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-dark"
                         type="submit">حفظ المغامرة</button>
                     <a class="rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200"
                         href="{{ route('adventures.index') }}">إلغاء</a>

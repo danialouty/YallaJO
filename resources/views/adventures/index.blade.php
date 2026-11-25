@@ -5,7 +5,7 @@
                 <h1 class="text-2xl font-black text-slate-900">المغامرات</h1>
                 <p class="mt-1 text-sm text-slate-500">إدارة المغامرات والمواعيد والصور.</p>
             </div>
-            <a href="{{ route('adventures.create') }}" class="rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-800">＋ أضف مغامرة</a>
+            <a href="{{ route('adventures.create') }}" class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark">＋ أضف مغامرة</a>
             @session('success')
                 <div class="w-full rounded-lg bg-emerald-100 px-4 py-3 text-sm font-semibold text-emerald-900" role="status">{{ $value }}</div>
             @endsession
@@ -43,14 +43,14 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-800">{{ $adventure->category }}</span></td>
+                            <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand-dark">{{ $adventure->category }}</span></td>
                             <td class="whitespace-nowrap px-5 py-4">{{ $adventure->capacity }} مقعد</td>
                             <td class="whitespace-nowrap px-5 py-4 font-bold">{{ number_format($adventure->price) }} د.أ</td>
                             <td class="whitespace-nowrap px-5 py-4"><span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-900">{{ $adventure->status }}</span></td>
                             <td class="whitespace-nowrap px-5 py-4">
                                 <div class="flex items-center gap-2">
                                     <a class="rounded-md bg-slate-100 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200" href="{{ route('adventures.show', $adventure) }}">عرض</a>
-                                    <a class="rounded-md bg-orange-100 px-3 py-2 text-xs font-bold text-orange-800 hover:bg-orange-200" href="{{ route('adventures.edit', $adventure) }}">تعديل</a>
+                                    <a class="rounded-md bg-brand/10 px-3 py-2 text-xs font-bold text-brand-dark hover:bg-brand/15" href="{{ route('adventures.edit', $adventure) }}">تعديل</a>
                                     <form action="{{ route('adventures.destroy', $adventure) }}" method="POST" data-confirm="هل أنت متأكد من حذف المغامرة؟">
                                         @csrf
                                         @method('DELETE')
@@ -93,7 +93,7 @@
                         <input type="hidden" name="_form_type" value="optional">
                         <input type="hidden" name="_adventure_id" value="{{ $optionalAdventure->id }}">
                         <label class="text-sm font-semibold sm:col-span-2">اختر الصور<input class="mt-1 block w-full rounded-lg border border-slate-300 p-2 text-sm" type="file" name="image_files[]" accept="image/jpeg,image/png,image/webp" multiple required></label>
-                        <div><button class="rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-800" type="submit">رفع الصور</button></div>
+                        <div><button class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark" type="submit">رفع الصور</button></div>
                     </form>
                 </section>
                 <a class="mt-6 inline-block rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200" href="{{ route('adventures.index') }}">إنهاء</a>

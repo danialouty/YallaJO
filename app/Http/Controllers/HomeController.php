@@ -11,7 +11,13 @@ class HomeController extends Controller
     //
     public function home()
 {
-    $adventures = Adventure::where('status', 'Active')
+    $adventures = Adventure::with([
+        'images',
+        'schedules' => fn ($query) => $query
+            ->with('guide.activityOrganizer.user')
+            ->orderBy('starts_at'),
+    ])
+        ->where('status', 'Active')
         ->latest()
         ->take(4)
         ->get();

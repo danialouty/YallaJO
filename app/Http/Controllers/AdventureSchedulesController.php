@@ -135,7 +135,7 @@ class AdventureSchedulesController extends Controller
             report($exception);
 
             return response()->json([
-                'message' => 'تعذر توليد البرنامج. تأكد من تشغيل Ollama وتحميل النموذج المحدد في الإعدادات.',
+                'message' => 'تعذر إعداد البرنامج بالذكاء الاصطناعي. حاول مرة أخرى لاحقًا.',
             ], 503);
         }
     }

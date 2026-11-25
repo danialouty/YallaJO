@@ -6,7 +6,7 @@
                 <p class="text-sm text-gray-500 mt-1">هذه لوحة إدارة رحلاتك وجداولك كمَرشد</p>
             </div>
             @if (! $guide)
-                <a href="{{ route('guides.create') }}" class="inline-flex rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">إضافة مرشد</a>
+                <a href="{{ route('guides.create') }}" class="inline-flex rounded-xl bg-[#9B7448] px-4 py-2.5 text-sm font-bold text-white">إضافة مرشد</a>
             @elseif ($guide->status === 'Available')
                 <span class="inline-flex px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">متاح للعمل</span>
             @else
@@ -27,7 +27,7 @@
             </div>
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-xs text-gray-500 font-medium">الجداول النشطة</p>
-                <p class="text-2xl font-extrabold text-[#2D5041] mt-2">{{ $activeSchedules }}</p>
+                <p class="text-2xl font-extrabold text-[#3F6653] mt-2">{{ $activeSchedules }}</p>
             </div>
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-xs text-gray-500 font-medium">الجداول المعلقة</p>
@@ -35,7 +35,7 @@
             </div>
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <p class="text-xs text-gray-500 font-medium">سنوات الخبرة</p>
-                <p class="text-2xl font-extrabold text-[#A94B2B] mt-2">{{ $guide?->experience_years ?? 0 }} <span class="text-xs font-normal">سنة</span></p>
+                <p class="text-2xl font-extrabold text-[#9B7448] mt-2">{{ $guide?->experience_years ?? 0 }} <span class="text-xs font-normal">سنة</span></p>
             </div>
         </div>
 
@@ -81,7 +81,7 @@
 
             <div class="space-y-4">
                 @if ($guide)
-                    <div class="bg-[#2D5041] rounded-2xl p-6 text-white shadow-sm">
+                    <div class="bg-[#3F6653] rounded-2xl p-6 text-white shadow-sm">
                         <p class="text-sm text-emerald-100">ملف المرشد</p>
                         <p class="text-xl font-extrabold mt-2">{{ $organizer?->user?->name ?? Auth::user()->name }}</p>
                         <p class="text-sm text-emerald-100 mt-2 leading-6">{{ $guide->bio }}</p>
@@ -90,7 +90,7 @@
                         <p class="text-sm font-bold text-gray-800 mb-3">التخصصات</p>
                         <div class="flex flex-wrap gap-2">
                             @foreach ($guide->specialization ?? [] as $specialty)
-                                <span class="px-3 py-1 rounded-lg bg-[#E8F1ED] text-[#2D5041] text-xs font-bold">{{ $specialty }}</span>
+                                <span class="px-3 py-1 rounded-lg bg-[#EEF4F0] text-[#3F6653] text-xs font-bold">{{ $specialty }}</span>
                             @endforeach
                         </div>
                         @if ($guide->cetification)
@@ -130,7 +130,7 @@
                                 <input type="text" name="cetification" value="{{ $guide->cetification }}"
                                        class="w-full rounded-xl border-gray-200 text-sm">
                             </div>
-                            <button type="submit" class="w-full rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">
+                            <button type="submit" class="w-full rounded-xl bg-[#9B7448] px-4 py-2.5 text-sm font-bold text-white">
                                 حفظ بيانات المرشد
                             </button>
                         </form>
@@ -165,7 +165,7 @@
                                        class="w-full rounded-xl border-gray-200 text-sm">
                             </div>
                             <input type="hidden" name="status" value="Available">
-                            <button type="submit" class="w-full rounded-xl bg-[#A94B2B] px-4 py-2.5 text-sm font-bold text-white">
+                            <button type="submit" class="w-full rounded-xl bg-[#9B7448] px-4 py-2.5 text-sm font-bold text-white">
                                 إنشاء ملف المرشد
                             </button>
                         </form>

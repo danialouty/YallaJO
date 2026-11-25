@@ -1,4 +1,4 @@
-<div id="yallajo-chatbot" data-chatbot-endpoint="{{ route('chatbot.chat') }}" dir="rtl" class="fixed {{ request()->routeIs('adventures.create', 'adventures.edit') ? 'chatbot-at-top top-5' : 'bottom-5' }} left-5 z-[70] sm:left-6">
+<div id="yallajo-chatbot" data-chatbot-endpoint="{{ route('chatbot.chat') }}" dir="rtl" class="landing-scroll-entry fixed {{ request()->routeIs('adventures.create', 'adventures.edit') ? 'chatbot-at-top top-5' : 'bottom-5' }} left-5 z-[70] sm:left-6">
     <section id="chatbot-panel"
              class="chatbot-panel hidden"
              aria-label="مساعد يلا جو الذكي"

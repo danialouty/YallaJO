@@ -22,7 +22,7 @@
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">
                         المغامرة
                         <select name="adventure_id" required
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand">
                             <option value="">اختر المغامرة</option>
                             @foreach ($adventures as $adventure)
                                 <option value="{{ $adventure->id }}" @selected((string) old('adventure_id') === (string) $adventure->id)>{{ $adventure->title }}</option>
@@ -31,7 +31,7 @@
                     </label>
                     <label class="text-sm font-bold text-slate-700">الدليل
                         <select
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700"
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand"
                             id="guide_id" name="guide_id" required>
                             <option value="">اختر الدليل</option>
                             @foreach ($guides as $guide)
@@ -43,20 +43,20 @@
                     </label>
                     <label class="text-sm font-bold text-slate-700">يبدأ في
                         <input type="datetime-local" name="starts_at" value="{{ old('starts_at') }}" required
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand">
                     </label>
                     <label class="text-sm font-bold text-slate-700">ينتهي في
                         <input type="datetime-local" name="ends_at" value="{{ old('ends_at') }}" required
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand">
                     </label>
                     <label class="text-sm font-bold text-slate-700">السعة
                         <input type="number" name="capacity" value="{{ old('capacity') }}" min="1" required
-                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-emerald-700 focus:ring-emerald-700">
+                            class="mt-1 w-full rounded-lg border-slate-300 text-sm focus:border-brand focus:ring-brand">
                     </label>
 
                     <div class="flex flex-wrap gap-3 sm:col-span-2">
                         <button type="submit"
-                            class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">حفظ
+                            class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-dark">حفظ
                             ومتابعة</button>
                         <a href="{{ route('adventure-schedules.index') }}"
                             class="rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200">إلغاء</a>
@@ -137,7 +137,7 @@
 
                 <div class="mt-5 flex flex-wrap gap-3">
                     <button type="submit"
-                        class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800">حفظ
+                        class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-dark">حفظ
                         الأيام</button>
                     <a href="{{ route('adventure-schedules.show', $schedule) }}"
                         class="rounded-lg bg-slate-100 px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200">إنهاء
@@ -155,7 +155,7 @@
 
             generateButton.addEventListener('click', async () => {
                 generateButton.disabled = true;
-                aiStatus.textContent = 'يتم إعداد اقتراح البرنامج عبر Ollama المحلي...';
+                aiStatus.textContent = 'يتم إعداد اقتراح البرنامج بالذكاء الاصطناعي...';
 
                 try {
                     const response = await fetch(generateButton.dataset.endpoint, {
@@ -170,7 +170,7 @@
 
                     const rows = [...document.querySelectorAll('#day-rows .day-row')];
                     if (!Array.isArray(result.days) || result.days.length !== rows.length) {
-                        throw new Error('أعاد Ollama عددًا غير متوقع من الأيام.');
+                        throw new Error('تعذر إعداد عدد الأيام المتوقع.');
                     }
 
                     rows.forEach((row, index) => {

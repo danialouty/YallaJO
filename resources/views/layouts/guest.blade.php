@@ -27,6 +27,18 @@
                 <span class="block mt-2 text-xs text-emerald-200">منصة المغامرات والسياحة البيئية في الأردن</span>
             </div>
 
+            @if (request()->routeIs('register'))
+                <div class="relative -mx-8 my-2 hidden min-h-52 flex-1 overflow-hidden lg:-mx-12 lg:my-1 lg:block" aria-hidden="true">
+                    <img
+                        src="https://www.sherazadetravel.com/images/sites/petra/petra-gal05.jpg"
+                        alt=""
+                        class="absolute inset-0 size-full object-cover"
+                        loading="lazy"
+                    >
+                    <div class="absolute inset-0 bg-[linear-gradient(to_bottom,#2D5041_0%,transparent_28%,transparent_72%,#2D5041_100%)]"></div>
+                </div>
+            @endif
+
             <div class="my-10 lg:my-0 space-y-5">
                 <span class="inline-block px-3 py-1 bg-white/10 rounded-full text-xs font-semibold text-emerald-100">
                     بوابتك لتجارب الطبيعة في الأردن

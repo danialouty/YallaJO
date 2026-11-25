@@ -3,7 +3,7 @@
         <section class="rounded-2xl bg-white p-5 shadow-sm sm:p-8">
             <header class="mb-6 flex flex-wrap items-center justify-between gap-3">
                 <h1 class="text-2xl font-black text-slate-900">تعديل المغامرة</h1>
-                <a class="text-sm font-bold text-orange-700 hover:text-orange-900" href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
+                <a class="text-sm font-bold text-brand hover:text-brand-dark" href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
             </header>
             @if (session('success'))
                 <div class="mb-5 rounded-lg bg-emerald-100 p-3 text-sm text-emerald-900" role="status">{{ session('success') }}</div>
@@ -48,7 +48,7 @@
                     <label class="text-sm font-bold text-slate-700 sm:col-span-2">المتطلبات<textarea class="mt-1 w-full rounded-lg border-slate-300 text-sm" id="requirements" name="requirements" rows="3" required>{{ old('requirements', $adventure->requirements) }}</textarea></label>
                 </div>
                 <div class="mt-6 flex flex-wrap gap-3">
-                    <button class="rounded-lg bg-orange-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-orange-800" type="submit">حفظ التعديلات</button>
+                    <button class="rounded-lg bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-dark" type="submit">حفظ التعديلات</button>
                     <a class="rounded-lg bg-slate-100 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-200" href="{{ route('adventures.index') }}">إلغاء</a>
                 </div>
             </form>
@@ -64,7 +64,7 @@
                         <input type="hidden" name="_adventure_id" value="{{ $adventure->id }}">
                         <img src="{{ asset('images/' . $image->image_path) }}" alt="{{ $adventure->title }}" class="h-16 w-16 rounded-lg object-cover">
                         <label class="min-w-0 flex-1 text-xs font-bold">استبدال الصورة<input class="mt-1 block w-full text-xs" type="file" name="image_path" accept="image/jpeg,image/png,image/webp" required></label>
-                        <button class="rounded-lg bg-orange-700 px-3 py-2 text-xs font-bold text-white hover:bg-orange-800" type="submit">تحديث</button>
+                        <button class="rounded-lg bg-brand px-3 py-2 text-xs font-bold text-white hover:bg-brand-dark" type="submit">تحديث</button>
                     </form>
                 @empty
                     <p class="text-sm text-slate-500">لا توجد صور لهذه المغامرة بعد.</p>
@@ -76,7 +76,7 @@
                 <input type="hidden" name="_form_type" value="edit">
                 <input type="hidden" name="_adventure_id" value="{{ $adventure->id }}">
                 <label class="text-sm font-bold">إضافة صور<input class="mt-1 block w-full rounded-lg border border-slate-300 p-2 text-sm" id="image_files" type="file" name="image_files[]" accept="image/jpeg,image/png,image/webp" multiple required></label>
-                <button class="rounded-lg bg-orange-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-orange-800" type="submit">رفع الصور</button>
+                <button class="rounded-lg bg-brand px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-dark" type="submit">رفع الصور</button>
             </form>
         </section>
     </main>

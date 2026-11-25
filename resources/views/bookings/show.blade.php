@@ -10,7 +10,7 @@
 
 @section('dashboard-header-actions')
     <a href="{{ route('bookings.index') }}"
-       class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-[#2D5041] shadow-sm transition hover:bg-gray-50">
+       class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-[#3F6653] shadow-sm transition hover:bg-gray-50">
         <span>&rarr; العودة إلى حجوزاتي</span>
     </a>
 @endsection
@@ -39,7 +39,7 @@
 
         <!-- بطاقة تفاصيل الحجز -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-            <div class="bg-[#2D5041] text-white p-6">
+            <div class="bg-[#3F6653] text-white p-6">
                 <p class="text-xs text-emerald-200 mb-1">رقم المرجع: #{{ $item->id }}</p>
                 <h2 class="text-2xl font-extrabold">{{ $item->adventure->title ?? 'مغامرة #' . $item->adventure_id }}</h2>
             </div>
@@ -57,9 +57,9 @@
                         <span class="text-lg font-extrabold text-gray-900 mt-1 block">{{ number_format($item->unit_price, 2) }} د.أ</span>
                     </div>
 
-                    <div class="p-4 bg-[#E8F1ED] rounded-xl border border-emerald-200">
-                        <span class="text-xs text-[#2D5041] font-bold block">المبلغ الإجمالي</span>
-                        <span class="text-xl font-extrabold text-[#2D5041] mt-1 block">{{ number_format($item->total_amount, 2) }} د.أ</span>
+                    <div class="p-4 bg-[#EEF4F0] rounded-xl border border-emerald-200">
+                        <span class="text-xs text-[#3F6653] font-bold block">المبلغ الإجمالي</span>
+                        <span class="text-xl font-extrabold text-[#3F6653] mt-1 block">{{ number_format($item->total_amount, 2) }} د.أ</span>
                     </div>
                 </div>
 

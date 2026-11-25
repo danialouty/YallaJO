@@ -1,4 +1,4 @@
-<section class="bg-surface py-10 md:py-12" aria-labelledby="featured-adventures-heading">
+<section class="landing-reveal bg-surface py-10 md:py-12" aria-labelledby="featured-adventures-heading">
     <div class="mx-auto max-w-[1360px] px-4 sm:px-6 lg:px-12">
         <div class="mb-7 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div class="max-w-2xl">
@@ -10,20 +10,23 @@
                     اكتشف مجموعة من التجارب المستوحاة من طبيعة الأردن وثقافاته المحلية.
                 </p>
             </div>
-            <a href="{{ route('adventuresAll.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark">
+            <a href="{{ route('adventuresAll.index') }}" class="landing-action inline-flex min-h-11 items-center justify-center rounded-control bg-brand px-4 text-sm font-bold text-white transition hover:bg-brand-dark">
                 عرض كل المغامرات
             </a>
         </div>
 
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @forelse($adventures as $adventure)
+                @php
+                    $guideName = $adventure->schedules->first()?->guide?->activityOrganizer?->user?->name ?? 'لم يُحدد المرشد';
+                @endphp
                 <x-adventure.card :adventure="[
                     'id' => $adventure->id,
                     'title' => $adventure->title,
                     'category' => $adventure->category,
                     'schedule' => $adventure->duration_hours . ' ساعات · ' . $adventure->difficulty_level,
-                    'organizer' => 'منظم رحلة معتمد',
-                    'organizer_initial' => 'م',
+                    'organizer' => $guideName,
+                    'organizer_initial' => Illuminate\Support\Str::substr($guideName, 0, 1),
                     'rating' => '4.9',
                     'reviews_count' => 24,
                     'price' => number_format($adventure->price, 2),

@@ -2,8 +2,8 @@
     <main class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         <article class="rounded-2xl bg-white p-5 shadow-sm sm:p-8">
             <nav class="mb-6 flex flex-wrap gap-4 text-sm font-bold">
-                <a class="text-orange-700 hover:text-orange-900" href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
-                <a class="text-orange-700 hover:text-orange-900" href="{{ route('adventures.edit', $adventure) }}">تعديل المغامرة</a>
+                <a class="text-brand hover:text-brand-dark" href="{{ route('adventures.index') }}">العودة إلى المغامرات</a>
+                <a class="text-brand hover:text-brand-dark" href="{{ route('adventures.edit', $adventure) }}">تعديل المغامرة</a>
             </nav>
             <h1 class="text-3xl font-black text-slate-900">{{ $adventure->title }}</h1>
             <p class="mt-3 leading-7 text-slate-600">{{ $adventure->description }}</p>
