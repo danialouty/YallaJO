@@ -80,7 +80,7 @@
                     <article class="adventure-card reveal-card group flex h-full flex-col overflow-hidden rounded-card border border-outline/30 bg-surface shadow-card">
                         <a href="{{ route('adventures.profile', $adventure) }}" class="relative block aspect-[4/3] overflow-hidden bg-canvas">
                             <img
-                                src="{{ $adventure->images->isNotEmpty() ? asset('images/' . $adventure->images->first()->image_path) : 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900' }}"
+                                src="{{ $adventure->images->isNotEmpty() ? $adventure->images->first()->url : 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900' }}"
                                 alt="{{ $adventure->title }}"
                                 loading="lazy"
                                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">

@@ -33,7 +33,7 @@
                     'availability' => $adventure->capacity . ' مقاعد متاحة',
                     'image_alt' => $adventure->title,
                     'image' => $adventure->images->isNotEmpty()
-                        ? asset('images/' . $adventure->images->first()->image_path)
+                        ? $adventure->images->first()->url
                         : 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=900',
                 ]" />
             @empty

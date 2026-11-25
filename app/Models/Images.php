@@ -14,6 +14,20 @@ class Images extends Model
         'image_path',
     ];
 
+    public function getUrlAttribute(): string
+    {
+        $path = trim((string) $this->image_path);
+
+        // Accept values copied from Markdown links as well as plain URLs.
+        if (preg_match('/^\[([^\]]+)\]\((https?:\/\/[^)]+)\)$/i', $path, $matches)) {
+            $path = $matches[2];
+        }
+
+        return preg_match('/^https?:\/\//i', $path)
+            ? $path
+            : asset('images/' . ltrim($path, '/'));
+    }
+
     public function adventure(): BelongsTo{
         return $this->belongsTo(Adventure::class);
     }

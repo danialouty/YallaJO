@@ -33,7 +33,7 @@
                                 <div class="flex items-center gap-3">
                                     @php($adventureImage = $adventure->images->first())
                                     @if ($adventureImage && $adventureImage->image_path)
-                                        <img src="{{ asset('images/' . $adventureImage->image_path) }}" alt="{{ $adventure->title }}" class="h-14 w-14 rounded-xl object-cover">
+                                        <img src="{{ $adventureImage->url }}" alt="{{ $adventure->title }}" class="h-14 w-14 rounded-xl object-cover">
                                     @else
                                         <div class="grid h-14 w-14 place-items-center rounded-xl bg-slate-100 text-xl text-slate-400" aria-label="لا توجد صورة">⛰</div>
                                     @endif
